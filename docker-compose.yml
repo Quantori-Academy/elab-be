@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: lims_be_dev_app
+    build:
+      context: .
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      NODE_ENV: development
+    command: npm run start:dev
