@@ -1,5 +1,5 @@
-import { STATUS } from "./status.entity";
+import { STATUS } from './status.entity';
 
 export type BffHealthCheck = {
-    status: STATUS,
+  status: STATUS;
 };

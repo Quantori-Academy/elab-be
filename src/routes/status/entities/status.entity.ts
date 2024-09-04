@@ -1,3 +1,3 @@
 export enum STATUS {
-    OK = "Ok",
-};
+  OK = 'Ok',
+}
