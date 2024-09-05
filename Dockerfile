@@ -15,7 +15,7 @@ COPY . .
 EXPOSE 3000
 
 # Development environment command
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:docker:dev"]
 
 ##################################
 
@@ -45,6 +45,8 @@ WORKDIR /usr/src/app
 # Copy only the necessary files from the build stage
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/prisma ./prisma
+
 COPY package*.json ./
 
 # Expose the port
