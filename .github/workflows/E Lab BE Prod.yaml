@@ -70,6 +70,7 @@ jobs:
             SSH_USER: ${{secrets.SSH_USER}}
             VM_IP: ${{vars.VM_IP}}
           run: |
+            cat ./elab-be/.env
             echo "${SSH_KEY}" >> /tmp/ssh_key
             chmod 400 /tmp/ssh_key
             scp -o KexAlgorithms=ecdh-sha2-nistp521 -o 'StrictHostKeyChecking no' -i /tmp/ssh_key -r ./elab-be ${SSH_USER}@$VM_IP:~
