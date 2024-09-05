@@ -53,4 +53,4 @@ COPY package*.json ./
 EXPOSE 3000
 
 # Production environment command
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:docker:prod"]

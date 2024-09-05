@@ -1,4 +1,4 @@
-name: E-Lab BE Build GHA
+name: E Lab BE PR
 
 on:
   push:
