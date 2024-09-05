@@ -4,7 +4,7 @@ on:
   push:
     branches:    
       - '*/*'       # matches every branch containing a single '/'
-      - '!master'   # excludes master
+      - '!main'   # excludes master
 
 env:
   HUSKY: 0
