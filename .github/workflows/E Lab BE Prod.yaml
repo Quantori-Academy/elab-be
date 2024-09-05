@@ -1,4 +1,4 @@
-name: E-Lab BE Build GHA
+name: E Lab BE Prod
 
 on: workflow_dispatch
 
@@ -84,5 +84,5 @@ jobs:
             script: |
               cd ~/elab-be
               sudo docker compose stop
-              sudo docker compose up -d --build -f docker-compose.prod.yml
+              sudo docker compose -f docker-compose.prod.yml up -d --build
               rm -rf ./.git
