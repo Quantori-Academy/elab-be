@@ -32,6 +32,8 @@ RUN npm ci --production
 # Copy the application code
 COPY . .
 
+RUN npm i -g @nestjs/cli
+
 # Build the application
 RUN npm run build
 
@@ -46,6 +48,7 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/prisma ./prisma
+COPY --from=build /usr/src/app/package.json ./package.json
 
 COPY package*.json ./
 
