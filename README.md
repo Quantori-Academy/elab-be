@@ -1,73 +1,108 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# E-LAB Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is the backend service for the E-LAB project, built with Nest.js and TypeScript, and utilizing Docker for containerization and Prisma for database management.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Table of Contents
 
-## Description
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [Running Tests](#running-tests)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requirements
+
+- Node.js LTS (At least 20+)
+- Docker
+- Docker Compose
+- Prisma CLI
 
 ## Installation
 
-```bash
-$ npm install
-```
+1. **Clone the repository:**
 
-## Running the app
+   ```bash
+   git clone https://github.com/Quantori-Academy/elab-be.git
+   ```
 
-```bash
-# development
-$ npm run start
+2. **Navigate to the project folder:**
 
-# watch mode
-$ npm run start:dev
+   ```bash
+   cd elab-be
+   ```
 
-# production mode
-$ npm run start:prod
-```
+3. **Install the dependencies:**
 
-## Test
+   ```bash
+   npm install
+   ```
 
-```bash
-# unit tests
-$ npm run test
+4. **Set up the environment variables:**
 
-# e2e tests
-$ npm run test:e2e
+   Create a `.env` file based on `.env.example` and provide the necessary configurations (database, ports, etc.). You can use your own values for local container with your own DB, or ask Azat for creds of DEV DB.
 
-# test coverage
-$ npm run test:cov
-```
+## Running the Application
 
-## Support
+1. **Using Docker** (Recommended):
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+   Use Docker to run the application in a containerized environment:
 
-## Stay in touch
+   ```bash
+   docker-compose up --build
+   ```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+2. **Running Locally:**
 
-## License
+   Alternatively you can run the application locally:
 
-Nest is [MIT licensed](LICENSE).
+   ```bash
+   npm run start:dev
+   ```
+
+   Don't forget to run Docker container with DB. 
+
+   *If you have issues with Docker you should run DB locally and populate `.env` file with corresponding values.*
+
+## Running Tests
+
+- **Unit Tests:**
+
+  ```bash
+  npm run test
+  ```
+---
+
+## Layered Architecture and Best Practices
+
+### Layered Architecture
+
+The E-LAB backend follows a layered architecture for scalability and maintainability:
+
+1. **Controller Layer**: Manages HTTP requests and responses.
+2. **Service Layers**:
+   2.1 **Module Service**: Encapsulates business logic.
+   2.2 ***ORM Service**: Encapsulates database interactions.
+3. **DTOs and Validators**: Ensure data integrity across layers.
+
+### Best Practices
+
+- **Modular Architecture**: Organize code into feature-based modules.
+- **Dependency Injection**: Use DI for managing services.
+- **Validation**: Implement pipes and DTOs for data validation.
+- **Exception Handling**: Use global filters for error management.
+- **Security**: Protect routes with authentication and secure headers.
+- **Testing**: Write unit using Jest.
+
+---
+
+# Git flow
+
+Use the following Git flow for the development 
+
+https://nvie.com/posts/a-successful-git-branching-model/
+
+In a nutshell, when you would like to start your work do the following:
+
+- Create feature branch 
+- Complete your work
+- Push feature branch (you can squash it if you would like to) and open PR to `develop`
+- When PR is approved by at least mentor and 2 students, merge it to `develop`
