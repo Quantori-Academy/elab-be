@@ -7,7 +7,7 @@ import { UserRepository } from './user.repository';
 export class UserService implements IUserService {
   constructor(private userRepository: UserRepository) {}
 
-  getUser(id: string): Promise<IUser | undefined> {
+  getUser(id: number): Promise<IUser | undefined> {
     return this.userRepository.get(id);
   }
 

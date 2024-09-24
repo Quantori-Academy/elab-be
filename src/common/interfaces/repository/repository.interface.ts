@@ -1,4 +1,4 @@
 export interface IRepository<T> {
-  get(id: string): Promise<T | undefined>;
+  get(id: number): Promise<T | undefined>;
   save(entity: T): Promise<void>;
 }

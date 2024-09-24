@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { IRepository } from 'src/common/interfaces/repository/repository.interface';
 import { IUser } from './interfaces/userEntity.interface';
+import { UserRoles } from './enums/roles';
 
 @Injectable()
 export class UserRepository implements IRepository<IUser> {
-  async get(id: string): Promise<IUser | undefined> {
+  async get(id: number): Promise<IUser | undefined> {
     const user: IUser = {
-      id: 'asd',
+      id: 123,
       email: 'mockemail',
       password: 'password',
+      role: UserRoles.admin,
     };
-    const a = id;
-    console.log(a);
+    console.log(id);
     return user;
   }
 
