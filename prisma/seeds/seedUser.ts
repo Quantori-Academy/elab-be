@@ -1,13 +1,8 @@
 import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { Users } from 'src/interfaces/user';
 
 const prisma = new PrismaClient();
-
-interface Users {
-  email: string;
-  password: string;
-  role: Role;
-}
 
 export async function UserSeed() {
   const users: Users[] = [
