@@ -1,3 +1,3 @@
 export interface IAuthService {
-  login(id: string): Promise<void>;
+  login(id: number): Promise<any>;
 }

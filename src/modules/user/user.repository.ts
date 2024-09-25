@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IRepository } from 'src/common/interfaces/repository/repository.interface';
+import { IRepository } from 'src/common/interfaces/repository.interface';
 import { IUser } from './interfaces/userEntity.interface';
 import { UserRoles } from './enums/roles';
 
