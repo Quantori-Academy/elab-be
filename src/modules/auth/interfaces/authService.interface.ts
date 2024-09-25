@@ -1,3 +1,5 @@
+import { IUser } from 'src/modules/user/interfaces/userEntity.interface';
+
 export interface IAuthService {
-  login(id: number): Promise<any>;
+  login(user: IUser): Promise<any>;
 }

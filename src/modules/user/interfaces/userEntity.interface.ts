@@ -1,8 +1,10 @@
-import { UserRoles } from '../enums/roles';
+import { Role } from '@prisma/client';
 
 export interface IUser {
-  id: number;
+  id?: number;
   email: string;
   password: string;
-  role: UserRoles;
+  role: Role;
 }
+
+export type UserPayload = Omit<IUser, 'password'>;

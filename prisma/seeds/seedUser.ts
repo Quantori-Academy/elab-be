@@ -1,11 +1,11 @@
 import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { Users } from 'src/interfaces/user';
+import { IUser } from 'src/modules/user/interfaces/userEntity.interface';
 
 const prisma = new PrismaClient();
 
 export async function UserSeed() {
-  const users: Users[] = [
+  const users: IUser[] = [
     { email: 'admin@elab.com', password: 'Admin_123', role: Role.Admin },
     { email: 'nurai@elab.com', password: 'Nurai_456', role: Role.Admin },
     {

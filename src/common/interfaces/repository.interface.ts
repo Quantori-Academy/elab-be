@@ -1,4 +1,4 @@
 export interface IRepository<T> {
-  get(id: number): Promise<T | undefined>;
+  findById(id: number): Promise<T | null>;
   save(entity: T): Promise<void>;
 }
