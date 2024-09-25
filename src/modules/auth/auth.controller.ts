@@ -10,8 +10,10 @@ import {
   LoginResponseDto,
 } from './dto/login.dto';
 
-@ApiTags('auth')
-@Controller('auth')
+const ROUTE = 'auth';
+
+@ApiTags(ROUTE)
+@Controller(ROUTE)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
