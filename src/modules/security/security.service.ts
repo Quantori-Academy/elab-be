@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { AccessToken, RefreshToken } from './interfaces/token.interface';
+import { ISecurityService } from './interfaces/securityService.interface';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class SecurityService {
+export class SecurityService implements ISecurityService {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
