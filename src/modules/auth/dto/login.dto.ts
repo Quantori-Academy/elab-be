@@ -1,4 +1,3 @@
-import { IsEmail, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
@@ -6,18 +5,16 @@ export class LoginDto {
     description: 'The email of the user',
     example: 'admin@elab.com',
   })
-  @IsEmail()
   email: string;
 
   @ApiProperty({
     description: 'The password of the user',
     example: 'Admin_123',
   })
-  @IsString()
   password: string;
 }
 
-export class LoginResponseDto {
+export class LoginSuccessResponseDto {
   @ApiProperty({
     description: 'The access token returned after successful login',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
@@ -25,7 +22,10 @@ export class LoginResponseDto {
   access_token: string;
 
   @ApiProperty({
-    example: 'Inside cookie ',
+    description:
+      'The refresh token returned after successful login *(inside cookie)',
+    example:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...(located inside cookie not body)',
   })
   refresh_token: string;
 }
@@ -33,13 +33,19 @@ export class LoginResponseDto {
 export class LoginErrorResponseDto {
   @ApiProperty({
     description: 'A descriptive message about the error',
-    example: 'Invalid credentials. or Email and password are required',
+    example: 'Invalid credentials/Email and password are required',
   })
   message: string;
 
-  @ApiProperty({ description: 'The error type', example: 'Unauthorized' })
+  @ApiProperty({
+    description: 'The error type',
+    example: 'Unauthorized',
+  })
   error: string;
 
-  @ApiProperty({ description: 'HTTP status code of the error', example: 401 })
+  @ApiProperty({
+    description: 'HTTP status code of the error',
+    example: 401,
+  })
   statusCode: number;
 }

@@ -7,7 +7,7 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   LoginDto,
   LoginErrorResponseDto,
-  LoginResponseDto,
+  LoginSuccessResponseDto,
 } from './dto/login.dto';
 
 const ROUTE = 'auth';
@@ -21,7 +21,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Created',
-    type: LoginResponseDto,
+    type: LoginSuccessResponseDto,
   })
   @ApiResponse({
     status: 401,
