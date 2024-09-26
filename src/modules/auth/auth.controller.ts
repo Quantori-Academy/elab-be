@@ -17,7 +17,6 @@ const ROUTE = 'auth';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('login')
   @ApiBody({ type: LoginDto })
   @ApiResponse({
     status: 200,
@@ -29,6 +28,7 @@ export class AuthController {
     description: 'Unauthorized',
     type: LoginErrorResponseDto,
   })
+  @Post('login')
   @UseGuards(LoginGuard)
   async login(@Req() req: Request, @Res() res: Response) {
     const tokens: Tokens = await this.authService.login(req.body.user);
