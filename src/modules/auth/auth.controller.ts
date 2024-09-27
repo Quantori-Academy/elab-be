@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginGuard } from 'src/modules/auth/guards/login.guard';
 import { Request, Response } from 'express';
 import { Tokens } from '../security/interfaces/token.interface';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
@@ -20,16 +20,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiBody({ type: LoginDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Created',
-    type: LoginSuccessResponseDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-    type: LoginErrorResponseDto,
-  })
+  @ApiResponse({ status: 200, type: LoginSuccessResponseDto })
+  @ApiResponse({ status: 401, type: LoginErrorResponseDto })
   @UseGuards(LoginGuard)
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
@@ -38,16 +30,9 @@ export class AuthController {
     return res.json({ access_token: tokens.access_token });
   }
 
-  @ApiResponse({
-    status: 200,
-    description: 'Ok',
-    type: RefreshTokenSuccessResponseDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-    type: RefreshTokenErrorResponseDto,
-  })
+  @ApiCookieAuth()
+  @ApiResponse({ status: 200, type: RefreshTokenSuccessResponseDto })
+  @ApiResponse({ status: 401, type: RefreshTokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')
   async refreshAccessToken(@Req() req: Request) {
