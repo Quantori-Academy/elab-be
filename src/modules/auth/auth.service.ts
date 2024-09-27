@@ -8,11 +8,10 @@ import { SecurityService } from '../security/security.service';
 export class AuthService implements IAuthService {
   constructor(private securityService: SecurityService) {}
 
-  async login(user: UserPayload): Promise<Tokens> {
-    const userPayload: UserPayload = user;
+  async login(payload: UserPayload): Promise<Tokens> {
     const tokens: Tokens = {
-      access_token: await this.securityService.generateAccessToken(userPayload),
-      refresh_token: await this.securityService.generateRefreshToken(userPayload),
+      access_token: await this.securityService.generateAccessToken(payload),
+      refresh_token: await this.securityService.generateRefreshToken(payload),
     };
     return tokens;
   }
