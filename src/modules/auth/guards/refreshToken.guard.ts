@@ -11,7 +11,7 @@ export class RefreshTokenGuard implements CanActivate {
 
     const refreshToken = request.cookies?.refresh_token;
     if (!refreshToken) {
-      throw new UnauthorizedException('refresh token not found.');
+      throw new UnauthorizedException('Refresh token not found.');
     }
     try {
       const payload: UserPayload = await this.securityService.verifyRefreshToken(refreshToken);

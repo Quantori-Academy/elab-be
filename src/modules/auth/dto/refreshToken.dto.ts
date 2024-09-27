@@ -9,7 +9,7 @@ export class RefreshTokenSuccessResponseDto {
 
 export class RefreshTokenErrorResponseDto {
   @ApiProperty({
-    example: 'Invalid credentials/Email and password are required',
+    example: 'Refresh token not found, Invalid token , Expired Token',
   })
   message: string;
 
