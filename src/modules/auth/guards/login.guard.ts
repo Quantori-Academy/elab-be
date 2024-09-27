@@ -19,10 +19,10 @@ export class LoginGuard implements CanActivate {
       throw new UnauthorizedException('Invalid credentials.');
     }
 
-    const { password: omitPass, ...user } = validUser;
+    const { password: omitPass, ...userPayload } = validUser;
     void omitPass; // for lint (intentionally not using this variable)
 
-    request.body.user = user as UserPayload;
+    request.body.user = userPayload as UserPayload;
     return true;
   }
 }

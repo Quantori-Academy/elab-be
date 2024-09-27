@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginGuard } from 'src/common/guards/login.guard';
+import { LoginGuard } from 'src/modules/auth/guards/login.guard';
 import { Request, Response } from 'express';
 import { Tokens } from '../security/interfaces/token.interface';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
-import { Role } from '@prisma/client';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
+import { RefreshTokenGuard } from './guards/refreshToken.guard';
 
 const ROUTE = 'auth';
 
@@ -35,15 +35,11 @@ export class AuthController {
   }
 
   @Get('refreshAccessToken')
+  @UseGuards(RefreshTokenGuard)
   async refreshAccessToken(@Req() req: Request) {
-    console.log(req);
-    const mockUser: UserPayload = {
-      id: 1,
-      email: 'email',
-      role: Role.Admin,
-    };
+    const user: UserPayload = (req as any).user as UserPayload;
     return {
-      access_token: await this.authService.refreshAccessToken(mockUser),
+      access_token: await this.authService.refreshAccessToken(user),
     };
   }
 }
