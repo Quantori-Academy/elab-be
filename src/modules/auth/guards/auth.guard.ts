@@ -4,16 +4,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { SecurityService } from 'src/modules/security/security.service';
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService,
-  ) {}
+  constructor(private securityService: SecurityService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -22,9 +18,8 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token not provided or invalid format!');
     }
     try {
-      const payload: UserPayload = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
-      });
+      const payload: UserPayload =
+        await this.securityService.verifyToken(token);
       request.user = payload;
     } catch (error) {
       throw new UnauthorizedException('Token verification failed!');
