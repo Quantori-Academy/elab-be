@@ -7,6 +7,10 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
+import {
+  RefreshTokenErrorResponseDto,
+  RefreshTokenSuccessResponseDto,
+} from './dto/refreshToken.dto';
 
 const ROUTE = 'auth';
 
@@ -26,16 +30,26 @@ export class AuthController {
     description: 'Unauthorized',
     type: LoginErrorResponseDto,
   })
-  @Post('login')
   @UseGuards(LoginGuard)
+  @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
     const tokens: Tokens = await this.authService.login(req.body.user);
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
     return res.json({ access_token: tokens.access_token });
   }
 
-  @Get('refreshAccessToken')
+  @ApiResponse({
+    status: 200,
+    description: 'Ok',
+    type: RefreshTokenSuccessResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+    type: RefreshTokenErrorResponseDto,
+  })
   @UseGuards(RefreshTokenGuard)
+  @Get('refreshAccessToken')
   async refreshAccessToken(@Req() req: Request) {
     const user: UserPayload = (req as any).user as UserPayload;
     return {

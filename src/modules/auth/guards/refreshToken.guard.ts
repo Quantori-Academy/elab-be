@@ -23,7 +23,7 @@ export class RefreshTokenGuard implements CanActivate {
 
       request.user = userPayload;
     } catch (error) {
-      throw new UnauthorizedException(error.mssage);
+      throw new UnauthorizedException('Invalid/Expired Token');
     }
     return true;
   }
