@@ -25,7 +25,8 @@ export class AuthController {
   @UseGuards(LoginGuard)
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
-    const tokens: Tokens = await this.authService.login(req.body.user);
+    const user: UserPayload = (req as any).user as UserPayload;
+    const tokens: Tokens = await this.authService.login(user);
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
     return res.json({ access_token: tokens.access_token });
   }

@@ -22,7 +22,7 @@ export class LoginGuard implements CanActivate {
     const { password: omitPass, ...userPayload } = validUser;
     void omitPass; // for lint (intentionally not using this variable)
 
-    request.body.user = userPayload as UserPayload;
+    request.user = userPayload as UserPayload;
     return true;
   }
 }
