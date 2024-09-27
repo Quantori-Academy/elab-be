@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IAuthService } from './interfaces/authService.interface';
-import { IUser, UserPayload } from '../user/interfaces/userEntity.interface';
+import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { AccessToken, Tokens } from '../security/interfaces/token.interface';
 import { SecurityService } from '../security/security.service';
 
@@ -8,7 +8,7 @@ import { SecurityService } from '../security/security.service';
 export class AuthService implements IAuthService {
   constructor(private securityService: SecurityService) {}
 
-  async login(user: IUser): Promise<Tokens> {
+  async login(user: UserPayload): Promise<Tokens> {
     const userPayload: UserPayload = user;
     const tokens: Tokens = {
       access_token: await this.securityService.generateAccessToken(userPayload),
