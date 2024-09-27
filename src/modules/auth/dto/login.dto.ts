@@ -22,10 +22,8 @@ export class LoginSuccessResponseDto {
   access_token: string;
 
   @ApiProperty({
-    description:
-      'The refresh token returned after successful login *(inside cookie)',
-    example:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...(located inside cookie not body)',
+    description: 'The refresh token returned after successful login *(inside cookie)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...(located inside cookie not body)',
   })
   refresh_token: string;
 }
