@@ -19,8 +19,10 @@ export class UserRepository implements IRepository<IUser> {
     });
   }
 
-  async save(user: IUser): Promise<void> {
-    console.log(user);
-    // save logic
+  async update(userId: number, userData: Partial<IUser>): Promise<IUser> {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: userData,
+    });
   }
 }
