@@ -28,7 +28,7 @@ export class UserService implements IUserService {
     return null;
   }
 
-  async editRole(userId: number, role: Role): Promise<UserPayload> {
+  async editUserRole(userId: number, role: Role): Promise<UserPayload> {
     const user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
     user.role = role;

@@ -2,13 +2,13 @@ import { IsEnum } from 'class-validator';
 import { Role } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
-class EditRoleDto {
+class EditUserRoleDto {
   @ApiProperty({ example: 'Admin' })
   @IsEnum(Role)
   role: Role;
 }
 
-class EditRoleSuccessResponseDto {
+class EditUserRoleSuccessResponseDto {
   @ApiProperty({ example: 1 })
   id: number;
 
@@ -19,7 +19,7 @@ class EditRoleSuccessResponseDto {
   role: Role;
 }
 
-class EditRoleErrorResponseDto {
+class EditUserRoleErrorResponseDto {
   @ApiProperty({ example: 'User not found' })
   message: string;
 
@@ -30,4 +30,4 @@ class EditRoleErrorResponseDto {
   statusCode: number;
 }
 
-export { EditRoleDto, EditRoleSuccessResponseDto, EditRoleErrorResponseDto };
+export { EditUserRoleDto, EditUserRoleSuccessResponseDto, EditUserRoleErrorResponseDto };
