@@ -3,44 +3,30 @@ import { Role } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 class EditRoleDto {
-  @ApiProperty({
-    example: 'Admin',
-  })
+  @ApiProperty({ example: 'Admin' })
   @IsEnum(Role)
   role: Role;
 }
 
 class EditRoleSuccessResponseDto {
-  @ApiProperty({
-    example: 1,
-  })
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({
-    example: 'admin@elab.com',
-  })
+  @ApiProperty({ example: 'admin@elab.com' })
   email: string;
 
-  @ApiProperty({
-    example: 'Admin',
-  })
+  @ApiProperty({ example: 'Admin' })
   role: Role;
 }
 
 class EditRoleErrorResponseDto {
-  @ApiProperty({
-    example: 'User not found',
-  })
+  @ApiProperty({ example: 'User not found' })
   message: string;
 
-  @ApiProperty({
-    example: 'Not Found',
-  })
+  @ApiProperty({ example: 'Not Found' })
   error: string;
 
-  @ApiProperty({
-    example: 404,
-  })
+  @ApiProperty({ example: 404 })
   statusCode: number;
 }
 
