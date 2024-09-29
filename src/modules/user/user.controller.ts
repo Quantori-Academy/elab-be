@@ -1,13 +1,15 @@
 import { Body, Controller, Param, Patch, ValidationPipe } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ParseIntPipe } from 'src/common/pipes/parseInt.pipe';
+import { UserService } from './user.service';
+import { Role } from '@prisma/client';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import {
   EditRoleDto,
   EditRoleErrorResponseDto,
   EditRoleSuccessResponseDto,
 } from './dto/editRole.dto';
-import { ParseIntPipe } from 'src/common/pipes/parseInt.pipe';
-import { UserService } from './user.service';
-import { Role } from '@prisma/client';
+import { RoleGuardErrorDto } from 'src/common/dtos/role.dto';
 
 const ROUTE = 'users';
 
@@ -18,6 +20,8 @@ export class UserController {
 
   @ApiResponse({ status: 200, type: EditRoleSuccessResponseDto })
   @ApiResponse({ status: 401, type: EditRoleErrorResponseDto })
+  @ApiResponse({ status: 403, type: RoleGuardErrorDto })
+  @Roles(Role.Admin)
   @Patch(':id/role')
   async editRole(
     @Param('id', ParseIntPipe) userId: number,
