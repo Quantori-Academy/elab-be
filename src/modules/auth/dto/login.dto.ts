@@ -22,29 +22,23 @@ export class LoginSuccessResponseDto {
   access_token: string;
 
   @ApiProperty({
-    description:
-      'The refresh token returned after successful login *(inside cookie)',
-    example:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...(located inside cookie not body)',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...(located inside cookie not body)',
   })
   refresh_token: string;
 }
 
 export class LoginErrorResponseDto {
   @ApiProperty({
-    description: 'A descriptive message about the error',
     example: 'Invalid credentials/Email and password are required',
   })
   message: string;
 
   @ApiProperty({
-    description: 'The error type',
     example: 'Unauthorized',
   })
   error: string;
 
   @ApiProperty({
-    description: 'HTTP status code of the error',
     example: 401,
   })
   statusCode: number;

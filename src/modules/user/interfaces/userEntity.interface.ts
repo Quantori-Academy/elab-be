@@ -7,4 +7,7 @@ export interface IUser {
   role: Role;
 }
 
-export type UserPayload = Omit<IUser, 'password'>;
+export type UserPayload = Omit<IUser, 'password'> & {
+  iat?: number;
+  exp?: number;
+};

@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { StatusService } from '../services';
 import { BffHealthCheck } from '../entities';
 

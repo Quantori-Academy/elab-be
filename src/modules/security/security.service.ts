@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AccessToken, RefreshToken } from './interfaces/token.interface';
 import { ISecurityService } from './interfaces/securityService.interface';
 import * as bcrypt from 'bcrypt';
+import { UserPayload } from '../user/interfaces/userEntity.interface';
 
 @Injectable()
 export class SecurityService implements ISecurityService {
@@ -32,5 +33,12 @@ export class SecurityService implements ISecurityService {
 
   async compare(raw: any, hashed: any): Promise<boolean> {
     return await bcrypt.compare(raw, hashed);
+  }
+
+  async verifyRefreshToken(token: RefreshToken): Promise<UserPayload> {
+    const payload = await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+    return payload;
   }
 }
