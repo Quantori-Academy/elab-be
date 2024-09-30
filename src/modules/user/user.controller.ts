@@ -1,15 +1,18 @@
-import { Body, Controller, Param, Patch, ValidationPipe } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ParseIntPipe } from 'src/common/pipes/parseInt.pipe';
+import { Body, Controller, Param, Patch, UseGuards, ValidationPipe } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { RoleGuardErrorDto } from 'src/common/dtos/role.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import {
   EditUserRoleDto,
   EditUserRoleErrorResponseDto,
   EditUserRoleSuccessResponseDto,
 } from './dto/editRole.dto';
-import { RoleGuardErrorDto } from 'src/common/dtos/role.dto';
+import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'users';
 
@@ -18,13 +21,16 @@ const ROUTE = 'users';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, type: EditUserRoleSuccessResponseDto })
+  @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: 401, type: EditUserRoleErrorResponseDto })
   @ApiResponse({ status: 403, type: RoleGuardErrorDto })
   @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
   async editRole(
-    @Param('id', ParseIntPipe) userId: number,
+    @Param('id', ParseIdPipe) userId: number,
     @Body(ValidationPipe) body: EditUserRoleDto,
   ) {
     const role: Role = body.role;

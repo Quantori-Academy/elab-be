@@ -20,11 +20,11 @@ export class RefreshTokenGuard implements CanActivate {
       const { iat, exp, ...userPayload } = payload;
       void iat;
       void exp;
-
       request.user = userPayload as UserPayload;
+
+      return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid/Expired Token');
     }
-    return true;
   }
 }
