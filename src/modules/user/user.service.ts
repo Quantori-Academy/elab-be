@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { UserRepository } from './user.repository';
@@ -59,33 +59,20 @@ export class UserService implements IUserService {
     const token = await this.securityService.verifyResetToken(reset_token);
 
     if (!token) {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Token is invalid',
-      };
+      throw new NotFoundException('Token is invalid');
     }
 
     const user = await this.getUserById(token.id);
 
     if (!user) {
-      return {
-        statusCode: HttpStatus.NOT_FOUND,
-        message: 'User not found',
-      };
+      throw new NotFoundException('User not found');
     }
 
     if (newPassword !== confirmPassword) {
-      return {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Passwords do not match',
-      };
+      throw new BadRequestException('Passwords do not match');
     }
     user.password = await this.securityService.hash(newPassword, 10);
 
     await this.userRepository.save(user);
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Password has been successfully changed',
-    };
   }
 }

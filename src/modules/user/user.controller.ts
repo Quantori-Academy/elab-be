@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { UserPayload } from './interfaces/userEntity.interface';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 const ROUTE = 'user';
 
@@ -14,7 +15,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('change-password')
-  //@UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   async changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
     const user: UserPayload = (req as any).user as UserPayload;
     await this.userService.changePassword(
@@ -37,13 +38,16 @@ export class UserController {
 
   @Post('reset-password')
   async resetPassword(
-    @Query('reset-token') reset_token: string,
+    @Query('reset_token') reset_token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
-    return await this.userService.resetPassword(
+    await this.userService.resetPassword(
       reset_token,
       resetPasswordDto.newPassword,
       resetPasswordDto.confirmPassword,
     );
+    return {
+      message: 'The password reset successfully',
+    };
   }
 }
