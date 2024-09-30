@@ -1,11 +1,11 @@
 name: E Lab BE PR
 
 on:
+  workflow_dispatch:  
   push:
     branches:    
       - '*/*'       # matches every branch containing a single '/'
       - '!main'   # excludes master
-  workflow_dispatch:  # This line allows manual triggering
 
 env:
   HUSKY: 0
