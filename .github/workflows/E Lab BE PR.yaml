@@ -26,6 +26,7 @@ jobs:
               run: npm install
       
             - name: Run lint
+              run: npx eslint "{src,apps,libs,test}/**/*.ts" --fix
               run: npm run lint
       
             # - name: Run tests
