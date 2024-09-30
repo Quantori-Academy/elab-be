@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { UserPayload } from './interfaces/userEntity.interface';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 
 const ROUTE = 'user';
 
@@ -22,6 +23,14 @@ export class UserController {
     );
     return {
       message: 'The password is changed successfully',
+    };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this.userService.forgotPassword(forgotPasswordDto.email);
+    return {
+      message: 'The link is sent to your email. Please check it',
     };
   }
 }

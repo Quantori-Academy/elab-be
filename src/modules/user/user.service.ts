@@ -3,12 +3,14 @@ import { IUser } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { UserRepository } from './user.repository';
 import { SecurityService } from '../security/security.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
     private userRepository: UserRepository,
     private securityService: SecurityService,
+    private emailService: EmailService,
   ) {}
 
   async getUserByEmail(email: string): Promise<IUser | null> {
@@ -27,7 +29,7 @@ export class UserService implements IUserService {
     return null;
   }
 
-  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+  async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
     const user = await this.getUserById(userId);
     if (!user) {
       throw new NotFoundException('User is not found');
@@ -41,5 +43,14 @@ export class UserService implements IUserService {
     const newHashedPassword = await this.securityService.hash(newPassword, 10);
     user.password = newHashedPassword;
     await this.userRepository.save(user);
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.getUserByEmail(email);
+    const payload = { email };
+    if (user) {
+      const token = await this.securityService.generateResetToken(payload);
+      await this.emailService.sendPasswordResetEmail(email, token);
+    }
   }
 }
