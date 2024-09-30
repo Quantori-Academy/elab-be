@@ -6,11 +6,7 @@ on:
   push:
     branches:    
       - '*/*'       # matches every branch containing a single '/'
-      - '!main'   # excludes master
-      
-  pull_request:
-    branches:
-      - '*/*'
+      - '**'       # matches every branch 
       - '!main'   # excludes master
 
 env:
