@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post, Query, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { UserPayload } from './interfaces/userEntity.interface';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 
 const ROUTE = 'user';
 
@@ -32,5 +33,17 @@ export class UserController {
     return {
       message: 'The link is sent to your email. Please check it',
     };
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Query('reset-token') reset_token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
+    return await this.userService.resetPassword(
+      reset_token,
+      resetPasswordDto.newPassword,
+      resetPasswordDto.confirmPassword,
+    );
   }
 }

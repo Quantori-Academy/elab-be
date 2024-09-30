@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { UserRepository } from './user.repository';
 import { SecurityService } from '../security/security.service';
 import { EmailService } from '../email/email.service';
+import { ResetToken } from '../security/interfaces/token.interface';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -47,10 +48,44 @@ export class UserService implements IUserService {
 
   async forgotPassword(email: string): Promise<void> {
     const user = await this.getUserByEmail(email);
-    const payload = { email };
     if (user) {
+      const payload = { id: user.id as number, email };
       const token = await this.securityService.generateResetToken(payload);
       await this.emailService.sendPasswordResetEmail(email, token);
     }
+  }
+
+  async resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string) {
+    const token = await this.securityService.verifyResetToken(reset_token);
+
+    if (!token) {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Token is invalid',
+      };
+    }
+
+    const user = await this.getUserById(token.id);
+
+    if (!user) {
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'User not found',
+      };
+    }
+
+    if (newPassword !== confirmPassword) {
+      return {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Passwords do not match',
+      };
+    }
+    user.password = await this.securityService.hash(newPassword, 10);
+
+    await this.userRepository.save(user);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Password has been successfully changed',
+    };
   }
 }
