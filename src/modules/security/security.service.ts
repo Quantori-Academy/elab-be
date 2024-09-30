@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { AccessToken, RefreshToken } from './interfaces/token.interface';
+import { AccessToken, RefreshToken, ResetToken } from './interfaces/token.interface';
 import { ISecurityService } from './interfaces/securityService.interface';
 import * as bcrypt from 'bcrypt';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
@@ -27,6 +27,13 @@ export class SecurityService implements ISecurityService {
     });
   }
 
+  async generateResetToken(payload: any): Promise<ResetToken> {
+    return this.jwtService.sign(payload, {
+      secret: this.configService.getOrThrow<string>('JWT_RESET_SECRET'),
+      expiresIn: this.configService.getOrThrow<string>('JWT_RESET_TOKEN_EXPIRATION'),
+    });
+  }
+
   async hash(entity: any, salt: number = 10): Promise<string> {
     return await bcrypt.hash(entity, salt);
   }
@@ -45,6 +52,13 @@ export class SecurityService implements ISecurityService {
   async verifyRefreshToken(token: RefreshToken): Promise<UserPayload> {
     const payload = await this.jwtService.verifyAsync(token, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+    return payload;
+  }
+
+  async verifyResetToken(token: ResetToken): Promise<any> {
+    const payload = await this.jwtService.verifyAsync(token, {
+      secret: this.configService.getOrThrow<string>('JWT_RESET_SECRET'),
     });
     return payload;
   }
