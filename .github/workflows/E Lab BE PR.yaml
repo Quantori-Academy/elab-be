@@ -5,7 +5,8 @@ on:
     branches:    
       - '*/*'       # matches every branch containing a single '/'
       - '!main'   # excludes master
-  workflow_dispatch:
+  workflow_dispatch:  # This line allows manual triggering
+
 env:
   HUSKY: 0
 
@@ -21,15 +22,15 @@ jobs:
               uses: actions/setup-node@v3
               with:
                 node-version: '20' # Specify the Node.js version you want to use
-      
+
             - name: Install dependencies
               run: npm install
-      
+
             - name: Run lint
               run: npx eslint "{src,apps,libs,test}/**/*.ts" --fix || true
-      
+
             # - name: Run tests
             #   run: npm run test
-      
+
             - name: Run build
               run: npm run build
