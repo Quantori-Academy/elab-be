@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { UserPayload } from './interfaces/userEntity.interface';
@@ -14,6 +14,10 @@ const ROUTE = 'user';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, description: 'The password is changed successfully' })
+  @ApiResponse({ status: 400, description: 'Wrong Password' })
+  @ApiResponse({ status: 404, description: 'The User is not found' })
   @Post('change-password')
   @UseGuards(AuthGuard)
   async changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
@@ -28,6 +32,7 @@ export class UserController {
     };
   }
 
+  @ApiResponse({ status: 201, description: 'The link to reset password is sent to email' })
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     await this.userService.forgotPassword(forgotPasswordDto.email);
@@ -36,6 +41,9 @@ export class UserController {
     };
   }
 
+  @ApiResponse({ status: 201, description: 'The password is reset successfully' })
+  @ApiResponse({ status: 400, description: 'Passwords do not match' })
+  @ApiResponse({ status: 404, description: 'The User is not found' })
   @Post('reset-password')
   async resetPassword(
     @Query('reset_token') reset_token: string,
