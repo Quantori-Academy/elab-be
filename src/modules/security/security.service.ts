@@ -35,6 +35,13 @@ export class SecurityService implements ISecurityService {
     return await bcrypt.compare(raw, hashed);
   }
 
+  async verifyAccessToken(token: AccessToken): Promise<UserPayload> {
+    const payload = await this.jwtService.verifyAsync(token, {
+      secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+    });
+    return payload;
+  }
+
   async verifyRefreshToken(token: RefreshToken): Promise<UserPayload> {
     const payload = await this.jwtService.verifyAsync(token, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
