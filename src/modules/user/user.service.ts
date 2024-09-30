@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { UserRepository } from './user.repository';
@@ -25,5 +25,21 @@ export class UserService implements IUserService {
       return user;
     }
     return null;
+  }
+
+  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User is not found');
+    }
+
+    const passwordCheck = await this.securityService.compare(oldPassword, user.password);
+    if (!passwordCheck) {
+      throw new BadRequestException('Wrong password');
+    }
+
+    const newHashedPassword = await this.securityService.hash(newPassword, 10);
+    user.password = newHashedPassword;
+    await this.userRepository.save(user);
   }
 }
