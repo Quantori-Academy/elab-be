@@ -8,8 +8,8 @@ export class LoginGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { email, password } = request.body;
 
+    const { email, password } = request.body;
     if (!email || !password) {
       throw new UnauthorizedException('Email and password are required.');
     }
@@ -19,10 +19,9 @@ export class LoginGuard implements CanActivate {
       throw new UnauthorizedException('Invalid credentials.');
     }
 
-    const { password: omitPass, ...userPayload } = validUser;
-    void omitPass; // for lint (intentionally not using this variable)
+    const userPayload: UserPayload = this.userService.omitPassword(validUser);
+    request.user = userPayload;
 
-    request.user = userPayload as UserPayload;
     return true;
   }
 }

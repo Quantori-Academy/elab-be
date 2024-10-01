@@ -31,19 +31,25 @@ export class UserService implements IUserService {
     return null;
   }
 
+  omitPassword(user: IUser): UserPayload {
+    const { password, ...userPayload } = user;
+    void password; // for lint (intentionally not using this variable)
+    return userPayload;
+  }
+
   async editUserRole(userId: number, role: Role): Promise<UserPayload> {
-    const user: IUser | null = await this.getUserById(userId);
+    let user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
     user.role = role;
-    const { password, ...modifiedUser } = await this.userRepository.update(user);
-    void password; // for lint (intentionally not using this variable)
-    return modifiedUser as UserPayload;
+    user = await this.userRepository.update(user);
+    const userPayload: UserPayload = this.omitPassword(user);
+    return userPayload;
   }
 
   async createUser(user: IUser): Promise<UserPayload> {
-    const { password, ...userPayload } = await this.userRepository.create(user);
-    void password; // for lint;
-    return userPayload as UserPayload;
+    const result: IUser = await this.userRepository.create(user);
+    const userPayload: UserPayload = this.omitPassword(result);
+    return userPayload;
   }
 
   async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {

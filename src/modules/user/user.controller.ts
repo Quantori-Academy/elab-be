@@ -35,7 +35,9 @@ export class UserController {
     return await this.userService.editUserRole(userId, role);
   }
 
-  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Post('/create-user')
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
