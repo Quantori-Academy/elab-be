@@ -25,7 +25,7 @@ export class AuthController {
     const user: UserPayload = (req as any).user as UserPayload;
     const tokens: Tokens = await this.authService.login(user);
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
-    return res.json({ access_token: tokens.access_token });
+    return res.status(200).json({ access_token: tokens.access_token });
   }
 
   @ApiCookieAuth()
