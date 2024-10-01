@@ -6,4 +6,6 @@ export interface IUserService {
   getUserById(id: number): Promise<IUser | null>;
   validateUser(email: string, password: string): Promise<IUser | null>;
   editUserRole(userId: number, role: Role): Promise<UserPayload>;
+  createUser(user: IUser): Promise<UserPayload>;
+  omitPassword(user: IUser): UserPayload;
 }
