@@ -32,7 +32,7 @@ export class UserService implements IUserService {
     const user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
     user.role = role;
-    const { password, ...modifiedUser } = await this.userRepository.update(userId, user);
+    const { password, ...modifiedUser } = await this.userRepository.update(user);
     void password; // for lint (intentionally not using this variable)
     return modifiedUser as UserPayload;
   }
