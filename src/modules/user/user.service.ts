@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser, UserPayload } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
@@ -47,8 +47,11 @@ export class UserService implements IUserService {
   }
 
   async createUser(user: IUser): Promise<UserPayload> {
-    const result: IUser = await this.userRepository.create(user);
-    const userPayload: UserPayload = this.omitPassword(result);
+    const existingUser = await this.userRepository.findByEmail(user.email);
+    if (existingUser) throw new ConflictException('User with this email already exists');
+    user.password = await this.securityService.hash(user.password);
+    user = await this.userRepository.create(user);
+    const userPayload: UserPayload = this.omitPassword(user);
     return userPayload;
   }
 

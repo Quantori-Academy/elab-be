@@ -13,7 +13,7 @@ import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { CreateUserDto } from './dto/createUser.dto';
+import { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto } from './dto/createUser.dto';
 
 const ROUTE = 'users';
 
@@ -30,15 +30,22 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
-  async editRole(@Param('id', ParseIdPipe) userId: number, @Body(ValidationPipe) body: EditUserRoleDto) {
+  async editRole(
+    @Param('id', ParseIdPipe) userId: number,
+    @Body(ValidationPipe) body: EditUserRoleDto,
+  ): Promise<UserPayload> {
     const role: Role = body.role;
     return await this.userService.editUserRole(userId, role);
   }
 
   @ApiBearerAuth()
+  @ApiResponse({ status: 201, type: CreateUserDto })
+  @ApiResponse({ status: 400, type: CreateUserValidationErrorDto })
+  @ApiResponse({ status: 403, type: RoleGuardErrorDto })
+  @ApiResponse({ status: 409, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('/create-user')
+  @Post('create-user')
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
   }
