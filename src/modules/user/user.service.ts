@@ -39,6 +39,13 @@ export class UserService implements IUserService {
     void password; // for lint (intentionally not using this variable)
     return modifiedUser as UserPayload;
   }
+
+  async createUser(user: IUser): Promise<UserPayload> {
+    const { password, ...userPayload } = await this.userRepository.create(user);
+    void password; // for lint;
+    return userPayload as UserPayload;
+  }
+
   async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
     const user = await this.getUserById(userId);
     if (!user) {
