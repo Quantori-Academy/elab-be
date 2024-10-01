@@ -15,13 +15,12 @@ export class RefreshTokenGuard implements CanActivate {
     }
     try {
       const payload: UserPayload = await this.securityService.verifyRefreshToken(refreshToken);
-
       // for lint (intentionally not using these variables)
       const { iat, exp, ...userPayload } = payload;
       void iat;
       void exp;
-      request.user = userPayload as UserPayload;
 
+      request.user = userPayload as UserPayload;
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid/Expired Token');

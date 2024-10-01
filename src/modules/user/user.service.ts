@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser, UserPayload } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
@@ -31,14 +31,30 @@ export class UserService implements IUserService {
     return null;
   }
 
+  omitPassword(user: IUser): UserPayload {
+    const { password, ...userPayload } = user;
+    void password; // for lint (intentionally not using this variable)
+    return userPayload;
+  }
+
   async editUserRole(userId: number, role: Role): Promise<UserPayload> {
-    const user: IUser | null = await this.getUserById(userId);
+    let user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
     user.role = role;
-    const { password, ...modifiedUser } = await this.userRepository.update(user);
-    void password; // for lint (intentionally not using this variable)
-    return modifiedUser as UserPayload;
+    user = await this.userRepository.update(user);
+    const userPayload: UserPayload = this.omitPassword(user);
+    return userPayload;
   }
+
+  async createUser(user: IUser): Promise<UserPayload> {
+    const existingUser = await this.userRepository.findByEmail(user.email);
+    if (existingUser) throw new ConflictException('User with this email already exists');
+    user.password = await this.securityService.hash(user.password);
+    user = await this.userRepository.create(user);
+    const userPayload: UserPayload = this.omitPassword(user);
+    return userPayload;
+  }
+
   async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
     const user = await this.getUserById(userId);
     if (!user) {

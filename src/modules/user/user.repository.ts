@@ -26,17 +26,18 @@ export class UserRepository implements IRepository<IUser> {
     });
   }
 
+  async create(user: IUser): Promise<IUser> {
+    return await this.prisma.user.create({
+      data: user,
+    });
+  }
+
   async save(user: IUser): Promise<void> {
     const existingUser = await this.findById(user.id as number);
     if (existingUser) {
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: user,
-      });
+      await this.update(user);
     } else {
-      await this.prisma.user.create({
-        data: user,
-      });
+      await this.create(user);
     }
   }
 }
