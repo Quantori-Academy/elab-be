@@ -7,10 +7,7 @@ import { ApiBody, ApiCookieAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import {
-  RefreshTokenErrorResponseDto,
-  RefreshTokenSuccessResponseDto,
-} from './dto/refreshToken.dto';
+import { RefreshTokenErrorResponseDto, RefreshTokenSuccessResponseDto } from './dto/refreshToken.dto';
 
 const ROUTE = 'auth';
 

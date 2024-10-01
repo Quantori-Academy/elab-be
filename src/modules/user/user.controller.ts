@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
@@ -22,11 +12,7 @@ import { ChangePasswordDto } from './dto/changePassword.dto';
 import { UserPayload } from './interfaces/userEntity.interface';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
-import {
-  EditUserRoleDto,
-  EditUserRoleErrorResponseDto,
-  EditUserRoleSuccessResponseDto,
-} from './dto/editRole.dto';
+import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 
 const ROUTE = 'users';
 
@@ -43,10 +29,7 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
-  async editRole(
-    @Param('id', ParseIdPipe) userId: number,
-    @Body(ValidationPipe) body: EditUserRoleDto,
-  ) {
+  async editRole(@Param('id', ParseIdPipe) userId: number, @Body(ValidationPipe) body: EditUserRoleDto) {
     const role: Role = body.role;
     return await this.userService.editUserRole(userId, role);
   }
@@ -81,15 +64,8 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Passwords do not match' })
   @ApiResponse({ status: 404, description: 'The User is not found' })
   @Post('reset-password')
-  async resetPassword(
-    @Query('reset_token') reset_token: string,
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ) {
-    await this.userService.resetPassword(
-      reset_token,
-      resetPasswordDto.newPassword,
-      resetPasswordDto.confirmPassword,
-    );
+  async resetPassword(@Query('reset_token') reset_token: string, @Body() resetPasswordDto: ResetPasswordDto) {
+    await this.userService.resetPassword(reset_token, resetPasswordDto.newPassword, resetPasswordDto.confirmPassword);
     return {
       message: 'The password reset successfully',
     };
