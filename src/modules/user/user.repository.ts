@@ -25,4 +25,18 @@ export class UserRepository implements IRepository<IUser> {
       data: user,
     });
   }
+
+  async save(user: IUser): Promise<void> {
+    const existingUser = await this.findById(user.id as number);
+    if (existingUser) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: user,
+      });
+    } else {
+      await this.prisma.user.create({
+        data: user,
+      });
+    }
+  }
 }
