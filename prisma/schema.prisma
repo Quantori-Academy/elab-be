@@ -31,9 +31,7 @@ model Session {
   id            Int      @id @default(autoincrement())
   refreshToken  String   @unique
   createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  expiresAt     DateTime
-  userId        Int      // Foreign key to User
+  userId        Int      @unique // Make userId unique
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([refreshToken])  // For faster queries based on refreshToken
