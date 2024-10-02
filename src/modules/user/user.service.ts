@@ -6,6 +6,7 @@ import { UserRepository } from './user.repository';
 import { SecurityService } from '../security/security.service';
 import { EmailService } from '../email/email.service';
 import { ResetToken } from '../security/interfaces/token.interface';
+import generator from 'generate-password-ts';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -68,7 +69,7 @@ export class UserService implements IUserService {
 
     const newHashedPassword = await this.securityService.hash(newPassword, 10);
     user.password = newHashedPassword;
-    await this.userRepository.save(user);
+    await this.userRepository.update(user);
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -98,6 +99,23 @@ export class UserService implements IUserService {
     }
     user.password = await this.securityService.hash(newPassword, 10);
 
-    await this.userRepository.save(user);
+    await this.userRepository.update(user);
+  }
+
+  async adminResetPassword(userId: number) {
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const tempPassword = generator.generate({
+      length: 10,
+      numbers: true,
+    });
+
+    user.password = await this.securityService.hash(tempPassword, 10);
+    await this.userRepository.update(user);
+    await this.emailService.sendTempPasswordEmail(user.email, tempPassword);
   }
 }
