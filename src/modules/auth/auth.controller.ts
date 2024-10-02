@@ -9,6 +9,8 @@ import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { RefreshTokenErrorResponseDto, RefreshTokenSuccessResponseDto } from './dto/refreshToken.dto';
 import { AuthGuard } from './guards/auth.guard';
+import { LogoutErrorResponseDto, LogoutSuccessResponseDto } from './dto/logout.dto';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 
 const ROUTE = 'auth';
 
@@ -30,6 +32,9 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: LogoutSuccessResponseDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 404, type: LogoutErrorResponseDto })
   @UseGuards(AuthGuard)
   @Delete('logout')
   async logout(@Req() req: Request, @Res() res: Response) {

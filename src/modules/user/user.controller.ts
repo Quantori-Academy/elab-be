@@ -4,7 +4,7 @@ import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RoleGuardErrorDto } from 'src/common/dtos/role.dto';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
@@ -26,7 +26,7 @@ export class UserController {
   @ApiResponse({ status: 200, type: EditUserRoleSuccessResponseDto })
   @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: 401, type: EditUserRoleErrorResponseDto })
-  @ApiResponse({ status: 403, type: RoleGuardErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
@@ -41,7 +41,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: 201, type: CreateUserDto })
   @ApiResponse({ status: 400, type: CreateUserValidationErrorDto })
-  @ApiResponse({ status: 403, type: RoleGuardErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 409, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
