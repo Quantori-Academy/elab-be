@@ -21,13 +21,13 @@ export class AuthRepository implements Partial<IRepository<ISession>> {
       data: session,
     });
   }
+
   async create(session: ISession): Promise<ISession> {
-    {
-      return await this.prisma.session.create({
-        data: session,
-      });
-    }
+    return await this.prisma.session.create({
+      data: session,
+    });
   }
+
   async save(session: ISession): Promise<void> {
     const existingSession = await this.findSessionByUserId(session.userId);
     if (existingSession) {

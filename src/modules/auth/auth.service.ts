@@ -23,7 +23,7 @@ export class AuthService implements IAuthService {
       createdAt: new Date(),
       userId: payload.id!,
     };
-    await this.authRepository.create(session);
+    await this.authRepository.save(session);
     return tokens;
   }
 
