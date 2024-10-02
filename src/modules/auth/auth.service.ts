@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IAuthService } from './interfaces/authService.interface';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { AccessToken, Tokens } from '../security/interfaces/token.interface';
@@ -20,11 +20,25 @@ export class AuthService implements IAuthService {
     };
     const session: ISession = {
       refreshToken: tokens.refresh_token,
+      isLoggedIn: true,
       createdAt: new Date(),
       userId: payload.id!,
     };
     await this.authRepository.save(session);
     return tokens;
+  }
+
+  async logout(user: UserPayload): Promise<void> {
+    const session: ISession | false = await this.isLoggedIn(user.id as number);
+    if (!session) throw new NotFoundException('Session not found');
+    session.isLoggedIn = false;
+    await this.authRepository.update(session);
+  }
+
+  async isLoggedIn(userId: number): Promise<ISession | false> {
+    const session: ISession | null = await this.authRepository.findSessionByUserId(userId);
+    if (!session || !session.isLoggedIn) return false;
+    return session;
   }
 
   async refreshAccessToken(user: UserPayload): Promise<AccessToken> {
