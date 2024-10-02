@@ -117,5 +117,6 @@ export class UserService implements IUserService {
     user.password = await this.securityService.hash(tempPassword, 10);
     await this.userRepository.update(user);
     await this.emailService.sendTempPasswordEmail(user.email, tempPassword);
+    await this.userRepository.setPasswordResetFlag(user, true);
   }
 }

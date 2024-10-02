@@ -31,4 +31,13 @@ export class UserRepository implements IRepository<IUser> {
       data: user,
     });
   }
+
+  async setPasswordResetFlag(user: IUser, bool: boolean) {
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isPasswordResetRequired: bool,
+      },
+    });
+  }
 }

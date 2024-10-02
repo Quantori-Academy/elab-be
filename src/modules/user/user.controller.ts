@@ -51,11 +51,14 @@ export class UserController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: 201, description: 'The temporary password is send to user email' })
+  @ApiResponse({
+    status: 201,
+    description: 'The temporary password is send to user email. User needs to change password after login',
+  })
   @ApiResponse({ status: 404, description: 'The User is not found' })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Post(':id/reset-password')
+  @Post('/:id/reset-password')
   async adminResetPassword(@Param('id', ParseIdPipe) id: number) {
     await this.userService.adminResetPassword(id);
     return {
