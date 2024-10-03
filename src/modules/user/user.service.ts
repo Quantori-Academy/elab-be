@@ -100,4 +100,10 @@ export class UserService implements IUserService {
 
     await this.userRepository.upsert(user);
   }
+
+  async getUser(userId: number): Promise<UserPayload> {
+    const user: IUser | null = await this.getUserById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return this.omitPassword(user);
+  }
 }
