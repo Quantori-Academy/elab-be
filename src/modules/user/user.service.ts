@@ -15,11 +15,11 @@ export class UserService implements IUserService {
     private emailService: EmailService,
   ) {}
 
-  async getUserByEmail(email: string): Promise<IUser | null> {
+  private async getUserByEmail(email: string): Promise<IUser | null> {
     return await this.userRepository.findByEmail(email);
   }
 
-  async getUserById(id: number): Promise<IUser | null> {
+  private async getUserById(id: number): Promise<IUser | null> {
     return await this.userRepository.findById(id);
   }
 
