@@ -70,6 +70,7 @@ export class UserService implements IUserService {
     const newHashedPassword = await this.securityService.hash(newPassword, 10);
     user.password = newHashedPassword;
     await this.userRepository.update(user);
+    await this.userRepository.setPasswordResetFlag(user, false);
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -100,6 +101,7 @@ export class UserService implements IUserService {
     user.password = await this.securityService.hash(newPassword, 10);
 
     await this.userRepository.update(user);
+    await this.userRepository.setPasswordResetFlag(user, false);
   }
 
   async adminResetPassword(userId: number) {
