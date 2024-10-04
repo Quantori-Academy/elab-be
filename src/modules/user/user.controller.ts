@@ -1,4 +1,16 @@
-import { Body, Controller, Param, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
@@ -60,10 +72,17 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   @Post('/:id/reset-password')
   async adminResetPassword(@Param('id', ParseIdPipe) id: number) {
-    await this.userService.adminResetPassword(id);
-    return {
-      message: 'The temporary password is sent to email of the user',
-    };
+    try {
+      await this.userService.adminResetPassword(id);
+      return {
+        message: 'The temporary password is sent to email of the user',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @ApiBearerAuth()
