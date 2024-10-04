@@ -100,4 +100,12 @@ export class UserService implements IUserService {
 
     await this.userRepository.upsert(user);
   }
+
+  async deleteUser(userId: number) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.delete(user);
+  }
 }

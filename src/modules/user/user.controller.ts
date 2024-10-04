@@ -1,4 +1,17 @@
-import { Body, Controller, Param, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
@@ -48,6 +61,26 @@ export class UserController {
   @Post('create-user')
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, description: 'User is deleted' })
+  @ApiResponse({ status: 404, description: 'User not Found' })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete('/:id')
+  async deleteUser(@Param('id', ParseIdPipe) id: number) {
+    try {
+      await this.userService.deleteUser(id);
+      return {
+        message: 'User is deleted!',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @ApiBearerAuth()
