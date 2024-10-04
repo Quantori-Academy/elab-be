@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
@@ -21,6 +33,7 @@ const ROUTE = 'users';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class UserController {
+  private readonly _logger: Logger = new Logger(UserController.name);
   constructor(private userService: UserService) {}
 
   @ApiBearerAuth()
@@ -92,10 +105,17 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, type: GetUserSuccessDto })
   @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 404, type: GetUserErrorDto })
   @UseGuards(AuthGuard)
   @Get(':id')
   async getUser(@Param('id', ParseIdPipe) userId: number) {
-    return await this.userService.getUser(userId);
+    this._logger.log(this.getUser.name);
+    try {
+      return await this.userService.getUser(userId);
+    } catch (error: any) {
+      this._logger.error(this.getUser.name + ' ' + error);
+      throw error;
+    }
   }
 }
