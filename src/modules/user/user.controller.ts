@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Param, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
@@ -57,10 +70,17 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   @Delete('/:id')
   async deleteUser(@Param('id', ParseIdPipe) id: number) {
-    await this.userService.deleteUser(id);
-    return {
-      message: 'User is deleted!',
-    };
+    try {
+      await this.userService.deleteUser(id);
+      return {
+        message: 'User is deleted!',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @ApiBearerAuth()
