@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Logger, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginGuard } from 'src/modules/auth/guards/login.guard';
 import { Request, Response } from 'express';
@@ -17,6 +17,7 @@ const ROUTE = 'auth';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class AuthController {
+  private readonly _logger: Logger = new Logger(AuthController.name);
   constructor(private readonly authService: AuthService) {}
 
   @ApiBody({ type: LoginDto })
@@ -38,14 +39,21 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Delete('logout')
   async logout(@Req() req: Request, @Res() res: Response) {
-    const user: UserPayload = (req as any).user as UserPayload;
-    await this.authService.logout(user);
-    res.clearCookie('refresh_token', { httpOnly: true });
-    return res.status(200).json({ message: 'Logged out successfully' });
+    try {
+      this._logger.log(this.logout.name);
+      const user: UserPayload = (req as any).user as UserPayload;
+      await this.authService.logout(user);
+      res.clearCookie('refresh_token', { httpOnly: true });
+      return res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error: any) {
+      this._logger.error(this.logout.name + ' ' + error);
+      throw error;
+    }
   }
 
   @ApiCookieAuth()
   @ApiResponse({ status: 200, type: RefreshTokenSuccessResponseDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 401, type: RefreshTokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')

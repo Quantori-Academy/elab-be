@@ -1,18 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { ISession } from './interfaces/session.interface';
 
 @Injectable()
 export class AuthRepository implements Partial<IRepository<ISession>> {
+  private readonly _logger: Logger = new Logger(AuthRepository.name);
   constructor(private readonly prisma: PrismaService) {}
 
   async findSessionByUserId(userId: number): Promise<ISession | null> {
-    return await this.prisma.session.findFirst({
-      where: {
-        userId,
-      },
-    });
+    try {
+      this._logger.log(this.findSessionByUserId.name);
+      return await this.prisma.session.findFirst({
+        where: {
+          userId,
+        },
+      });
+    } catch (error: any) {
+      this._logger.error(this.findSessionByUserId.name + ' ' + error);
+      throw error;
+    }
   }
 
   async update(session: ISession): Promise<ISession> {
