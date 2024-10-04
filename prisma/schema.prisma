@@ -24,4 +24,16 @@ model User {
   email String  @unique
   password String
   role Role
+  sessions Session[] @ignore
+}
+
+model Session {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique // Make userId unique
+  isLoggedIn    Boolean
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  refreshToken  String   @unique
+
+  @@index([refreshToken])  // For faster queries based on refreshToken
 }
