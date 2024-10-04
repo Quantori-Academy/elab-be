@@ -9,8 +9,8 @@ export class AuthRepository implements Partial<IRepository<ISession>> {
   constructor(private readonly prisma: PrismaService) {}
 
   async findSessionByUserId(userId: number): Promise<ISession | null> {
+    this._logger.log(this.findSessionByUserId.name);
     try {
-      this._logger.log(this.findSessionByUserId.name);
       return await this.prisma.session.findFirst({
         where: {
           userId,

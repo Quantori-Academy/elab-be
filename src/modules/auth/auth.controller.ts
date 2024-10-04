@@ -39,8 +39,8 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Delete('logout')
   async logout(@Req() req: Request, @Res() res: Response) {
+    this._logger.log(this.logout.name);
     try {
-      this._logger.log(this.logout.name);
       const user: UserPayload = (req as any).user as UserPayload;
       await this.authService.logout(user);
       res.clearCookie('refresh_token', { httpOnly: true });

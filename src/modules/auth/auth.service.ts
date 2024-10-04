@@ -30,8 +30,8 @@ export class AuthService implements IAuthService {
   }
 
   async logout(user: UserPayload): Promise<void> {
+    this._logger.log(this.logout.name);
     try {
-      this._logger.log(this.logout.name);
       const session: ISession | false = await this.isLoggedIn(user.id as number);
       if (!session) throw new NotFoundException('Session not found');
       session.isLoggedIn = false;
@@ -43,8 +43,8 @@ export class AuthService implements IAuthService {
   }
 
   async isLoggedIn(userId: number): Promise<ISession | false> {
+    this._logger.log(this.isLoggedIn.name);
     try {
-      this._logger.log(this.isLoggedIn.name);
       const session: ISession | null = await this.authRepository.findSessionByUserId(userId);
       if (!session || !session.isLoggedIn) return false;
       return session;
