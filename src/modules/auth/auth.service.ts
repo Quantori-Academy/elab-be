@@ -24,7 +24,7 @@ export class AuthService implements IAuthService {
       createdAt: new Date(),
       userId: payload.id!,
     };
-    await this.authRepository.save(session);
+    await this.authRepository.upsert(session);
     return tokens;
   }
 

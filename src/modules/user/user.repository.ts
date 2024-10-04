@@ -32,12 +32,15 @@ export class UserRepository implements IRepository<IUser> {
     });
   }
 
-  async save(user: IUser): Promise<void> {
-    const existingUser = await this.findById(user.id as number);
-    if (existingUser) {
-      await this.update(user);
-    } else {
-      await this.create(user);
-    }
+  async upsert(user: IUser): Promise<void> {
+    await this.prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        ...user,
+      },
+      create: {
+        ...user,
+      },
+    });
   }
 }
