@@ -5,9 +5,10 @@ export interface IUser {
   email: string;
   password: string;
   role: Role;
+  isPasswordResetRequired?: boolean;
 }
 
-export type UserPayload = Omit<IUser, 'password'> & {
+export type UserPayload = Omit<IUser, 'password' | 'isPasswordResetRequired'> & {
   iat?: number;
   exp?: number;
 };
