@@ -99,7 +99,6 @@ export class UserService implements IUserService {
       throw new BadRequestException('Passwords do not match');
     }
     user.password = await this.securityService.hash(newPassword, 10);
-
     await this.userRepository.update(user);
     await this.userRepository.setPasswordResetFlag(user, false);
   }
@@ -120,5 +119,13 @@ export class UserService implements IUserService {
     await this.userRepository.update(user);
     await this.emailService.sendTempPasswordEmail(user.email, tempPassword);
     await this.userRepository.setPasswordResetFlag(user, true);
+  }
+
+  async deleteUser(userId: number) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.delete(user);
   }
 }

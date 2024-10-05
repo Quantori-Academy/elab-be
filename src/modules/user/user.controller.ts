@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -16,7 +17,7 @@ import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UserService } from './user.service';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RoleGuardErrorDto } from 'src/common/dtos/role.dto';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
@@ -38,7 +39,7 @@ export class UserController {
   @ApiResponse({ status: 200, type: EditUserRoleSuccessResponseDto })
   @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: 401, type: EditUserRoleErrorResponseDto })
-  @ApiResponse({ status: 403, type: RoleGuardErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
@@ -53,7 +54,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: 201, type: CreateUserDto })
   @ApiResponse({ status: 400, type: CreateUserValidationErrorDto })
-  @ApiResponse({ status: 403, type: RoleGuardErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 409, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -76,6 +77,25 @@ export class UserController {
       await this.userService.adminResetPassword(id);
       return {
         message: 'The temporary password is sent to email of the user',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  
+  @ApiResponse({ status: 201, description: 'User is deleted' })
+  @ApiResponse({ status: 404, description: 'User not Found' })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete('/:id')
+  async deleteUser(@Param('id', ParseIdPipe) id: number) {
+    try {
+      await this.userService.deleteUser(id);
+      return {
+        message: 'User is deleted!',
       };
     } catch (error) {
       if (error instanceof NotFoundException) {

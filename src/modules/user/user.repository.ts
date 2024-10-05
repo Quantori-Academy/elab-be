@@ -40,4 +40,22 @@ export class UserRepository implements IRepository<IUser> {
       },
     });
   }
+
+  async upsert(user: IUser): Promise<void> {
+    await this.prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        ...user,
+      },
+      create: {
+        ...user,
+      },
+    });
+  }
+
+  async delete(user: IUser): Promise<IUser> {
+    return await this.prisma.user.delete({
+      where: { id: user.id },
+    });
+  }
 }

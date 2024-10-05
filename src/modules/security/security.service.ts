@@ -14,21 +14,21 @@ export class SecurityService implements ISecurityService {
   ) {}
 
   async generateAccessToken(payload: any): Promise<AccessToken> {
-    return this.jwtService.sign(payload, {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
       expiresIn: this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRATION'),
     });
   }
 
   async generateRefreshToken(payload: any): Promise<RefreshToken> {
-    return this.jwtService.sign(payload, {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION'),
     });
   }
 
   async generateResetToken(payload: any): Promise<ResetToken> {
-    return this.jwtService.sign(payload, {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_RESET_SECRET'),
       expiresIn: this.configService.getOrThrow<string>('JWT_RESET_TOKEN_EXPIRATION'),
     });
