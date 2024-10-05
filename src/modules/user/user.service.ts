@@ -6,6 +6,7 @@ import { UserRepository } from './user.repository';
 import { SecurityService } from '../security/security.service';
 import { EmailService } from '../email/email.service';
 import { ResetToken } from '../security/interfaces/token.interface';
+import generator from 'generate-password-ts';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -75,7 +76,8 @@ export class UserService implements IUserService {
 
     const newHashedPassword = await this.securityService.hash(newPassword, 10);
     user.password = newHashedPassword;
-    await this.userRepository.upsert(user);
+    await this.userRepository.update(user);
+    await this.userRepository.setPasswordResetFlag(user, false);
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -104,8 +106,34 @@ export class UserService implements IUserService {
       throw new BadRequestException('Passwords do not match');
     }
     user.password = await this.securityService.hash(newPassword, 10);
+    await this.userRepository.update(user);
+    await this.userRepository.setPasswordResetFlag(user, false);
+  }
 
-    await this.userRepository.upsert(user);
+  async adminResetPassword(userId: number) {
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const tempPassword = generator.generate({
+      length: 10,
+      numbers: true,
+    });
+
+    user.password = await this.securityService.hash(tempPassword, 10);
+    await this.userRepository.update(user);
+    await this.emailService.sendTempPasswordEmail(user.email, tempPassword);
+    await this.userRepository.setPasswordResetFlag(user, true);
+  }
+
+  async deleteUser(userId: number) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.delete(user);
   }
 
   async getUser(userId: number): Promise<UserPayload> {

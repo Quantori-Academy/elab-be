@@ -3,6 +3,9 @@ import {
   Controller,
   Get,
   Logger,
+  Delete,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -62,6 +65,48 @@ export class UserController {
   @Post('create-user')
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'The temporary password is send to user email. User needs to change password after login',
+  })
+  @ApiResponse({ status: 404, description: 'The User is not found' })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('/:id/reset-password')
+  async adminResetPassword(@Param('id', ParseIdPipe) id: number) {
+    try {
+      await this.userService.adminResetPassword(id);
+      return {
+        message: 'The temporary password is sent to email of the user',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+  
+  @ApiResponse({ status: 201, description: 'User is deleted' })
+  @ApiResponse({ status: 404, description: 'User not Found' })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete('/:id')
+  async deleteUser(@Param('id', ParseIdPipe) id: number) {
+    try {
+      await this.userService.deleteUser(id);
+      return {
+        message: 'User is deleted!',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   @ApiBearerAuth()
