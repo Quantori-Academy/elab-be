@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IAuthService } from './interfaces/authService.interface';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { AccessToken, Tokens } from '../security/interfaces/token.interface';
@@ -8,7 +8,6 @@ import { ISession } from './interfaces/session.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
-  private readonly _logger: Logger = new Logger(AuthService.name);
   constructor(
     private securityService: SecurityService,
     private authRepository: AuthRepository,
@@ -30,28 +29,16 @@ export class AuthService implements IAuthService {
   }
 
   async logout(user: UserPayload): Promise<void> {
-    this._logger.log(this.logout.name);
-    try {
-      const session: ISession | false = await this.isLoggedIn(user.id as number);
-      if (!session) throw new NotFoundException('Session not found');
-      session.isLoggedIn = false;
-      await this.authRepository.update(session);
-    } catch (error: any) {
-      this._logger.error(this.logout.name + ' ' + error);
-      throw error;
-    }
+    const session: ISession | false = await this.isLoggedIn(user.id as number);
+    if (!session) throw new NotFoundException('Session not found');
+    session.isLoggedIn = false;
+    await this.authRepository.update(session);
   }
 
   async isLoggedIn(userId: number): Promise<ISession | false> {
-    this._logger.log(this.isLoggedIn.name);
-    try {
-      const session: ISession | null = await this.authRepository.findSessionByUserId(userId);
-      if (!session || !session.isLoggedIn) return false;
-      return session;
-    } catch (error: any) {
-      this._logger.error(this.isLoggedIn.name + ' ' + error);
-      throw error;
-    }
+    const session: ISession | null = await this.authRepository.findSessionByUserId(userId);
+    if (!session || !session.isLoggedIn) return false;
+    return session;
   }
 
   async refreshAccessToken(user: UserPayload): Promise<AccessToken> {

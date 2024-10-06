@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser, UserPayload } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
@@ -10,7 +10,6 @@ import generator from 'generate-password-ts';
 
 @Injectable()
 export class UserService implements IUserService {
-  private readonly _logger: Logger = new Logger(UserService.name);
   constructor(
     private userRepository: UserRepository,
     private securityService: SecurityService,
@@ -22,13 +21,7 @@ export class UserService implements IUserService {
   }
 
   private async getUserById(id: number): Promise<IUser | null> {
-    this._logger.log(this.getUserById.name);
-    try {
-      return await this.userRepository.findById(id);
-    } catch (error: any) {
-      this._logger.error(this.getUserById.name + ' ' + error);
-      throw error;
-    }
+    return await this.userRepository.findById(id);
   }
 
   async validateUser(email: string, password: string): Promise<IUser | null> {
@@ -137,14 +130,8 @@ export class UserService implements IUserService {
   }
 
   async getUser(userId: number): Promise<UserPayload> {
-    this._logger.log(this.getUser.name);
-    try {
-      const user: IUser | null = await this.getUserById(userId);
-      if (!user) throw new NotFoundException('User not found');
-      return this.omitPassword(user);
-    } catch (error: any) {
-      this._logger.error(this.getUser.name + ' ' + error);
-      throw error;
-    }
+    const user: IUser | null = await this.getUserById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return this.omitPassword(user);
   }
 }

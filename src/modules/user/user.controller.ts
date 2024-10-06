@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Logger,
   Delete,
   InternalServerErrorException,
   NotFoundException,
@@ -36,7 +35,6 @@ const ROUTE = 'users';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class UserController {
-  private readonly _logger: Logger = new Logger(UserController.name);
   constructor(private userService: UserService) {}
 
   @ApiBearerAuth()
@@ -89,7 +87,7 @@ export class UserController {
       throw new InternalServerErrorException(error.message);
     }
   }
-  
+
   @ApiResponse({ status: 201, description: 'User is deleted' })
   @ApiResponse({ status: 404, description: 'User not Found' })
   @Roles(Role.Admin)
@@ -155,12 +153,6 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get(':id')
   async getUser(@Param('id', ParseIdPipe) userId: number) {
-    this._logger.log(this.getUser.name);
-    try {
-      return await this.userService.getUser(userId);
-    } catch (error: any) {
-      this._logger.error(this.getUser.name + ' ' + error);
-      throw error;
-    }
+    return await this.userService.getUser(userId);
   }
 }
