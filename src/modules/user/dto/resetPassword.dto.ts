@@ -6,7 +6,7 @@ export class ResetPasswordDto {
     description: 'New password',
   })
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   @Matches(/(?=.*\d)/, {
     message: 'New password must contain at least one number!',
   })
@@ -16,7 +16,7 @@ export class ResetPasswordDto {
     description: 'Confirm password',
   })
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   @Matches(/(?=.*\d)/, {
     message: 'New password must contain at least one number!',
   })
