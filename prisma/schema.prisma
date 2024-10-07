@@ -38,3 +38,18 @@ model Session {
 
   @@index([refreshToken])  // For faster queries based on refreshToken
 }
+
+model Reagent {
+  id            Int      @id @default(autoincrement())
+  storageId     Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  storage       Storage  @relation(fields: [storageId], references: [id], onDelete: Cascade)
+}
+
+model Storage {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  reagents      Reagent[]  @relation("Storage_Reagents")
+}
