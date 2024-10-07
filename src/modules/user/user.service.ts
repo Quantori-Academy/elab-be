@@ -75,11 +75,12 @@ export class UserService implements IUserService {
 
   async forgotPassword(email: string): Promise<void> {
     const user = await this.getUserByEmail(email);
-    if (user) {
-      const payload = { id: user.id as number, email };
-      const token = await this.securityService.generateResetToken(payload);
-      await this.emailService.sendPasswordResetEmail(email, token);
+    if (!user) {
+      throw new NotFoundException('User with this email not found');
     }
+    const payload = { id: user.id as number, email };
+    const token = await this.securityService.generateResetToken(payload);
+    await this.emailService.sendPasswordResetEmail(email, token);
   }
 
   async resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string) {

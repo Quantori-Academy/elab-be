@@ -85,7 +85,7 @@ export class UserController {
       throw new InternalServerErrorException(error.message);
     }
   }
-  
+
   @ApiResponse({ status: 201, description: 'User is deleted' })
   @ApiResponse({ status: 404, description: 'User not Found' })
   @Roles(Role.Admin)
@@ -124,6 +124,7 @@ export class UserController {
   }
 
   @ApiResponse({ status: 201, description: 'The link to reset password is sent to email' })
+  @ApiResponse({ status: 404, description: 'User with this email not found' })
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     await this.userService.forgotPassword(forgotPasswordDto.email);
