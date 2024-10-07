@@ -4,7 +4,7 @@ import { IUser } from './interfaces/userEntity.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class UserRepository implements IRepository<IUser> {
+class UserRepository implements IRepository<IUser> {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string): Promise<IUser | null> {
@@ -59,3 +59,11 @@ export class UserRepository implements IRepository<IUser> {
     });
   }
 }
+
+const USER_REPOSITORY_TOKEN = Symbol('USER_REPOSITORY_TOKEN');
+const UserRepositoryProvider = {
+  provide: USER_REPOSITORY_TOKEN,
+  useClass: UserRepository,
+};
+
+export { USER_REPOSITORY_TOKEN, UserRepositoryProvider };

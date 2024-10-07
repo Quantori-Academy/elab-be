@@ -1,10 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
-import { SecurityService } from 'src/modules/security/security.service';
+import { SECURITY_SERVICE_TOKEN } from 'src/modules/security/security.service';
+import { ISecurityService } from 'src/modules/security/interfaces/securityService.interface';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
-  constructor(private securityService: SecurityService) {}
+  constructor(@Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

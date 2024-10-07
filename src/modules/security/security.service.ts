@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 
 @Injectable()
-export class SecurityService implements ISecurityService {
+class SecurityService implements ISecurityService {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -63,3 +63,11 @@ export class SecurityService implements ISecurityService {
     return payload;
   }
 }
+
+const SECURITY_SERVICE_TOKEN = Symbol('SECURITY_SERVICE_TOKEN');
+const SecurityServiceProvider = {
+  provide: SECURITY_SERVICE_TOKEN,
+  useClass: SecurityService,
+};
+
+export { SECURITY_SERVICE_TOKEN, SecurityServiceProvider };

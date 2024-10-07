@@ -40,3 +40,11 @@ export class AuthRepository implements Partial<IRepository<ISession>> {
     });
   }
 }
+
+const AUTH_REPOSITORY_TOKEN = Symbol('AUTH_REPOSITORY_TOKEN');
+const UserRepositoryProvider = {
+  provide: AUTH_REPOSITORY_TOKEN,
+  useClass: AuthRepository,
+};
+
+export { AUTH_REPOSITORY_TOKEN, UserRepositoryProvider };
