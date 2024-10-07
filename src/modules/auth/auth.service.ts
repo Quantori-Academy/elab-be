@@ -6,12 +6,13 @@ import { SECURITY_SERVICE_TOKEN } from '../security/security.service';
 import { ISession } from './interfaces/session.interface';
 import { ISecurityService } from '../security/interfaces/securityService.interface';
 import { IAuthRepository } from './interfaces/authRepository.interface';
+import { AUTH_REPOSITORY_TOKEN } from './auth.repository';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     @Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService,
-    @Inject(SECURITY_SERVICE_TOKEN) private authRepository: IAuthRepository,
+    @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: IAuthRepository,
   ) {}
 
   async login(payload: UserPayload): Promise<Tokens> {
