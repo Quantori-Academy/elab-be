@@ -43,6 +43,17 @@ model Session {
 
 model Reagent {
   id            Int      @id @default(autoincrement())
+  name          String
+  casNumber     String
+  producer      String
+  catalogId     String
+  catalogLink   String
+  pricePerUnit  Float
+  quantityUnit  String
+  totalQuantity String
+  description   String
+  quantityLeft  Int
+  expirationDate  DateTime
   storageId     Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
