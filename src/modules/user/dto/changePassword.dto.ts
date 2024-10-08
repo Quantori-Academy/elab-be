@@ -12,7 +12,7 @@ export class ChangePasswordDto {
     description: 'New password',
   })
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   @Matches(/(?=.*\d)/, {
     message: 'New password must contain at least one number!',
   })

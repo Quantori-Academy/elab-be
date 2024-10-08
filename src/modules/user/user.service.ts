@@ -24,7 +24,8 @@ export class UserService implements IUserService {
 
   @LoggingForAsync()
   async getUserById(id: number): Promise<IUser | null> {
-    return await this.userRepository.findById(id);
+  private async getUserByEmail(email: string): Promise<IUser | null> {
+    return await this.userRepository.findByEmail(email);
   }
 
   @LoggingForAsync()
@@ -84,11 +85,12 @@ export class UserService implements IUserService {
   @LoggingForAsync()
   async forgotPassword(email: string): Promise<void> {
     const user = await this.getUserByEmail(email);
-    if (user) {
-      const payload = { id: user.id as number, email };
-      const token = await this.securityService.generateResetToken(payload);
-      await this.emailService.sendPasswordResetEmail(email, token);
+    if (!user) {
+      throw new NotFoundException('User with this email not found');
     }
+    const payload = { id: user.id as number, email };
+    const token = await this.securityService.generateResetToken(payload);
+    await this.emailService.sendPasswordResetEmail(email, token);
   }
 
   @LoggingForAsync()
@@ -139,5 +141,12 @@ export class UserService implements IUserService {
       throw new NotFoundException('User not found');
     }
     await this.userRepository.delete(user);
+  }
+
+  @LoggingForAsync()
+  async getUser(userId: number): Promise<UserPayload> {
+    const user: IUser | null = await this.getUserById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return this.omitPassword(user);
   }
 }
