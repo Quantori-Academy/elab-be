@@ -16,11 +16,11 @@ export class UserService implements IUserService {
     private emailService: EmailService,
   ) {}
 
-  async getUserByEmail(email: string): Promise<IUser | null> {
+  private async getUserByEmail(email: string): Promise<IUser | null> {
     return await this.userRepository.findByEmail(email);
   }
 
-  async getUserById(id: number): Promise<IUser | null> {
+  private async getUserById(id: number): Promise<IUser | null> {
     return await this.userRepository.findById(id);
   }
 
@@ -128,5 +128,11 @@ export class UserService implements IUserService {
       throw new NotFoundException('User not found');
     }
     await this.userRepository.delete(user);
+  }
+
+  async getUser(userId: number): Promise<UserPayload> {
+    const user: IUser | null = await this.getUserById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return this.omitPassword(user);
   }
 }

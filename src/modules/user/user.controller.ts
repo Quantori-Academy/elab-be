@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Delete,
   InternalServerErrorException,
   NotFoundException,
@@ -27,6 +28,7 @@ import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto } from './dto/createUser.dto';
+import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 
 const ROUTE = 'users';
 
@@ -142,5 +144,16 @@ export class UserController {
     return {
       message: 'The password reset successfully',
     };
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: GetUserSuccessDto })
+  @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 404, type: GetUserErrorDto })
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async getUser(@Param('id', ParseIdPipe) userId: number) {
+    return await this.userService.getUser(userId);
   }
 }
