@@ -5,7 +5,7 @@ import { setupSwagger } from './common/config/swagger.config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   if (process.env.NODE_ENV !== 'production') {
-    app.enableCors({ origin: '*', credentials: true });
+    app.enableCors({ origin: '*' });
   }
 
   app.setGlobalPrefix('api/v1');
