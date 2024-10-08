@@ -3,8 +3,7 @@ import { IUser, UserPayload } from './userEntity.interface';
 import { ResetToken } from 'src/modules/security/interfaces/token.interface';
 
 export interface IUserService {
-  getUserByEmail(email: string): Promise<IUser | null>;
-  getUserById(id: number): Promise<IUser | null>;
+  getUser(userId: number): Promise<UserPayload>;
   validateUser(email: string, password: string): Promise<IUser | null>;
   editUserRole(userId: number, role: Role): Promise<UserPayload>;
   createUser(user: IUser): Promise<UserPayload>;
