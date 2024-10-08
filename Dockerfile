@@ -6,10 +6,10 @@ WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install
-
 # Copy the rest of the source code
 COPY . .
+
+RUN npm install
 
 # Expose the port
 EXPOSE 3000
