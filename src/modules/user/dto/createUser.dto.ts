@@ -23,6 +23,24 @@ class CreateUserDto implements Omit<IUser, 'password'> {
   role: Role;
 }
 
+class CreateUserSuccessDto {
+  @ApiProperty({ example: 'user@example.com' })
+  @IsEmail({}, { message: 'Invalid email address' })
+  email: string;
+
+  @ApiProperty({ example: 'Arman' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Mikoyan' })
+  lastName: string;
+
+  @ApiProperty({ enum: Role })
+  role: Role;
+
+  @ApiProperty({ example: true })
+  isPasswordResetRequired: boolean;
+}
+
 class CreateUserErrorDto {
   @ApiProperty({ example: 'User with this email already exists' })
   message: string;
@@ -52,4 +70,4 @@ class CreateUserValidationErrorDto {
   statusCode: number;
 }
 
-export { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto };
+export { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto, CreateUserSuccessDto };

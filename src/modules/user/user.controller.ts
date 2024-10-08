@@ -28,7 +28,12 @@ import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto } from './dto/createUser.dto';
+import {
+  CreateUserDto,
+  CreateUserErrorDto,
+  CreateUserSuccessDto,
+  CreateUserValidationErrorDto,
+} from './dto/createUser.dto';
 import { IUserService } from './interfaces/userService.interface';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 
@@ -56,7 +61,7 @@ export class UserController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: 201, type: CreateUserDto })
+  @ApiResponse({ status: 201, type: CreateUserSuccessDto })
   @ApiResponse({ status: 400, type: CreateUserValidationErrorDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 409, type: CreateUserErrorDto })
