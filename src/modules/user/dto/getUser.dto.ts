@@ -17,6 +17,9 @@ class GetUserSuccessDto implements UserPayload {
 
   @ApiProperty({ example: 'Admin' })
   role: Role;
+
+  @ApiProperty({ example: true })
+  isPasswordResetRequired: boolean;
 }
 
 class GetUserErrorDto {
