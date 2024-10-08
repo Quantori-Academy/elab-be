@@ -44,7 +44,7 @@ model Reagent {
   storageId     Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  storage       Storage  @relation(fields: [storageId], references: [id], onDelete: Cascade)
+  storage       Storage  @relation(fields: [storageId], references: [id])
 }
 
 model Storage {
