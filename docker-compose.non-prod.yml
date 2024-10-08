@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: lims_be_prod_app
+    container_name: lims_be_non_prod_app
     build:
       context: .
       target: development
