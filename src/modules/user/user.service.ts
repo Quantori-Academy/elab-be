@@ -9,7 +9,7 @@ import { ResetToken } from '../security/interfaces/token.interface';
 import generator from 'generate-password-ts';
 import { IUserRepository } from './interfaces/userRepository.interface';
 import { ISecurityService } from '../security/interfaces/securityService.interface';
-import { LoggingForAsync, LoggingForSync } from 'src/common/decorators/logger.decorator';
+import { CreateUserDto } from './dto/createUser.dto';
 
 @Injectable()
 class UserService implements IUserService {
@@ -19,17 +19,14 @@ class UserService implements IUserService {
     private emailService: EmailService,
   ) {}
 
-  @LoggingForAsync()
   async getUserByEmail(email: string): Promise<IUser | null> {
     return await this.userRepository.findByEmail(email);
   }
 
-  @LoggingForAsync()
   async getUserById(id: number): Promise<IUser | null> {
     return await this.userRepository.findById(id);
   }
 
-  @LoggingForAsync()
   async validateUser(email: string, password: string): Promise<IUser | null> {
     const user = await this.getUserByEmail(email);
     if (user && (await this.securityService.compare(password, user.password))) {
@@ -38,14 +35,12 @@ class UserService implements IUserService {
     return null;
   }
 
-  @LoggingForSync()
   omitPassword(user: IUser): UserPayload {
     const { password, ...userPayload } = user;
     void password; // for lint (intentionally not using this variable)
     return userPayload;
   }
 
-  @LoggingForAsync()
   async editUserRole(userId: number, role: Role): Promise<UserPayload> {
     let user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
@@ -55,17 +50,31 @@ class UserService implements IUserService {
     return userPayload;
   }
 
-  @LoggingForAsync()
-  async createUser(user: IUser): Promise<UserPayload> {
-    const existingUser = await this.userRepository.findByEmail(user.email);
+  async createUser(userInfo: CreateUserDto): Promise<UserPayload> {
+    const existingUser = await this.userRepository.findByEmail(userInfo.email);
     if (existingUser) throw new ConflictException('User with this email already exists');
-    user.password = await this.securityService.hash(user.password);
-    user = await this.userRepository.create(user);
+    const tempPassword = this.generatePassword();
+
+    let user: IUser = {
+      ...userInfo,
+      isPasswordResetRequired: true,
+      password: await this.securityService.hash(tempPassword),
+    };
+    try {
+      user = await this.userRepository.create(user);
+      await this.emailService.sendTempPasswordEmail(userInfo.email, tempPassword);
+    } catch (error) {
+      const toDelete: IUser | null = await this.userRepository.findByEmail(userInfo.email);
+      if (toDelete) {
+        await this.deleteUser(toDelete.id as number);
+      }
+      throw error;
+    }
+
     const userPayload: UserPayload = this.omitPassword(user);
     return userPayload;
   }
 
-  @LoggingForAsync()
   async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
     const user = await this.getUserById(userId);
     if (!user) {
@@ -83,7 +92,6 @@ class UserService implements IUserService {
     await this.userRepository.setPasswordResetFlag(user, false);
   }
 
-  @LoggingForAsync()
   async forgotPassword(email: string): Promise<void> {
     const user = await this.getUserByEmail(email);
     if (!user) {
@@ -94,7 +102,6 @@ class UserService implements IUserService {
     await this.emailService.sendPasswordResetEmail(email, token);
   }
 
-  @LoggingForAsync()
   async resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string) {
     const token = await this.securityService.verifyResetToken(reset_token);
 
@@ -116,7 +123,6 @@ class UserService implements IUserService {
     await this.userRepository.setPasswordResetFlag(user, false);
   }
 
-  @LoggingForAsync()
   async adminResetPassword(userId: number) {
     const user = await this.getUserById(userId);
 
@@ -124,10 +130,7 @@ class UserService implements IUserService {
       throw new NotFoundException('User not found');
     }
 
-    const tempPassword = generator.generate({
-      length: 10,
-      numbers: true,
-    });
+    const tempPassword = this.generatePassword();
 
     user.password = await this.securityService.hash(tempPassword, 10);
     await this.userRepository.update(user);
@@ -135,7 +138,6 @@ class UserService implements IUserService {
     await this.userRepository.setPasswordResetFlag(user, true);
   }
 
-  @LoggingForAsync()
   async deleteUser(userId: number) {
     const user = await this.getUserById(userId);
     if (!user) {
@@ -144,11 +146,17 @@ class UserService implements IUserService {
     await this.userRepository.delete(user);
   }
 
-  @LoggingForAsync()
   async getUser(userId: number): Promise<UserPayload> {
     const user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
     return this.omitPassword(user);
+  }
+
+  private generatePassword(): string {
+    return generator.generate({
+      length: 10,
+      numbers: true,
+    });
   }
 }
 

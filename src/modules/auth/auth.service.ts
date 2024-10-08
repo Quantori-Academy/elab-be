@@ -7,7 +7,6 @@ import { ISession } from './interfaces/session.interface';
 import { ISecurityService } from '../security/interfaces/securityService.interface';
 import { IAuthRepository } from './interfaces/authRepository.interface';
 import { AUTH_REPOSITORY_TOKEN } from './auth.repository';
-import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -16,7 +15,6 @@ export class AuthService implements IAuthService {
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: IAuthRepository,
   ) {}
 
-  @LoggingForAsync()
   async login(payload: UserPayload): Promise<Tokens> {
     const tokens: Tokens = {
       access_token: await this.securityService.generateAccessToken(payload),
@@ -32,7 +30,6 @@ export class AuthService implements IAuthService {
     return tokens;
   }
 
-  @LoggingForAsync()
   async logout(user: UserPayload): Promise<void> {
     const session: ISession | false = await this.isLoggedIn(user.id as number);
     if (!session) throw new NotFoundException('Session not found');
@@ -40,14 +37,12 @@ export class AuthService implements IAuthService {
     await this.authRepository.update(session);
   }
 
-  @LoggingForAsync()
   async isLoggedIn(userId: number): Promise<ISession | false> {
     const session: ISession | null = await this.authRepository.findSessionByUserId(userId);
     if (!session || !session.isLoggedIn) return false;
     return session;
   }
 
-  @LoggingForAsync()
   async refreshAccessToken(user: UserPayload): Promise<AccessToken> {
     return await this.securityService.generateAccessToken(user);
   }

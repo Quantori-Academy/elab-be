@@ -2,13 +2,11 @@ import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedExceptio
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
 import { SECURITY_SERVICE_TOKEN } from 'src/modules/security/security.service';
 import { ISecurityService } from 'src/modules/security/interfaces/securityService.interface';
-import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
   constructor(@Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService) {}
 
-  @LoggingForAsync()
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
