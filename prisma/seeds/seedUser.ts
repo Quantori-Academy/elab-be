@@ -35,6 +35,8 @@ export async function UserSeed() {
       update: {},
       create: {
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
         password: await bcrypt.hash(user.password, 10),
         role: user.role,
       },
