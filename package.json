@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky || true",
-    "start:docker:dev": "prisma generate && prisma migrate dev && npm run start:dev",
+    "start:docker:dev": "prisma generate && prisma migrate deploy && npm run start:dev",
     "start:docker:prod": "prisma generate && prisma migrate deploy && npm run start:prod",
     "prisma:seed": "prisma db seed",
     "prisma:reset": "prisma migrate reset",
