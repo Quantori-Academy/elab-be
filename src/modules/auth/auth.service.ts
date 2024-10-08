@@ -1,17 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IAuthService } from './interfaces/authService.interface';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { AccessToken, Tokens } from '../security/interfaces/token.interface';
-import { SecurityService } from '../security/security.service';
-import { AuthRepository } from './auth.repository';
+import { SECURITY_SERVICE_TOKEN } from '../security/security.service';
 import { ISession } from './interfaces/session.interface';
+import { ISecurityService } from '../security/interfaces/securityService.interface';
+import { IAuthRepository } from './interfaces/authRepository.interface';
+import { AUTH_REPOSITORY_TOKEN } from './auth.repository';
 import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
-    private securityService: SecurityService,
-    private authRepository: AuthRepository,
+    @Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService,
+    @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: IAuthRepository,
   ) {}
 
   @LoggingForAsync()
@@ -50,3 +52,11 @@ export class AuthService implements IAuthService {
     return await this.securityService.generateAccessToken(user);
   }
 }
+
+const AUTH_SERVICE_TOKEN = Symbol('AUTH_SERVICE_TOKEN');
+const AuthServiceProvider = {
+  provide: AUTH_SERVICE_TOKEN,
+  useClass: AuthService,
+};
+
+export { AUTH_SERVICE_TOKEN, AuthServiceProvider };

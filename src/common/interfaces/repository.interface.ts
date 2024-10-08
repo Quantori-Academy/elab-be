@@ -1,6 +1,7 @@
 export interface IRepository<T> {
   findById(id: number): Promise<T | null>;
-  create(entity: T): Promise<any>;
-  update(entity: T): Promise<any>;
+  create(entity: T): Promise<T>;
+  update(entity: T): Promise<T>;
   upsert(entity: T): Promise<void>;
+  delete(entity: T): Promise<T>;
 }

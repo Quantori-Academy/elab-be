@@ -1,11 +1,12 @@
-import { UserService } from 'src/modules/user/user.service';
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { USER_SERVICE_TOKEN } from 'src/modules/user/user.service';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { IUser, UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
+import { IUserService } from 'src/modules/user/interfaces/userService.interface';
 import { LoggingForAsync } from '../../../common/decorators/logger.decorator';
 
 @Injectable()
 export class LoginGuard implements CanActivate {
-  constructor(private userService: UserService) {}
+  constructor(@Inject(USER_SERVICE_TOKEN) private userService: IUserService) {}
 
   @LoggingForAsync()
   async canActivate(context: ExecutionContext): Promise<boolean> {

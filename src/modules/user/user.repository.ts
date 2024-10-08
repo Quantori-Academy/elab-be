@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 
 @Injectable()
-export class UserRepository implements IRepository<IUser> {
+class UserRepository implements IRepository<IUser> {
   constructor(private readonly prisma: PrismaService) {}
 
   @LoggingForAsync()
@@ -67,3 +67,11 @@ export class UserRepository implements IRepository<IUser> {
     });
   }
 }
+
+const USER_REPOSITORY_TOKEN = Symbol('USER_REPOSITORY_TOKEN');
+const UserRepositoryProvider = {
+  provide: USER_REPOSITORY_TOKEN,
+  useClass: UserRepository,
+};
+
+export { USER_REPOSITORY_TOKEN, UserRepositoryProvider };

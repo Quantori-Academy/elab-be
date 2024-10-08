@@ -1,19 +1,21 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IUser, UserPayload } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
-import { UserRepository } from './user.repository';
-import { SecurityService } from '../security/security.service';
+import { USER_REPOSITORY_TOKEN } from './user.repository';
+import { SECURITY_SERVICE_TOKEN } from '../security/security.service';
 import { EmailService } from '../email/email.service';
 import { ResetToken } from '../security/interfaces/token.interface';
 import generator from 'generate-password-ts';
+import { IUserRepository } from './interfaces/userRepository.interface';
+import { ISecurityService } from '../security/interfaces/securityService.interface';
 import { LoggingForAsync, LoggingForSync } from 'src/common/decorators/logger.decorator';
 
 @Injectable()
-export class UserService implements IUserService {
+class UserService implements IUserService {
   constructor(
-    private userRepository: UserRepository,
-    private securityService: SecurityService,
+    @Inject(USER_REPOSITORY_TOKEN) private userRepository: IUserRepository,
+    @Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService,
     private emailService: EmailService,
   ) {}
 
@@ -24,8 +26,7 @@ export class UserService implements IUserService {
 
   @LoggingForAsync()
   async getUserById(id: number): Promise<IUser | null> {
-  private async getUserByEmail(email: string): Promise<IUser | null> {
-    return await this.userRepository.findByEmail(email);
+    return await this.userRepository.findById(id);
   }
 
   @LoggingForAsync()
@@ -150,3 +151,11 @@ export class UserService implements IUserService {
     return this.omitPassword(user);
   }
 }
+
+const USER_SERVICE_TOKEN = Symbol('USER_SERVICE_TOKEN');
+const UserServiceProvider = {
+  provide: USER_SERVICE_TOKEN,
+  useClass: UserService,
+};
+
+export { USER_SERVICE_TOKEN, UserServiceProvider };

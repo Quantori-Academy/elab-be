@@ -1,5 +1,5 @@
-import { Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Controller, Delete, Get, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { AUTH_SERVICE_TOKEN } from './auth.service';
 import { LoginGuard } from 'src/modules/auth/guards/login.guard';
 import { Request, Response } from 'express';
 import { Tokens } from '../security/interfaces/token.interface';
@@ -11,6 +11,7 @@ import { RefreshTokenErrorResponseDto, RefreshTokenSuccessResponseDto } from './
 import { AuthGuard } from './guards/auth.guard';
 import { LogoutErrorResponseDto, LogoutSuccessResponseDto } from './dto/logout.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { IAuthService } from './interfaces/authService.interface';
 import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 
 const ROUTE = 'auth';
@@ -18,7 +19,7 @@ const ROUTE = 'auth';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  @Inject(AUTH_SERVICE_TOKEN) private authService: IAuthService;
 
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, type: LoginSuccessResponseDto })

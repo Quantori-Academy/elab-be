@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Delete,
+  Inject,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -15,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
-import { UserService } from './user.service';
+import { USER_SERVICE_TOKEN } from './user.service';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
@@ -28,6 +29,7 @@ import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto } from './dto/createUser.dto';
+import { IUserService } from './interfaces/userService.interface';
 import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 
@@ -36,7 +38,7 @@ const ROUTE = 'users';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(@Inject(USER_SERVICE_TOKEN) private userService: IUserService) {}
 
   @ApiBearerAuth()
   @ApiResponse({ status: 200, type: EditUserRoleSuccessResponseDto })
