@@ -11,6 +11,7 @@ import { RefreshTokenErrorResponseDto, RefreshTokenSuccessResponseDto } from './
 import { AuthGuard } from './guards/auth.guard';
 import { LogoutErrorResponseDto, LogoutSuccessResponseDto } from './dto/logout.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 
 const ROUTE = 'auth';
 
@@ -24,6 +25,7 @@ export class AuthController {
   @ApiResponse({ status: 401, type: LoginErrorResponseDto })
   @UseGuards(LoginGuard)
   @Post('login')
+  @LoggingForAsync()
   async login(@Req() req: Request, @Res() res: Response) {
     const user: UserPayload = (req as any).user as UserPayload;
     const tokens: Tokens = await this.authService.login(user);
@@ -37,6 +39,7 @@ export class AuthController {
   @ApiResponse({ status: 404, type: LogoutErrorResponseDto })
   @UseGuards(AuthGuard)
   @Delete('logout')
+  @LoggingForAsync()
   async logout(@Req() req: Request, @Res() res: Response) {
     const user: UserPayload = (req as any).user as UserPayload;
     await this.authService.logout(user);
@@ -50,6 +53,7 @@ export class AuthController {
   @ApiResponse({ status: 401, type: RefreshTokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')
+  @LoggingForAsync()
   async refreshAccessToken(@Req() req: Request) {
     const user: UserPayload = (req as any).user as UserPayload;
     return {
