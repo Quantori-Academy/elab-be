@@ -154,6 +154,14 @@ export class UserController {
   }
 
   @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('current')
+  async getCurrentUser(@Req() req: Request) {
+    const user: UserPayload = (req as any).user as UserPayload;
+    return await this.userService.getUser(user.id as number);
+  }
+
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, type: GetUserSuccessDto })
   @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
