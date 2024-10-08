@@ -1,9 +1,7 @@
-import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { ISecurityService } from 'src/modules/security/interfaces/securityService.interface';
 import { SECURITY_SERVICE_TOKEN } from 'src/modules/security/security.service';
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
-import { SecurityService } from 'src/modules/security/security.service';
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
 
 @Injectable()
