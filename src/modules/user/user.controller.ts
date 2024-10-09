@@ -177,10 +177,8 @@ export class UserController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, type: GetUserSuccessDto })
-  @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: 200, type: [GetUserSuccessDto] })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
-  @ApiResponse({ status: 404, type: GetUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
