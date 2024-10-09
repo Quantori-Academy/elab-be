@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, HttpStatus, Inject, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AUTH_SERVICE_TOKEN } from './auth.service';
 import { LoginGuard } from 'src/modules/auth/guards/login.guard';
 import { Request, Response } from 'express';
@@ -21,8 +21,8 @@ export class AuthController {
   @Inject(AUTH_SERVICE_TOKEN) private authService: IAuthService;
 
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 200, type: LoginSuccessResponseDto })
-  @ApiResponse({ status: 401, type: LoginErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: LoginSuccessResponseDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: LoginErrorResponseDto })
   @UseGuards(LoginGuard)
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
@@ -33,9 +33,9 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, type: LogoutSuccessResponseDto })
-  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
-  @ApiResponse({ status: 404, type: LogoutErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: LogoutSuccessResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: LogoutErrorResponseDto })
   @UseGuards(AuthGuard)
   @Delete('logout')
   async logout(@Req() req: Request, @Res() res: Response) {
@@ -46,9 +46,9 @@ export class AuthController {
   }
 
   @ApiCookieAuth()
-  @ApiResponse({ status: 200, type: RefreshTokenSuccessResponseDto })
-  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
-  @ApiResponse({ status: 401, type: RefreshTokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: RefreshTokenSuccessResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: RefreshTokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')
   async refreshAccessToken(@Req() req: Request) {
