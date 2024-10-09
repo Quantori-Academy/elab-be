@@ -175,4 +175,16 @@ export class UserController {
   async getUser(@Param('id', ParseIdPipe) userId: number) {
     return await this.userService.getUser(userId);
   }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: GetUserSuccessDto })
+  @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 404, type: GetUserErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getUsers() {
+    return await this.userService.getUsers();
+  }
 }

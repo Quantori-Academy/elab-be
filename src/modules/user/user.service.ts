@@ -41,6 +41,14 @@ class UserService implements IUserService {
     return userPayload;
   }
 
+  omitPasswords(users: IUser[]): UserPayload[] {
+    const userPayloads: UserPayload[] = users.map(({ password, ...userPayload }) => {
+      void password; // for lint (intentionally not using this variable)
+      return userPayload;
+    });
+    return userPayloads;
+  }
+
   async editUserRole(userId: number, role: Role): Promise<UserPayload> {
     let user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
@@ -150,6 +158,11 @@ class UserService implements IUserService {
     const user: IUser | null = await this.getUserById(userId);
     if (!user) throw new NotFoundException('User not found');
     return this.omitPassword(user);
+  }
+
+  async getUsers(): Promise<UserPayload[]> {
+    const users: IUser[] = await this.userRepository.findAll();
+    return this.omitPasswords(users);
   }
 
   private generatePassword(): string {

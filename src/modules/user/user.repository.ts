@@ -19,6 +19,10 @@ class UserRepository implements IRepository<IUser> {
     });
   }
 
+  async findAll(): Promise<IUser[]> {
+    return await this.prisma.user.findMany();
+  }
+
   async update(user: IUser): Promise<IUser> {
     return await this.prisma.user.update({
       where: { id: user.id },
