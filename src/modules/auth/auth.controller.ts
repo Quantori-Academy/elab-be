@@ -50,8 +50,7 @@ export class AuthController {
   @ApiCookieAuth()
   @ApiResponse({ status: HttpStatus.OK, type: RefreshTokenSuccessResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: RefreshTokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')
   async refreshAccessToken(@Req() req: Request) {
