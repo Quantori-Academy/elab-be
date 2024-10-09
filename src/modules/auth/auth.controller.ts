@@ -7,11 +7,12 @@ import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiResponse, ApiTags } from '@ne
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { RefreshTokenErrorResponseDto, RefreshTokenSuccessResponseDto } from './dto/refreshToken.dto';
+import { RefreshTokenSuccessResponseDto } from './dto/refreshToken.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { LogoutErrorResponseDto, LogoutSuccessResponseDto } from './dto/logout.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { IAuthService } from './interfaces/authService.interface';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
 const ROUTE = 'auth';
 
@@ -35,6 +36,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, type: LogoutSuccessResponseDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
   @ApiResponse({ status: 404, type: LogoutErrorResponseDto })
   @UseGuards(AuthGuard)
   @Delete('logout')
@@ -48,7 +50,7 @@ export class AuthController {
   @ApiCookieAuth()
   @ApiResponse({ status: 200, type: RefreshTokenSuccessResponseDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
-  @ApiResponse({ status: 401, type: RefreshTokenErrorResponseDto })
+  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')
   async refreshAccessToken(@Req() req: Request) {

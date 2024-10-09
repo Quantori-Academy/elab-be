@@ -36,6 +36,7 @@ import {
 } from './dto/createUser.dto';
 import { IUserService } from './interfaces/userService.interface';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
 const ROUTE = 'users';
 
@@ -47,7 +48,8 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, type: EditUserRoleSuccessResponseDto })
   @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
-  @ApiResponse({ status: 401, type: EditUserRoleErrorResponseDto })
+  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
+  @ApiResponse({ status: 404, type: EditUserRoleErrorResponseDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -63,6 +65,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: 201, type: CreateUserSuccessDto })
   @ApiResponse({ status: 400, type: CreateUserValidationErrorDto })
+  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 409, type: CreateUserErrorDto })
   @Roles(Role.Admin)
@@ -156,6 +159,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: 200, type: GetUserSuccessDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
   @ApiResponse({ status: 404, type: GetUserErrorDto })
   @UseGuards(AuthGuard)
   @Get('current')
@@ -168,6 +172,7 @@ export class UserController {
   @ApiResponse({ status: 200, type: GetUserSuccessDto })
   @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
   @ApiResponse({ status: 404, type: GetUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
