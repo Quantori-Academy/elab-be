@@ -51,7 +51,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  @ApiResponse({ status: HttpStatus.HttpStatus.NOT_FOUND, type: EditUserRoleErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: EditUserRoleErrorResponseDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
