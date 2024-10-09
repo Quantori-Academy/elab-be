@@ -69,3 +69,4 @@ model Room {
   locations   Storage[] 
 }
 
+
