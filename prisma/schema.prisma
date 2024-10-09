@@ -50,8 +50,22 @@ model Reagent {
 }
 
 model Storage {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  reagents      Reagent[]
+  id          Int      @id @default(autoincrement())
+  roomId      Int
+  room        Room     @relation(fields: [roomId], references: [id])
+  name        String   
+  description String?  
+  reagents    Reagent[] 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([roomId, name]) 
 }
+
+model Room {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  description String?         
+  locations   Storage[] 
+}
+
