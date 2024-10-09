@@ -34,7 +34,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: 401, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.OK, type: LogoutSuccessResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: LogoutErrorResponseDto })
