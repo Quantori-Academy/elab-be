@@ -28,9 +28,13 @@ import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { CreateUserDto, CreateUserErrorDto, CreateUserValidationErrorDto } from './dto/createUser.dto';
+import {
+  CreateUserDto,
+  CreateUserErrorDto,
+  CreateUserSuccessDto,
+  CreateUserValidationErrorDto,
+} from './dto/createUser.dto';
 import { IUserService } from './interfaces/userService.interface';
-import { LoggingForAsync } from 'src/common/decorators/logger.decorator';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 
 const ROUTE = 'users';
@@ -48,7 +52,6 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
-  @LoggingForAsync()
   async editRole(
     @Param('id', ParseIdPipe) userId: number,
     @Body(ValidationPipe) body: EditUserRoleDto,
@@ -58,14 +61,13 @@ export class UserController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: 201, type: CreateUserDto })
+  @ApiResponse({ status: 201, type: CreateUserSuccessDto })
   @ApiResponse({ status: 400, type: CreateUserValidationErrorDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 409, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('create-user')
-  @LoggingForAsync()
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
   }
@@ -79,7 +81,6 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('/:id/reset-password')
-  @LoggingForAsync()
   async adminResetPassword(@Param('id', ParseIdPipe) id: number) {
     try {
       await this.userService.adminResetPassword(id);
@@ -99,7 +100,6 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Delete('/:id')
-  @LoggingForAsync()
   async deleteUser(@Param('id', ParseIdPipe) id: number) {
     try {
       await this.userService.deleteUser(id);
@@ -120,7 +120,6 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'The User is not found' })
   @Post('change-password')
   @UseGuards(AuthGuard)
-  @LoggingForAsync()
   async changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
     const user: UserPayload = (req as any).user as UserPayload;
     await this.userService.changePassword(
@@ -136,7 +135,6 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'The link to reset password is sent to email' })
   @ApiResponse({ status: 404, description: 'User with this email not found' })
   @Post('forgot-password')
-  @LoggingForAsync()
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     await this.userService.forgotPassword(forgotPasswordDto.email);
     return {
@@ -148,7 +146,6 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Passwords do not match' })
   @ApiResponse({ status: 404, description: 'The User is not found' })
   @Post('reset-password')
-  @LoggingForAsync()
   async resetPassword(@Query('reset_token') reset_token: string, @Body() resetPasswordDto: ResetPasswordDto) {
     await this.userService.resetPassword(reset_token, resetPasswordDto.newPassword, resetPasswordDto.confirmPassword);
     return {
@@ -158,12 +155,23 @@ export class UserController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: 200, type: GetUserSuccessDto })
-  @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: 403, type: ForbiddenErrorDto })
   @ApiResponse({ status: 404, type: GetUserErrorDto })
   @UseGuards(AuthGuard)
+  @Get('current')
+  async getCurrentLoggedInUser(@Req() req: Request) {
+    const user: UserPayload = (req as any).user as UserPayload;
+    return await this.userService.getUser(user.id as number);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: GetUserSuccessDto })
+  @ApiResponse({ status: 400, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @ApiResponse({ status: 404, type: GetUserErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Get(':id')
-  @LoggingForAsync()
   async getUser(@Param('id', ParseIdPipe) userId: number) {
     return await this.userService.getUser(userId);
   }

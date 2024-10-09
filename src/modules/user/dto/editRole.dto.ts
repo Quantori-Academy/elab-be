@@ -1,6 +1,7 @@
 import { IsEnum } from 'class-validator';
 import { Role } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserPayload } from '../interfaces/userEntity.interface';
 
 class EditUserRoleDto {
   @ApiProperty({ example: 'Admin' })
@@ -8,9 +9,15 @@ class EditUserRoleDto {
   role: Role;
 }
 
-class EditUserRoleSuccessResponseDto {
+class EditUserRoleSuccessResponseDto implements UserPayload {
   @ApiProperty({ example: 1 })
   id: number;
+
+  @ApiProperty({ example: 'Arman' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Mikoyan' })
+  lastName: string;
 
   @ApiProperty({ example: 'admin@elab.com' })
   email: string;

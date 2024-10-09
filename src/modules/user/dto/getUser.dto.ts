@@ -6,11 +6,20 @@ class GetUserSuccessDto implements UserPayload {
   @ApiProperty({ example: 1 })
   id: number;
 
+  @ApiProperty({ example: 'Arman' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Mikoyan' })
+  lastName: string;
+
   @ApiProperty({ example: 'mockEmail@gmail.com' })
   email: string;
 
   @ApiProperty({ example: 'Admin' })
   role: Role;
+
+  @ApiProperty({ example: true })
+  isPasswordResetRequired: boolean;
 }
 
 class GetUserErrorDto {

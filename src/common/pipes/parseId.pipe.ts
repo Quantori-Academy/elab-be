@@ -1,9 +1,7 @@
 import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
-import { LoggingForSync } from '../decorators/logger.decorator';
 
 @Injectable()
 export class ParseIdPipe implements PipeTransform {
-  @LoggingForSync()
   transform(value: any, metadata: ArgumentMetadata) {
     if (!value) {
       throw new BadRequestException('Value is required.');
