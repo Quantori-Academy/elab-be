@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { setupSwagger } from './common/config/swagger.config';
+import { setupSwagger } from './common/configs/swagger.config';
+import { corsOptions } from './common/configs/cors.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   if (process.env.NODE_ENV !== 'production') {
-    app.enableCors({ origin: '*' });
+    app.enableCors(corsOptions);
   }
 
   app.setGlobalPrefix('api/v1');
