@@ -6,6 +6,7 @@ const whiteList = [
   'https://vm5.quantori.academy',
   'http://vm5.quantori.academy',
   'http://localhost:4200',
+  'http://localhost:3000/',
   'http://vm5.quantori.academy:3001',
 ];
 
