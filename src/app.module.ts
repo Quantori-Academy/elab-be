@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { StorageModule } from './modules/storage/storage.module';
 import * as cookieParser from 'cookie-parser';
+import { ReagentModule } from './modules/reagent/reagent.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import * as cookieParser from 'cookie-parser';
     SecurityModule,
     PrismaModule,
     StorageModule,
+    ReagentModule,
   ],
 })
 export class AppModule implements NestModule {
