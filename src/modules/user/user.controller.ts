@@ -13,6 +13,7 @@ import {
   Req,
   UseGuards,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
@@ -42,6 +43,8 @@ const ROUTE = 'users';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class UserController {
+  private readonly logger: Logger = new Logger(UserController.name);
+
   constructor(@Inject(USER_SERVICE_TOKEN) private userService: IUserService) {}
 
   @ApiBearerAuth()
@@ -67,7 +70,7 @@ export class UserController {
   @ApiResponse({ status: 409, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('create-user')
+  @Post('')
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
   }
@@ -183,6 +186,14 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
   async getUsers() {
-    return await this.userService.getUsers();
+    this.logger.log(`[${this.getUsers.name}] - Method start`);
+    try {
+      const users: UserPayload[] = await this.userService.getUsers();
+      this.logger.log(`[${this.getUsers.name}] - Method finished`);
+      return users;
+    } catch (error) {
+      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { IUser, UserPayload } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
@@ -13,6 +13,8 @@ import { CreateUserDto } from './dto/createUser.dto';
 
 @Injectable()
 class UserService implements IUserService {
+  private readonly logger: Logger = new Logger(UserService.name);
+
   constructor(
     @Inject(USER_REPOSITORY_TOKEN) private userRepository: IUserRepository,
     @Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService,
@@ -36,17 +38,32 @@ class UserService implements IUserService {
   }
 
   omitPassword(user: IUser): UserPayload {
-    const { password, ...userPayload } = user;
-    void password; // for lint (intentionally not using this variable)
-    return userPayload;
+    this.logger.log(`[${this.omitPassword.name}] - Method start`);
+    try {
+      const { password, ...userPayload } = user;
+      void password; // for lint (intentionally not using this variable)
+
+      this.logger.log(`[${this.omitPassword.name}] - Method finished`);
+      return userPayload;
+    } catch (error) {
+      this.logger.error(`[${this.omitPassword.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 
   omitPasswords(users: IUser[]): UserPayload[] {
-    const userPayloads: UserPayload[] = users.map(({ password, ...userPayload }) => {
-      void password; // for lint (intentionally not using this variable)
-      return userPayload;
-    });
-    return userPayloads;
+    this.logger.log(`[${this.omitPasswords.name}] - Method start`);
+    try {
+      const userPayloads: UserPayload[] = users.map(({ password, ...userPayload }) => {
+        void password; // for lint (intentionally not using this variable)
+        return userPayload;
+      });
+      this.logger.log(`[${this.omitPasswords.name}] - Method finished`);
+      return userPayloads;
+    } catch (error) {
+      this.logger.error(`[${this.omitPasswords.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 
   async editUserRole(userId: number, role: Role): Promise<UserPayload> {
@@ -161,8 +178,16 @@ class UserService implements IUserService {
   }
 
   async getUsers(): Promise<UserPayload[]> {
-    const users: IUser[] = await this.userRepository.findAll();
-    return this.omitPasswords(users);
+    this.logger.log(`[${this.getUsers.name}] - Method start`);
+    try {
+      const users: IUser[] = await this.userRepository.findAll();
+      const saveUsers: UserPayload[] = this.omitPasswords(users);
+      this.logger.log(`[${this.getUsers.name}] - Method finished`);
+      return saveUsers;
+    } catch (error) {
+      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 
   private generatePassword(): string {

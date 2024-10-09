@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { IUser } from './interfaces/userEntity.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 class UserRepository implements IRepository<IUser> {
+  private readonly logger: Logger = new Logger(UserRepository.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string): Promise<IUser | null> {
@@ -20,7 +22,15 @@ class UserRepository implements IRepository<IUser> {
   }
 
   async findAll(): Promise<IUser[]> {
-    return await this.prisma.user.findMany();
+    this.logger.log(`[${this.findAll.name}] - Method start`);
+    try {
+      const users: IUser[] = await this.prisma.user.findMany();
+      this.logger.log(`[${this.findAll.name}] - Method finished`);
+      return users;
+    } catch (error) {
+      this.logger.error(`[${this.findAll.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 
   async update(user: IUser): Promise<IUser> {
