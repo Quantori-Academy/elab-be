@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BffHealthCheck, STATUS } from '../../entities';
-import { StatusORMService } from '../orm/orm.service';
+import { BffHealthCheck, STATUS } from './entities';
+import { StatusORMService } from './orm/orm.service';
 
 @Injectable()
 export class StatusService {
