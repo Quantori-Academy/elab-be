@@ -13,6 +13,7 @@ import {
   Req,
   UseGuards,
   ValidationPipe,
+  Logger,
   HttpStatus,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -44,6 +45,8 @@ const ROUTE = 'users';
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class UserController {
+  private readonly logger: Logger = new Logger(UserController.name);
+
   constructor(@Inject(USER_SERVICE_TOKEN) private userService: IUserService) {}
 
   @ApiBearerAuth()
@@ -71,7 +74,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.CONFLICT, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('create-user')
+  @Post('')
   async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
     return this.userService.createUser(user);
   }
@@ -180,5 +183,23 @@ export class UserController {
   @Get(':id')
   async getUser(@Param('id', ParseIdPipe) userId: number) {
     return await this.userService.getUser(userId);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: [GetUserSuccessDto] })
+  @ApiResponse({ status: 403, type: ForbiddenErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getUsers() {
+    this.logger.log(`[${this.getUsers.name}] - Method start`);
+    try {
+      const users: UserPayload[] = await this.userService.getUsers();
+      this.logger.log(`[${this.getUsers.name}] - Method finished`);
+      return users;
+    } catch (error) {
+      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 }
