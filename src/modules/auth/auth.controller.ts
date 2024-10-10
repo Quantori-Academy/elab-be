@@ -41,8 +41,10 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Delete('logout')
   async logout(@Req() req: Request, @Res() res: Response) {
-    const user: UserPayload = (req as any).user as UserPayload;
-    await this.authService.logout(user);
+    const user: UserPayload | null = (req as any).user as UserPayload;
+    if (user) {
+      await this.authService.logout(user);
+    }
     res.clearCookie('refresh_token', { httpOnly: true });
     return res.status(200).json({ message: 'Logged out successfully' });
   }

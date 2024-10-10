@@ -18,6 +18,11 @@ export class AuthGuard implements CanActivate {
         this.logger.log(`[${this.canActivate.name}] - Forbidden`);
         return false;
       }
+      if (request.method === 'DELETE' && request.url === '/api/v1/auth/logout') {
+        request.user = null;
+        return true;
+      }
+
       const payload: UserPayload = await this.securityService.verifyAccessToken(token);
       request.user = payload;
 
