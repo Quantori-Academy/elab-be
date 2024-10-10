@@ -18,12 +18,8 @@ export class AuthGuard implements CanActivate {
         this.logger.log(`[${this.canActivate.name}] - Forbidden`);
         return false;
       }
-      try {
-        const payload: UserPayload = await this.securityService.verifyAccessToken(token);
-        request.user = payload;
-      } catch (error) {
-        throw new UnauthorizedException(error.message);
-      }
+      const payload: UserPayload = await this.securityService.verifyAccessToken(token);
+      request.user = payload;
 
       this.logger.log(`[${this.canActivate.name}] - Method finished`);
       return true;
