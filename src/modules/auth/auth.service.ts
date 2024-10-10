@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { IAuthService } from './interfaces/authService.interface';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { AccessToken, RefreshToken, Tokens } from '../security/interfaces/token.interface';
@@ -10,6 +10,8 @@ import { AUTH_REPOSITORY_TOKEN } from './auth.repository';
 
 @Injectable()
 export class AuthService implements IAuthService {
+  private readonly logger: Logger = new Logger(AuthService.name);
+
   constructor(
     @Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService,
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: IAuthRepository,
@@ -31,15 +33,24 @@ export class AuthService implements IAuthService {
   }
 
   async logout(user: UserPayload | null, token: RefreshToken | null = null): Promise<void> {
+    this.logger.log(`[${this.logout.name}] - Method start`);
     let session: ISession | false;
-    if (user) {
-      session = await this.isLoggedIn(user.id as number, null);
-    } else {
-      session = await this.isLoggedIn(null, token);
+    try {
+      if (user) {
+        session = await this.isLoggedIn(user.id as number, null);
+      } else {
+        session = await this.isLoggedIn(null, token);
+      }
+
+      if (!session) throw new NotFoundException('Session not found');
+      session.isLoggedIn = false;
+      await this.authRepository.update(session);
+
+      this.logger.log(`[${this.logout.name}] - Method finished`);
+    } catch (error) {
+      this.logger.error(`[${this.logout.name}] - Exception thrown` + error);
+      throw error;
     }
-    if (!session) throw new NotFoundException('Session not found');
-    session.isLoggedIn = false;
-    await this.authRepository.update(session);
   }
 
   async isLoggedIn(userId: number | null, token: RefreshToken | null = null): Promise<ISession | false> {
