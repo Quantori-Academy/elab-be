@@ -7,11 +7,12 @@ import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiResponse, ApiTags } from '@ne
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { RefreshTokenErrorResponseDto, RefreshTokenSuccessResponseDto } from './dto/refreshToken.dto';
+import { RefreshTokenSuccessResponseDto } from './dto/refreshToken.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { LogoutErrorResponseDto, LogoutSuccessResponseDto } from './dto/logout.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { IAuthService } from './interfaces/authService.interface';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
 const ROUTE = 'auth';
 
@@ -33,6 +34,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.OK, type: LogoutSuccessResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: LogoutErrorResponseDto })
@@ -47,8 +49,7 @@ export class AuthController {
 
   @ApiCookieAuth()
   @ApiResponse({ status: HttpStatus.OK, type: RefreshTokenSuccessResponseDto })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: RefreshTokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @UseGuards(RefreshTokenGuard)
   @Get('refreshAccessToken')
   async refreshAccessToken(@Req() req: Request) {

@@ -37,6 +37,7 @@ import {
 } from './dto/createUser.dto';
 import { IUserService } from './interfaces/userService.interface';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
 const ROUTE = 'users';
 
@@ -48,8 +49,9 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: EditUserRoleSuccessResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: EditUserRoleErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: EditUserRoleErrorResponseDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
@@ -65,6 +67,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateUserSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateUserValidationErrorDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.CONFLICT, type: CreateUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -157,6 +160,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetUserSuccessDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: GetUserErrorDto })
   @UseGuards(AuthGuard)
   @Get('current')
@@ -169,6 +173,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, type: GetUserSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: GetUserErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
