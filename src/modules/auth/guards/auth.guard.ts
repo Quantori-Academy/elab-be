@@ -1,6 +1,6 @@
 import { ISecurityService } from 'src/modules/security/interfaces/securityService.interface';
 import { SECURITY_SERVICE_TOKEN } from 'src/modules/security/security.service';
-import { CanActivate, ExecutionContext, Inject, Injectable, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class AuthGuard implements CanActivate {
       return true;
     } catch (error) {
       this.logger.error(`[${this.canActivate.name}] Exception thrown ` + error);
-      throw error;
+      throw new UnauthorizedException(error.message);
     }
   }
 }
