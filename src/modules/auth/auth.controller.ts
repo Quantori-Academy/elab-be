@@ -29,10 +29,18 @@ export class AuthController {
   @UseGuards(LoginGuard)
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
-    const user: UserPayload = (req as any).user as UserPayload;
-    const tokens: Tokens = await this.authService.login(user);
-    res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
-    return res.status(200).json({ access_token: tokens.access_token });
+    this.logger.log(`[${this.login.name}] - Method start`);
+    try {
+      const user: UserPayload = (req as any).user as UserPayload;
+      const tokens: Tokens = await this.authService.login(user);
+      res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
+
+      this.logger.log(`[${this.login.name}] - Method finished`);
+      return res.status(200).json({ access_token: tokens.access_token });
+    } catch (error) {
+      this.logger.error(`[${this.login.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 
   @ApiBearerAuth()

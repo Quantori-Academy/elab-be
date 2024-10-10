@@ -54,18 +54,34 @@ export class AuthService implements IAuthService {
   }
 
   async isLoggedIn(userId: number | null, token: RefreshToken | null = null): Promise<ISession | false> {
+    this.logger.log(`[${this.isLoggedIn.name}] - Method start`);
     let session: ISession | null;
-    if (userId) {
-      session = await this.authRepository.findSessionByUserId(userId);
-    } else {
-      session = await this.authRepository.findSessionByRefreshToken(token!);
+    try {
+      if (userId) {
+        session = await this.authRepository.findSessionByUserId(userId);
+      } else {
+        session = await this.authRepository.findSessionByRefreshToken(token!);
+      }
+
+      this.logger.log(`[${this.isLoggedIn.name}] - Method finished`);
+      if (!session || !session.isLoggedIn) return false;
+      return session;
+    } catch (error) {
+      this.logger.error(`[${this.isLoggedIn.name}] - Exception thrown` + error);
+      throw error;
     }
-    if (!session || !session.isLoggedIn) return false;
-    return session;
   }
 
   async refreshAccessToken(user: UserPayload): Promise<AccessToken> {
-    return await this.securityService.generateAccessToken(user);
+    this.logger.log(`[${this.refreshAccessToken.name}] - Method start`);
+    try {
+      const token: AccessToken = await this.securityService.generateAccessToken(user);
+      this.logger.log(`[${this.refreshAccessToken.name}] - Method finished`);
+      return token;
+    } catch (error) {
+      this.logger.error(`[${this.refreshAccessToken.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 }
 
