@@ -4,7 +4,7 @@ import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
 import { USER_REPOSITORY_TOKEN } from './user.repository';
 import { SECURITY_SERVICE_TOKEN } from '../security/security.service';
-import { EmailService } from '../email/email.service';
+import { EmailService } from '../../common/services/email/email.service';
 import { ResetToken } from '../security/interfaces/token.interface';
 import generator from 'generate-password-ts';
 import { IUserRepository } from './interfaces/userRepository.interface';

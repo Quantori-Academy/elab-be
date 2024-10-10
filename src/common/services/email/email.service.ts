@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { ResetToken } from '../security/interfaces/token.interface';
+import { ResetToken } from 'src/modules/security/interfaces/token.interface';
 
 @Injectable()
 export class EmailService {
