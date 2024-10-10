@@ -77,11 +77,18 @@ This is the backend service for the E-LAB project, built with Nest.js and TypeSc
 
 The E-LAB backend follows a layered architecture for scalability and maintainability:
 
-1. **Controller Layer**: Manages HTTP requests and responses.
-2. **Service Layers**:
-   2.1 **Module Service**: Encapsulates business logic.
-   2.2 ***ORM Service**: Encapsulates database interactions.
-3. **DTOs and Validators**: Ensure data integrity across layers.
+1. **Prisma Layer**: Manages database schemas, migrations, and interactions using Prisma ORM.
+2. **Modules Layer**:
+Each module contains components related to specific features or functionalities.
+
+   2.1 **Controller**: Handles HTTP requests, processes them, and returns responses.
+
+   2.2 **Service**: Contains business logic, coordinates between controllers and the data layer.
+
+   2.3 **DTOs and Validators**: Ensure data integrity across layers.
+
+   2.4 **Interfaces**: Define the shape of data and objects used throughout the application.
+3. **Common Layer**: Contains shared configs, decorators, guards, dtos, interfaces, pipes, services, and reusable components accessible across different modules.
 
 ### Best Practices
 
