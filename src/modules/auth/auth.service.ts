@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IAuthService } from './interfaces/authService.interface';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
-import { AccessToken, Tokens } from '../security/interfaces/token.interface';
+import { AccessToken, RefreshToken, Tokens } from '../security/interfaces/token.interface';
 import { SECURITY_SERVICE_TOKEN } from '../security/security.service';
 import { ISession } from './interfaces/session.interface';
 import { ISecurityService } from '../security/interfaces/securityService.interface';
@@ -30,15 +30,25 @@ export class AuthService implements IAuthService {
     return tokens;
   }
 
-  async logout(user: UserPayload): Promise<void> {
-    const session: ISession | false = await this.isLoggedIn(user.id as number);
+  async logout(user: UserPayload | null, token: RefreshToken | null = null): Promise<void> {
+    let session: ISession | false;
+    if (user) {
+      session = await this.isLoggedIn(user.id as number, null);
+    } else {
+      session = await this.isLoggedIn(null, token);
+    }
     if (!session) throw new NotFoundException('Session not found');
     session.isLoggedIn = false;
     await this.authRepository.update(session);
   }
 
-  async isLoggedIn(userId: number): Promise<ISession | false> {
-    const session: ISession | null = await this.authRepository.findSessionByUserId(userId);
+  async isLoggedIn(userId: number | null, token: RefreshToken | null = null): Promise<ISession | false> {
+    let session: ISession | null;
+    if (userId) {
+      session = await this.authRepository.findSessionByUserId(userId);
+    } else {
+      session = await this.authRepository.findSessionByRefreshToken(token!);
+    }
     if (!session || !session.isLoggedIn) return false;
     return session;
   }

@@ -27,7 +27,7 @@ model User {
   password                String
   role                    Role
   isPasswordResetRequired Boolean  @default(false)
-  sessions Session[] @ignore
+  sessions Session[] //@ignore
 }
 
 model Session {

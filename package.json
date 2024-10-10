@@ -37,7 +37,7 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "cookie-parser": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "generate-password-ts": "^1.6.5",
     "nodemailer": "^6.9.15",
     "reflect-metadata": "^0.2.0",

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { ISession } from './interfaces/session.interface';
+import { RefreshToken } from '../security/interfaces/token.interface';
 
 @Injectable()
 export class AuthRepository implements Partial<IRepository<ISession>> {
@@ -11,6 +12,14 @@ export class AuthRepository implements Partial<IRepository<ISession>> {
     return await this.prisma.session.findFirst({
       where: {
         userId,
+      },
+    });
+  }
+
+  async findSessionByRefreshToken(refreshToken: RefreshToken): Promise<ISession | null> {
+    return await this.prisma.session.findFirst({
+      where: {
+        refreshToken,
       },
     });
   }

@@ -2,7 +2,7 @@ import { Controller, Delete, Get, HttpStatus, Inject, Post, Req, Res, UseGuards 
 import { AUTH_SERVICE_TOKEN } from './auth.service';
 import { LoginGuard } from 'src/modules/auth/guards/login.guard';
 import { Request, Response } from 'express';
-import { Tokens } from '../security/interfaces/token.interface';
+import { RefreshToken, Tokens } from '../security/interfaces/token.interface';
 import { ApiBearerAuth, ApiBody, ApiCookieAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, LoginErrorResponseDto, LoginSuccessResponseDto } from './dto/login.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
@@ -43,7 +43,10 @@ export class AuthController {
   async logout(@Req() req: Request, @Res() res: Response) {
     const user: UserPayload | null = (req as any).user as UserPayload;
     if (user) {
-      await this.authService.logout(user);
+      await this.authService.logout(user, null);
+    } else {
+      const refresh_token: RefreshToken = req.cookies['refresh_token'];
+      await this.authService.logout(null, refresh_token);
     }
     res.clearCookie('refresh_token', { httpOnly: true });
     return res.status(200).json({ message: 'Logged out successfully' });
