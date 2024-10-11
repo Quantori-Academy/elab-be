@@ -23,16 +23,39 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findByStorageLocation(location: string): Promise<Storage | null> {
-    this.logger.log(`[${this.findByStorageLocation.name}] - Method start`);
+  async getRoomIdByName(roomName: string): Promise<number | null> {
+    this.logger.log(`[${this.getRoomIdByName.name}] - Method start`);
     try {
-      const storage: Storage | null = await this.prisma.storage.findUnique({
-        where: { location },
+      const room = await this.prisma.room.findUnique({
+        where: { name: roomName },
+        select: { id: true },
       });
-      this.logger.log(`[${this.findByStorageLocation.name}] - Method finished`);
+      this.logger.log(`[${this.getRoomIdByName.name}] - Method finished`);
+      return room ? room.id : null;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findUniqueStorage(roomName: string, storageName: string): Promise<Storage | null> {
+    this.logger.log(`[${this.findUniqueStorage.name}] - Method start`);
+    try {
+      const roomId: number | null = await this.getRoomIdByName(roomName);
+      if (!roomId) return null;
+
+      const storage: Storage | null = await this.prisma.storage.findUnique({
+        where: {
+          roomId_name: {
+            roomId: roomId,
+            name: storageName,
+          },
+        },
+      });
+      this.logger.log(`[${this.findUniqueStorage.name}] - Method finished`);
       return storage;
     } catch (error) {
-      this.logger.error(`[${this.findByStorageLocation.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.findUniqueStorage.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
@@ -41,6 +64,23 @@ export class StorageRepository implements IStorageRepository {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const storages: Storage[] = await this.prisma.storage.findMany();
+      this.logger.log(`[${this.findAll.name}] - Method finished,`);
+      return storages;
+    } catch (error) {
+      this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findAllInRoom(roomName: string): Promise<Storage[] | null> {
+    this.logger.log(`[${this.findAll.name}] - Method start`);
+    try {
+      const roomId: number | null = await this.getRoomIdByName(roomName);
+      if (!roomId) return null;
+
+      const storages: Storage[] = await this.prisma.storage.findMany({
+        where: { roomId },
+      });
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
       return storages;
     } catch (error) {

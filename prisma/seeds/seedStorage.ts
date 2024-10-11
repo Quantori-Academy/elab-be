@@ -29,14 +29,13 @@ export async function StorageSeed() {
       for (let k = 1; k <= numberOfShelves; k++) {
         const shelfName = `Shelf${k}`;
         
-        const storagelocation = `${cabinetName} ${shelfName}`;
+        const storageName = `${cabinetName}-${shelfName}`;
         
         await prisma.storage.create({
           data: {
             roomId: roomId,
-            location: storagelocation,
-            name: null,
-            description: `Description for ${storagelocation}`, 
+            name: storageName,
+            description: `Description for ${storageName}`, 
           },
         });
       }

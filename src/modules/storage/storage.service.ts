@@ -10,26 +10,41 @@ export class StorageService implements IStorageService {
 
   constructor(@Inject(STORAGE_REPOSITORY_TOKEN) private storageRepository: IStorageRepository) {}
 
-  async getStoragByLocation(location: string): Promise<Storage | null> {
-    this.logger.log(`[${this.getStoragByLocation.name}] - Method start`);
+  async getAllStorages(): Promise<Storage[]> {
+    this.logger.log(`[${this.getAllStorages.name}] - Method start`);
     try {
-      const storage: Storage | null = await this.storageRepository.findByStorageLocation(location);
-      if (!storage) throw new NotFoundException('Storage not found');
-      this.logger.log(`[${this.getStoragByLocation.name}] - Method finished`);
-      return storage;
+      const storages: Storage[] = await this.storageRepository.findAll();
+      this.logger.log(`[${this.getAllStorages.name}] - Method finished`);
+      return storages;
     } catch (error) {
-      this.logger.error(`[${this.getStoragByLocation.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.getAllStorages.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
-  async getStorages(): Promise<Storage[]> {
-    this.logger.log(`[${this.getStorages.name}] - Method start`);
+
+  async getStoragesInRoom(roomName: string): Promise<Storage[]> {
+    this.logger.log(`[${this.getStoragesInRoom.name}] - Method start`);
     try {
-      const storages: Storage[] = await this.storageRepository.findAll();
-      this.logger.log(`[${this.getStorages.name}] - Method finished`);
+      const storages: Storage[] | null = await this.storageRepository.findAllInRoom(roomName);
+      if (!storages) throw new NotFoundException('Room not found');
+
+      this.logger.log(`[${this.getStoragesInRoom.name}] - Method finished`);
       return storages;
     } catch (error) {
-      this.logger.error(`[${this.getStorages.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.getStoragesInRoom.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async getUniqueStorage(roomName: string, storageName: string): Promise<Storage | null> {
+    this.logger.log(`[${this.getUniqueStorage.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.storageRepository.findUniqueStorage(roomName, storageName);
+      if (!storage) throw new NotFoundException('Storage not found');
+      this.logger.log(`[${this.getUniqueStorage.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.getUniqueStorage.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

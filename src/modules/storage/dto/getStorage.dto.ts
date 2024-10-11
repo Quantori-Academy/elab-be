@@ -7,9 +7,6 @@ class GetStorageSuccessDto {
   @ApiProperty({ example: 3 })
   roomId: number;
 
-  @ApiProperty({ example: 'Room2-Cabinet1-Shelf4' })
-  location: string;
-
   @ApiProperty({ example: 'some name' })
   name: string;
 

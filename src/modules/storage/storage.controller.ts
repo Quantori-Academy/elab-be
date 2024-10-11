@@ -9,8 +9,6 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { GetStorageErrorDto, GetStorageSuccessDto } from './dto/getStorage.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
-import { LocationValidationPipe } from './pipes/location.pipe';
-import { ParseLocationPipeErrorDto } from './dto/location.dto';
 
 const ROUTE = 'storages';
 
@@ -31,7 +29,7 @@ export class StorageController {
   async getStorages() {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const storages: Storage[] = await this.storageService.getStorages();
+      const storages: Storage[] = await this.storageService.getAllStorages();
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {
@@ -41,22 +39,40 @@ export class StorageController {
   }
 
   @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [GetStorageSuccessDto] })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get(':roomName')
+  async getStoragesInRoom(@Param('roomName') roomName: string) {
+    this.logger.log(`[${this.getStoragesInRoom.name}] - Method start`);
+    try {
+      const storages: Storage[] = (await this.storageService.getStoragesInRoom(roomName)) as Storage[];
+      this.logger.log(`[${this.getStoragesInRoom.name}] - Method finished`);
+      return storages;
+    } catch (error) {
+      this.logger.error(`[${this.getStoragesInRoom.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetStorageSuccessDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: GetStorageErrorDto })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseLocationPipeErrorDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get(':location')
-  async getStorage(@Param('location', LocationValidationPipe) location: string) {
-    this.logger.log(`[${this.getStorage.name}] - Method start`);
+  @Get(':roomName/:storageName')
+  async getUniqueStorage(@Param('roomName') roomName: string, @Param('storageName') storageName: string) {
+    this.logger.log(`[${this.getUniqueStorage.name}] - Method start`);
     try {
-      const storage: Storage | null = await this.storageService.getStoragByLocation(location);
-      this.logger.log(`[${this.getStorage.name}] - Method finished`);
+      const storage: Storage | null = await this.storageService.getUniqueStorage(roomName, storageName);
+      this.logger.log(`[${this.getUniqueStorage.name}] - Method finished`);
       return storage;
     } catch (error) {
-      this.logger.error(`[${this.getStorage.name}] - Exception thrown` + error);
+      this.logger.error(`[${this.getUniqueStorage.name}] - Exception thrown` + error);
       throw error;
     }
   }

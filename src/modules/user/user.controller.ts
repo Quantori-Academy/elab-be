@@ -161,6 +161,24 @@ export class UserController {
   }
 
   @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [GetUserSuccessDto] })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getUsers() {
+    this.logger.log(`[${this.getUsers.name}] - Method start`);
+    try {
+      const users: UserPayload[] = await this.userService.getUsers();
+      this.logger.log(`[${this.getUsers.name}] - Method finished`);
+      return users;
+    } catch (error) {
+      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetUserSuccessDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
@@ -183,23 +201,5 @@ export class UserController {
   @Get(':id')
   async getUser(@Param('id', ParseIdPipe) userId: number) {
     return await this.userService.getUser(userId);
-  }
-
-  @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.OK, type: [GetUserSuccessDto] })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
-  @Get('')
-  async getUsers() {
-    this.logger.log(`[${this.getUsers.name}] - Method start`);
-    try {
-      const users: UserPayload[] = await this.userService.getUsers();
-      this.logger.log(`[${this.getUsers.name}] - Method finished`);
-      return users;
-    } catch (error) {
-      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
-      throw error;
-    }
   }
 }
