@@ -1,7 +1,8 @@
 import { ISecurityService } from 'src/modules/security/interfaces/securityService.interface';
 import { SECURITY_SERVICE_TOKEN } from 'src/modules/security/security.service';
-import { CanActivate, ExecutionContext, Inject, Injectable, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
+import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -11,16 +12,12 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     this.logger.log(`[${this.canActivate.name}] - Method start`);
+    const request = context.switchToHttp().getRequest();
     try {
-      const request = context.switchToHttp().getRequest();
       const [type, token] = request.headers.authorization?.split(' ') ?? [];
       if (type !== 'Bearer' || !token) {
         this.logger.log(`[${this.canActivate.name}] - Forbidden`);
         return false;
-      }
-      if (request.method === 'DELETE' && request.url === '/api/v1/auth/logout') {
-        request.user = null;
-        return true;
       }
 
       const payload: UserPayload = await this.securityService.verifyAccessToken(token);
@@ -29,8 +26,14 @@ export class AuthGuard implements CanActivate {
       this.logger.log(`[${this.canActivate.name}] - Method finished`);
       return true;
     } catch (error) {
+      if (error instanceof TokenExpiredError && request.method === 'DELETE' && request.url === '/api/v1/auth/logout') {
+        request.user = null;
+        return true;
+      } else if (error instanceof JsonWebTokenError) {
+        throw new UnauthorizedException('Invalid token');
+      }
       this.logger.error(`[${this.canActivate.name}] Exception thrown ` + error);
-      throw error;
+      throw new UnauthorizedException(error.message);
     }
   }
 }
