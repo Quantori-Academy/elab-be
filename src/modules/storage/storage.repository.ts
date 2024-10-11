@@ -41,9 +41,6 @@ export class StorageRepository implements IRepository<IStorage> {
       const updatedStorage: IStorage = await this.prisma.storage.update({
         where: { id: storage.id },
         data: storage,
-        include: {
-          reagents: true, // Include the 'reagents' relation
-        },
       });
       this.logger.log(`[${this.update.name}] - Method finished`);
       return updatedStorage;
@@ -91,9 +88,6 @@ export class StorageRepository implements IRepository<IStorage> {
         },
         create: {
           ...storage,
-        },
-        include: {
-          reagents: true, // Include the 'reagents' relation
         },
       });
       this.logger.log(`[${this.upsert.name}] - Method finished`);
