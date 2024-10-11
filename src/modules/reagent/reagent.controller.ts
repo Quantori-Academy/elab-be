@@ -6,7 +6,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { CreateReagentDto, CreateReagentErrorDto, CreateReagentSuccessDto } from './dto/createReagent.dto';
+import { CreateReagentDto, CreateReagentSuccessDto } from './dto/createReagent.dto';
 
 const ROUTE = 'reagents';
 
@@ -17,7 +17,6 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: CreateReagentErrorDto })
   @Roles(Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
