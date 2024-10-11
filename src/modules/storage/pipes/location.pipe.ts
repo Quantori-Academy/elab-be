@@ -1,15 +1,23 @@
-import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
+import { PipeTransform, Injectable, BadRequestException, Logger } from '@nestjs/common';
 
 @Injectable()
 export class LocationValidationPipe implements PipeTransform {
-  transform(value: string): string {
-    const locationPattern = /^Room\d+-Cabinet\d+-Shelf\d+$/;
+  private readonly logger: Logger = new Logger(LocationValidationPipe.name);
 
-    if (!locationPattern.test(value)) {
-      throw new BadRequestException(
-        'Location must follow the format RoomX-CabinetY-ShelfZ where X, Y, and Z are numeric strings.',
-      );
+  transform(value: string): string {
+    this.logger.log(`[${this.transform.name}] - Method start`);
+    try {
+      const locationPattern = /^Room\d+-Cabinet\d+-Shelf\d+$/;
+      if (!locationPattern.test(value)) {
+        throw new BadRequestException(
+          'Location must follow the format RoomX-CabinetY-ShelfZ where X, Y, and Z are numeric strings.',
+        );
+      }
+      this.logger.log(`[${this.transform.name}] - Method finished`);
+      return value;
+    } catch (error) {
+      this.logger.error(`[${this.transform.name}] - Exception thrown: ${error}`);
+      throw error;
     }
-    return value;
   }
 }
