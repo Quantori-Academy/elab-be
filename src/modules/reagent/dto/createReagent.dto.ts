@@ -46,9 +46,9 @@ export class CreateReagentDto {
   @IsDate()
   expirationDate: Date;
 
-  @ApiProperty({ example: 'Room 1, Cabinet 3, Shelf 5' })
+  @ApiProperty({ example: 2 })
   @IsString()
-  storageLocation: string;
+  storageId: number;
 }
 
 export class CreateReagentSuccessDto {
@@ -100,9 +100,9 @@ export class CreateReagentSuccessDto {
   @IsDate()
   expirationDate: Date;
 
-  @ApiProperty({ example: 'Room 1, Cabinet 3, Shelf 5' })
+  @ApiProperty({ example: 2 })
   @IsString()
-  storageLocation: string;
+  storageId: number;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()
@@ -111,15 +111,4 @@ export class CreateReagentSuccessDto {
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()
   updatedAt: Date;
-}
-
-export class CreateReagentErrorDto {
-  @ApiProperty({ example: 'The storage does not exist' })
-  message: string;
-
-  @ApiProperty({ example: 'Not Found' })
-  error: string;
-
-  @ApiProperty({ example: 404 })
-  statusCode: number;
 }
