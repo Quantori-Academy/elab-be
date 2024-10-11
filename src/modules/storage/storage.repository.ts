@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IRepository } from 'src/common/interfaces/repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorage } from './interfaces/storage.interface';
+import { IStorageRepository } from './interfaces/storageRepository.interface';
 
 @Injectable()
-export class StorageRepository implements IRepository<IStorage> {
+export class StorageRepository implements IStorageRepository {
   private readonly logger: Logger = new Logger(StorageRepository.name);
 
   constructor(private readonly prisma: PrismaService) {}
@@ -12,13 +12,27 @@ export class StorageRepository implements IRepository<IStorage> {
   async findById(id: number): Promise<IStorage | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
-      const storage = await this.prisma.storage.findUnique({
+      const storage: IStorage | null = await this.prisma.storage.findUnique({
         where: { id },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);
       return storage;
     } catch (error) {
       this.logger.error(`[${this.findById.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findByStorageLocation(location: string): Promise<IStorage | null> {
+    this.logger.log(`[${this.findByStorageLocation.name}] - Method start`);
+    try {
+      const storage: IStorage | null = await this.prisma.storage.findUnique({
+        where: { name: location },
+      });
+      this.logger.log(`[${this.findByStorageLocation.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.findByStorageLocation.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
