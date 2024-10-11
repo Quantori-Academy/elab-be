@@ -53,7 +53,8 @@ model Storage {
   id          Int      @id @default(autoincrement())
   roomId      Int
   room        Room     @relation(fields: [roomId], references: [id])
-  name        String   @unique 
+  name        String?   @unique 
+  location    String    @unique 
   description String?  
   reagents    Reagent[] 
   createdAt   DateTime @default(now())

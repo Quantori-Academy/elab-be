@@ -9,7 +9,7 @@ export async function StorageSeed() {
 
   const roomNames = [];
   for (let i = 1; i <= numberOfRooms; i++) {
-    const roomName = `Room ${i}`;
+    const roomName = `Room${i}`;
     roomNames.push(roomName);
 
     await prisma.room.create({
@@ -24,18 +24,19 @@ export async function StorageSeed() {
     const roomName = roomNames[i]; 
 
     for (let j = 1; j <= numberOfCabinets; j++) {
-      const cabinetName = `Cabinet ${j}`;
+      const cabinetName = `Cabinet${j}`;
 
       for (let k = 1; k <= numberOfShelves; k++) {
-        const shelfName = `Shelf ${k}`;
+        const shelfName = `Shelf${k}`;
         
-        const storageName = `${roomName} - ${cabinetName} - ${shelfName}`;
+        const storagelocation = `${roomName}-${cabinetName}-${shelfName}`;
         
         await prisma.storage.create({
           data: {
             roomId: roomId,
-            name: storageName,
-            description: `Description for ${storageName}`, 
+            location: storagelocation,
+            name: null,
+            description: `Description for ${storagelocation}`, 
           },
         });
       }
