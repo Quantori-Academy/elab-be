@@ -1,6 +1,7 @@
 /*
   Warnings:
 
+  - A unique constraint covering the columns `[name]` on the table `Storage` will be added. If there are existing duplicate values, this will fail.
   - A unique constraint covering the columns `[roomId,name]` on the table `Storage` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `name` to the `Storage` table without a default value. This is not possible if the table is not empty.
   - Added the required column `roomId` to the `Storage` table without a default value. This is not possible if the table is not empty.
@@ -22,6 +23,9 @@ CREATE TABLE "Room" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Room_name_key" ON "Room"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Storage_name_key" ON "Storage"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Storage_roomId_name_key" ON "Storage"("roomId", "name");
