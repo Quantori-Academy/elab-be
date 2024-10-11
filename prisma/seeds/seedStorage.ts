@@ -28,7 +28,7 @@ export async function StorageSeed() {
 
       for (let k = 1; k <= numberOfShelves; k++) {
         const shelfName = `Shelf ${k}`;
-        const storageName = `${roomNames[i]} - ${cabinetName} - ${shelfName}`;
+        const storageName = `${cabinetName} - ${shelfName}`;
         
         await prisma.storage.create({
           data: {
