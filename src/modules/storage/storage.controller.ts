@@ -2,11 +2,10 @@ import { Controller, Get, HttpStatus, Inject, Logger, Param, UseGuards } from '@
 import { STORAGE_SERVICE_TOKEN } from './storage.service';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IStorageService } from './interfaces/storageService.interface';
-import { Role } from '@prisma/client';
+import { Role, Storage } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { IStorage } from './interfaces/storage.interface';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { GetStorageErrorDto, GetStorageSuccessDto } from './dto/getStorage.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
@@ -32,7 +31,7 @@ export class StorageController {
   async getStorages() {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const storages: IStorage[] = await this.storageService.getStorages();
+      const storages: Storage[] = await this.storageService.getStorages();
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {
@@ -53,7 +52,7 @@ export class StorageController {
   async getStorage(@Param('location', LocationValidationPipe) location: string) {
     this.logger.log(`[${this.getStorage.name}] - Method start`);
     try {
-      const storage: IStorage | null = await this.storageService.getStoragByLocation(location);
+      const storage: Storage | null = await this.storageService.getStoragByLocation(location);
       this.logger.log(`[${this.getStorage.name}] - Method finished`);
       return storage;
     } catch (error) {

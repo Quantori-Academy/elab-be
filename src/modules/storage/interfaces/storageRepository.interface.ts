@@ -1,6 +1,6 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
-import { IStorage } from './storage.interface';
+import { Storage } from '@prisma/client';
 
-export interface IStorageRepository extends IRepository<IStorage> {
-  findByStorageLocation(location: string): Promise<IStorage | null>;
+export interface IStorageRepository extends IRepository<Storage> {
+  findByStorageLocation(location: string): Promise<Storage | null>;
 }

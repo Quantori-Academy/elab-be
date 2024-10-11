@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IStorage } from '../interfaces/storage.interface';
 
-class GetStorageSuccessDto implements IStorage {
+class GetStorageSuccessDto {
   @ApiProperty({ example: 5 })
   id: number;
 

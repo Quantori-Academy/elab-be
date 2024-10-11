@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
-import { IStorage } from './interfaces/storage.interface';
 import { IStorageService } from './interfaces/storageService.interface';
+import { Storage } from '@prisma/client';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -10,10 +10,10 @@ export class StorageService implements IStorageService {
 
   constructor(@Inject(STORAGE_REPOSITORY_TOKEN) private storageRepository: IStorageRepository) {}
 
-  async getStoragByLocation(location: string): Promise<IStorage | null> {
+  async getStoragByLocation(location: string): Promise<Storage | null> {
     this.logger.log(`[${this.getStoragByLocation.name}] - Method start`);
     try {
-      const storage: IStorage | null = await this.storageRepository.findByStorageLocation(location);
+      const storage: Storage | null = await this.storageRepository.findByStorageLocation(location);
       if (!storage) throw new NotFoundException('Storage not found');
       this.logger.log(`[${this.getStoragByLocation.name}] - Method finished`);
       return storage;
@@ -22,10 +22,10 @@ export class StorageService implements IStorageService {
       throw error;
     }
   }
-  async getStorages(): Promise<IStorage[]> {
+  async getStorages(): Promise<Storage[]> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const storages: IStorage[] = await this.storageRepository.findAll();
+      const storages: Storage[] = await this.storageRepository.findAll();
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {

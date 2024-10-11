@@ -1,6 +1,6 @@
-import { IStorage } from './storage.interface';
+import { Storage } from '@prisma/client';
 
 export interface IStorageService {
-  getStoragByLocation(location: string): Promise<IStorage | null>;
-  getStorages(): Promise<IStorage[]>;
+  getStoragByLocation(location: string): Promise<Storage | null>;
+  getStorages(): Promise<Storage[]>;
 }

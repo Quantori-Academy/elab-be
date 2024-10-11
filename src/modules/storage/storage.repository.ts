@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { IStorage } from './interfaces/storage.interface';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
+import { Storage } from '@prisma/client';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -10,10 +10,10 @@ export class StorageRepository implements IStorageRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number): Promise<IStorage | null> {
+  async findById(id: number): Promise<Storage | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
-      const storage: IStorage | null = await this.prisma.storage.findUnique({
+      const storage: Storage | null = await this.prisma.storage.findUnique({
         where: { id },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);
@@ -24,10 +24,10 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findByStorageLocation(location: string): Promise<IStorage | null> {
+  async findByStorageLocation(location: string): Promise<Storage | null> {
     this.logger.log(`[${this.findByStorageLocation.name}] - Method start`);
     try {
-      const storage: IStorage | null = await this.prisma.storage.findUnique({
+      const storage: Storage | null = await this.prisma.storage.findUnique({
         where: { location },
       });
       this.logger.log(`[${this.findByStorageLocation.name}] - Method finished`);
@@ -38,10 +38,10 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAll(): Promise<IStorage[]> {
+  async findAll(): Promise<Storage[]> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
-      const storages: IStorage[] = await this.prisma.storage.findMany();
+      const storages: Storage[] = await this.prisma.storage.findMany();
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
       return storages;
     } catch (error) {
@@ -50,10 +50,10 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async update(storage: IStorage): Promise<IStorage> {
+  async update(storage: Storage): Promise<Storage> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
-      const updatedStorage: IStorage = await this.prisma.storage.update({
+      const updatedStorage: Storage = await this.prisma.storage.update({
         where: { id: storage.id },
         data: storage,
       });
@@ -65,7 +65,7 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async create(storage: IStorage): Promise<IStorage> {
+  async create(storage: Storage): Promise<Storage> {
     this.logger.log(`[${this.create.name}] - Method start`);
     try {
       const newStorage = await this.prisma.storage.create({
@@ -79,7 +79,7 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async delete(storage: IStorage): Promise<IStorage> {
+  async delete(storage: Storage): Promise<Storage> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
       const deletedStorage = await this.prisma.storage.delete({
@@ -93,7 +93,7 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async upsert(storage: IStorage): Promise<void> {
+  async upsert(storage: Storage): Promise<void> {
     this.logger.log(`[${this.upsert.name}] - Method start`);
     try {
       await this.prisma.storage.upsert({
