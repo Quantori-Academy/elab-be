@@ -21,6 +21,6 @@ export class ReagentController {
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
   async createReagent(@Body() createReagentDto: CreateReagentDto) {
-    await this.reagentService.create(createReagentDto);
+    return await this.reagentService.create(createReagentDto);
   }
 }

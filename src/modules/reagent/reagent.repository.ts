@@ -1,9 +1,11 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 class ReagentRepository implements IRepository<IReagent> {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(reagent: IReagent): Promise<IReagent> {
     return await this.prisma.reagent.create({
