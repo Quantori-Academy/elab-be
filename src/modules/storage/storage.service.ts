@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorage } from './interfaces/storage.interface';
@@ -14,6 +14,7 @@ export class StorageService implements IStorageService {
     this.logger.log(`[${this.getStoragByLocation.name}] - Method start`);
     try {
       const storage: IStorage | null = await this.storageRepository.findByStorageLocation(location);
+      if (!storage) throw new NotFoundException('Storage not found');
       this.logger.log(`[${this.getStoragByLocation.name}] - Method finished`);
       return storage;
     } catch (error) {

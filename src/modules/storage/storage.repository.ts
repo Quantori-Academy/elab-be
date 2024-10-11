@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorage } from './interfaces/storage.interface';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
@@ -27,7 +28,7 @@ export class StorageRepository implements IStorageRepository {
     this.logger.log(`[${this.findByStorageLocation.name}] - Method start`);
     try {
       const storage: IStorage | null = await this.prisma.storage.findUnique({
-        where: { name: location },
+        where: { location },
       });
       this.logger.log(`[${this.findByStorageLocation.name}] - Method finished`);
       return storage;
