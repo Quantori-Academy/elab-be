@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Inject, Logger, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Inject, Logger, Param, Query, UseGuards } from '@nestjs/common';
 import { STORAGE_SERVICE_TOKEN } from './storage.service';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IStorageService } from './interfaces/storageService.interface';
@@ -26,7 +26,8 @@ export class StorageController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
-  async getStorages() {
+  async getStorages(@Query() obj: any) {
+    console.log(obj);
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
       const storages: Storage[] = await this.storageService.getAllStorages();

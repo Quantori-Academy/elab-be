@@ -73,7 +73,7 @@ export class StorageRepository implements IStorageRepository {
   }
 
   async findAllInRoom(roomName: string): Promise<Storage[] | null> {
-    this.logger.log(`[${this.findAll.name}] - Method start`);
+    this.logger.log(`[${this.findAllInRoom.name}] - Method start`);
     try {
       const roomId: number | null = await this.getRoomIdByName(roomName);
       if (!roomId) return null;
@@ -81,10 +81,10 @@ export class StorageRepository implements IStorageRepository {
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: { roomId },
       });
-      this.logger.log(`[${this.findAll.name}] - Method finished,`);
+      this.logger.log(`[${this.findAllInRoom.name}] - Method finished,`);
       return storages;
     } catch (error) {
-      this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.findAllInRoom.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

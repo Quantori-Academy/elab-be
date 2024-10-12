@@ -3,6 +3,7 @@ import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
+import { FilterOptions, PaginationOptions, SortOptions } from './interfaces/fIlterOptions.types';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -48,9 +49,24 @@ export class StorageService implements IStorageService {
       throw error;
     }
   }
+
+  async applyFilters(storages: Storage[], options: FilterOptions): Promise<Storage[]> {
+    console.log(options);
+    return storages;
+  }
+
+  async applySorting(storages: Storage[], options: SortOptions): Promise<Storage[]> {
+    console.log(options);
+    return storages;
+  }
+
+  async applyPagination(storages: Storage[], options: PaginationOptions): Promise<Storage[]> {
+    console.log(options);
+    return storages;
+  }
 }
 
-const STORAGE_SERVICE_TOKEN = Symbol('AUTHSTORAGE_SERVICE_TOKEN_SERVICE_TOKEN');
+const STORAGE_SERVICE_TOKEN = Symbol('STORAGE_SERVICE_TOKEN');
 const StorageServiceProvider = {
   provide: STORAGE_SERVICE_TOKEN,
   useClass: StorageService,
