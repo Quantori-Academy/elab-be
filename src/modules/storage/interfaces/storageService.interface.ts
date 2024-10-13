@@ -1,8 +1,7 @@
 import { Storage } from '@prisma/client';
+import { StorageOptions } from './storageOptions.interface';
 
 export interface IStorageService {
-  getAllStorages(): Promise<Storage[]>;
-  getStoragesInRoom(roomName: string): Promise<Storage[] | null>;
+  getStorages(options: StorageOptions): Promise<Storage[]>;
   getUniqueStorage(roomName: string, storageName: string): Promise<Storage | null>;
-  applyFilters(storages: Storage[], options: any): Promise<Storage[]>;
 }

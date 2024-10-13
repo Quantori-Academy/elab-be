@@ -1,4 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString, IsInt, Min, IsEnum } from 'class-validator';
+import { Order } from '../interfaces/storageOptions.interface';
+import { Transform } from 'class-transformer';
+
+class GetStoragesQueryDto {
+  @ApiProperty({ required: false, type: String, description: 'Name of the room' })
+  @IsOptional()
+  @IsString()
+  roomName?: string;
+
+  @ApiProperty({ required: false, type: String, description: 'Name of the storage' })
+  @IsOptional()
+  @IsString()
+  storageName?: string;
+
+  @ApiProperty({ required: false, type: Number, description: 'Starting index for pagination', minimum: 0 })
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(0)
+  skip?: number;
+
+  @ApiProperty({ required: false, type: Number, description: 'Number of items to return', minimum: 1 })
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  take?: number;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by chronological date (ASC or DESC)' })
+  @IsOptional()
+  @IsEnum(Order)
+  chronologicalDate?: Order;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical name (ASC or DESC)' })
+  @IsOptional()
+  @IsEnum(Order)
+  alphabeticalName?: Order;
+}
 
 class GetStorageSuccessDto {
   @ApiProperty({ example: 5 })
@@ -20,15 +59,4 @@ class GetStorageSuccessDto {
   updatedAt: Date;
 }
 
-class GetStorageErrorDto {
-  @ApiProperty({ example: 'Storage not found' })
-  message: number;
-
-  @ApiProperty({ example: 'Not Found' })
-  error: string;
-
-  @ApiProperty({ example: 404 })
-  statusCode: number;
-}
-
-export { GetStorageSuccessDto, GetStorageErrorDto };
+export { GetStorageSuccessDto, GetStoragesQueryDto };

@@ -1,9 +1,9 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
-import { FilterOptions, PaginationOptions, SortOptions } from './interfaces/fIlterOptions.types';
+import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from './interfaces/storageOptions.interface';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -11,28 +11,34 @@ export class StorageService implements IStorageService {
 
   constructor(@Inject(STORAGE_REPOSITORY_TOKEN) private storageRepository: IStorageRepository) {}
 
-  async getAllStorages(): Promise<Storage[]> {
-    this.logger.log(`[${this.getAllStorages.name}] - Method start`);
+  async getStorages(options: StorageOptions): Promise<Storage[]> {
+    this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const storages: Storage[] = await this.storageRepository.findAll();
-      this.logger.log(`[${this.getAllStorages.name}] - Method finished`);
+      const { roomName, storageName }: FilterOptions = options.filter;
+      const pagination: PaginationOptions = options.pagination;
+      const sort: SortOptions = options.sort;
+
+      let storages: Storage[] | null = [];
+      if (roomName && storageName) {
+        // 1. Unique storage
+        const result: Storage | null = await this.getUniqueStorage(roomName, storageName);
+        storages = result ? [result] : [];
+      } else if (roomName) {
+        //    2. All storages in the room
+        storages = await this.storageRepository.findAllByRoom(roomName, pagination, sort);
+        return storages ? storages : [];
+      } else if (storageName) {
+        //     3. The same storage name in  different rooms
+        storages = await this.storageRepository.findAllByName(storageName, pagination, sort);
+      } else {
+        //  4. Neither room nor storage name is provided ()
+        storages = await this.storageRepository.findAll(pagination, sort);
+      }
+
+      this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {
-      this.logger.error(`[${this.getAllStorages.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
-  async getStoragesInRoom(roomName: string): Promise<Storage[]> {
-    this.logger.log(`[${this.getStoragesInRoom.name}] - Method start`);
-    try {
-      const storages: Storage[] | null = await this.storageRepository.findAllInRoom(roomName);
-      if (!storages) throw new NotFoundException('Room not found');
-
-      this.logger.log(`[${this.getStoragesInRoom.name}] - Method finished`);
-      return storages;
-    } catch (error) {
-      this.logger.error(`[${this.getStoragesInRoom.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.getStorages.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
@@ -41,28 +47,12 @@ export class StorageService implements IStorageService {
     this.logger.log(`[${this.getUniqueStorage.name}] - Method start`);
     try {
       const storage: Storage | null = await this.storageRepository.findUniqueStorage(roomName, storageName);
-      if (!storage) throw new NotFoundException('Storage not found');
       this.logger.log(`[${this.getUniqueStorage.name}] - Method finished`);
       return storage;
     } catch (error) {
       this.logger.error(`[${this.getUniqueStorage.name}] - Exception thrown: ${error}`);
       throw error;
     }
-  }
-
-  async applyFilters(storages: Storage[], options: FilterOptions): Promise<Storage[]> {
-    console.log(options);
-    return storages;
-  }
-
-  async applySorting(storages: Storage[], options: SortOptions): Promise<Storage[]> {
-    console.log(options);
-    return storages;
-  }
-
-  async applyPagination(storages: Storage[], options: PaginationOptions): Promise<Storage[]> {
-    console.log(options);
-    return storages;
   }
 }
 

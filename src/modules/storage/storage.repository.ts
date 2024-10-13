@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Storage } from '@prisma/client';
+import { Order, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -38,6 +39,21 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
+  async getRoomNameById(id: number): Promise<string | null> {
+    this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
+    try {
+      const room = await this.prisma.room.findUnique({
+        where: { id },
+        select: { name: true },
+      });
+      this.logger.log(`[${this.getRoomNameById.name}] - Method finished`);
+      return room ? room.name : null;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomNameById.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
   async findUniqueStorage(roomName: string, storageName: string): Promise<Storage | null> {
     this.logger.log(`[${this.findUniqueStorage.name}] - Method start`);
     try {
@@ -60,10 +76,25 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAll(): Promise<Storage[]> {
+  async findAll(pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
-      const storages: Storage[] = await this.prisma.storage.findMany();
+      const { skip = 0, take = 10 } = pagination || {};
+      const { alphabeticalName = Order.ASC, chronologicalDate = Order.ASC } = sortOptions || {};
+      console.log(alphabeticalName, chronologicalDate);
+
+      const storages: Storage[] = await this.prisma.storage.findMany({
+        skip,
+        take,
+        // orderBy: [
+        //  {
+        //   name: alphabeticalName
+        //  },
+        //  {
+        //   createdAt: chronologicalDate
+        //  }
+        // ]
+      });
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
       return storages;
     } catch (error) {
@@ -72,19 +103,63 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllInRoom(roomName: string): Promise<Storage[] | null> {
-    this.logger.log(`[${this.findAllInRoom.name}] - Method start`);
+  async findAllByName(
+    storageName: string,
+    pagination?: PaginationOptions,
+    sortOptions?: SortOptions,
+  ): Promise<Storage[]> {
+    this.logger.log(`[${this.findAllByName.name}] - Method start`);
     try {
+      const { skip = 0, take = 10 } = pagination || {};
+      const { alphabeticalName = Order.ASC, chronologicalDate = Order.ASC } = sortOptions || {};
+      console.log(alphabeticalName, chronologicalDate);
+
+      const storages: Storage[] = await this.prisma.storage.findMany({
+        where: {
+          name: storageName,
+        },
+        skip,
+        take,
+        // orderBy: {
+        //   name: alphabeticalName,
+        //   createdAt: chronologicalDate
+        // }
+      });
+      this.logger.log(`[${this.findAllByName.name}] - Method finished,`);
+      return storages;
+    } catch (error) {
+      this.logger.error(`[${this.findAllByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findAllByRoom(
+    roomName: string,
+    pagination?: PaginationOptions,
+    sortOptions?: SortOptions,
+  ): Promise<Storage[] | null> {
+    this.logger.log(`[${this.findAllByRoom.name}] - Method start`);
+    try {
+      const { skip = 0, take = 10 } = pagination || {};
+      const { alphabeticalName = Order.ASC, chronologicalDate = Order.ASC } = sortOptions || {};
+      console.log(alphabeticalName, chronologicalDate);
+
       const roomId: number | null = await this.getRoomIdByName(roomName);
       if (!roomId) return null;
 
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: { roomId },
+        skip,
+        take,
+        // orderBy: {
+        //   name: alphabeticalName,
+        //   createdAt: chronologicalDate
+        // }
       });
-      this.logger.log(`[${this.findAllInRoom.name}] - Method finished,`);
+      this.logger.log(`[${this.findAllByRoom.name}] - Method finished,`);
       return storages;
     } catch (error) {
-      this.logger.error(`[${this.findAllInRoom.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.findAllByRoom.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
