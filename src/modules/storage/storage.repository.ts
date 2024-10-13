@@ -202,16 +202,22 @@ export class StorageRepository implements IStorageRepository {
   }
 
   private orderFactory(sortOptions: SortOptions | undefined): OrderBy {
-    if (!sortOptions) return undefined;
-    const orderBy: OrderBy = {};
-    if (sortOptions.alphabeticalName) {
-      orderBy.name = sortOptions.alphabeticalName;
+    this.logger.log(`[${this.orderFactory.name}] - Method start`);
+    try {
+      if (!sortOptions) return undefined;
+      const orderBy: OrderBy = {};
+      if (sortOptions.alphabeticalName) {
+        orderBy.name = sortOptions.alphabeticalName;
+      }
+      if (sortOptions.chronologicalDate) {
+        orderBy.createdAt = sortOptions.chronologicalDate;
+      }
+      this.logger.log(`[${this.orderFactory.name}] - Method finished`);
+      return Object.keys(orderBy).length > 0 ? orderBy : undefined;
+    } catch (error) {
+      this.logger.error(`[${this.orderFactory.name}] - Exception thrown: ${error}`);
+      throw error;
     }
-    if (sortOptions.chronologicalDate) {
-      orderBy.createdAt = sortOptions.chronologicalDate;
-    }
-
-    return Object.keys(orderBy).length > 0 ? orderBy : undefined;
   }
 }
 
