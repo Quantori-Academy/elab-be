@@ -12,8 +12,14 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
     const errors: ValidationError[] = await validate(queryDto);
 
     if (errors.length > 0) {
-      const [messages] = errors.map((error: ValidationError) => {
-        return error.constraints ? Object.values(error.constraints) : [];
+      const messages: string[] = [];
+
+      errors.forEach((error: ValidationError) => {
+        if (error.constraints) {
+          Object.values(error.constraints).forEach((constraintMessage) => {
+            messages.push(constraintMessage);
+          });
+        }
       });
 
       throw new BadRequestException({
@@ -22,7 +28,6 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
         error: 'Bad Request',
       });
     }
-
     if (queryDto.alphabeticalName && queryDto.chronologicalDate) {
       throw new BadRequestException({
         message: 'Only one of alphabeticalName or chronologicalDate must be provided',

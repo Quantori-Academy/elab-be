@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, Min, IsEnum } from 'class-validator';
 import { Order } from '../interfaces/storageOptions.interface';
 import { Transform } from 'class-transformer';
+import { HttpStatus } from '@nestjs/common';
 
 class GetStoragesQueryDto {
   @ApiProperty({ required: false, type: String, description: 'Name of the room' })
@@ -59,4 +60,24 @@ class GetStorageSuccessDto {
   updatedAt: Date;
 }
 
-export { GetStorageSuccessDto, GetStoragesQueryDto };
+class GetStorageValidationErrorsDto {
+  @ApiProperty({
+    example: [
+      'skip must not be less than 0',
+      'skip must be an integer number',
+      'take must not be less than 1',
+      'take must be an integer number',
+      'chronologicalDate must be one of the following values: asc, desc',
+      'alphabeticalName must be one of the following values: asc, desc',
+    ],
+  })
+  message: string;
+
+  @ApiProperty({ example: 'Bad Request' })
+  error: string;
+
+  @ApiProperty({ example: HttpStatus.BAD_REQUEST })
+  statusCode: number;
+}
+
+export { GetStorageSuccessDto, GetStoragesQueryDto, GetStorageValidationErrorsDto };
