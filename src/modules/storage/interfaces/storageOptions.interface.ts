@@ -3,6 +3,13 @@ enum Order {
   DESC = 'desc',
 }
 
+type OrderBy =
+  | {
+      name?: Order;
+      createdAt?: Order;
+    }
+  | undefined;
+
 type SortOptions = {
   chronologicalDate: Order | undefined;
   alphabeticalName: Order | undefined;
@@ -24,4 +31,4 @@ type StorageOptions = {
   pagination: PaginationOptions;
 };
 
-export { StorageOptions, FilterOptions, SortOptions, PaginationOptions, Order };
+export { StorageOptions, FilterOptions, SortOptions, PaginationOptions, Order, OrderBy };

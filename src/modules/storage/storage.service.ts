@@ -31,7 +31,7 @@ export class StorageService implements IStorageService {
         //     3. The same storage name in  different rooms
         storages = await this.storageRepository.findAllByName(storageName, pagination, sort);
       } else {
-        //  4. Neither room nor storage name is provided ()
+        //  4. Neither room nor storage name is provided (all rooms, all names)
         storages = await this.storageRepository.findAll(pagination, sort);
       }
 

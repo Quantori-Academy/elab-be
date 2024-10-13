@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Storage } from '@prisma/client';
-import { Order, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
+import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -80,20 +80,11 @@ export class StorageRepository implements IStorageRepository {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
-      const { alphabeticalName = Order.ASC, chronologicalDate = Order.ASC } = sortOptions || {};
-      console.log(alphabeticalName, chronologicalDate);
-
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
       const storages: Storage[] = await this.prisma.storage.findMany({
         skip,
         take,
-        // orderBy: [
-        //  {
-        //   name: alphabeticalName
-        //  },
-        //  {
-        //   createdAt: chronologicalDate
-        //  }
-        // ]
+        orderBy,
       });
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
       return storages;
@@ -103,16 +94,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByName(
-    storageName: string,
-    pagination?: PaginationOptions,
-    sortOptions?: SortOptions,
-  ): Promise<Storage[]> {
+  async findAllByName(storageName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
     this.logger.log(`[${this.findAllByName.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
-      const { alphabeticalName = Order.ASC, chronologicalDate = Order.ASC } = sortOptions || {};
-      console.log(alphabeticalName, chronologicalDate);
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
 
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: {
@@ -120,10 +106,7 @@ export class StorageRepository implements IStorageRepository {
         },
         skip,
         take,
-        // orderBy: {
-        //   name: alphabeticalName,
-        //   createdAt: chronologicalDate
-        // }
+        orderBy,
       });
       this.logger.log(`[${this.findAllByName.name}] - Method finished,`);
       return storages;
@@ -133,16 +116,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByRoom(
-    roomName: string,
-    pagination?: PaginationOptions,
-    sortOptions?: SortOptions,
-  ): Promise<Storage[] | null> {
+  async findAllByRoom(roomName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[] | null> {
     this.logger.log(`[${this.findAllByRoom.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
-      const { alphabeticalName = Order.ASC, chronologicalDate = Order.ASC } = sortOptions || {};
-      console.log(alphabeticalName, chronologicalDate);
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
 
       const roomId: number | null = await this.getRoomIdByName(roomName);
       if (!roomId) return null;
@@ -151,10 +129,7 @@ export class StorageRepository implements IStorageRepository {
         where: { roomId },
         skip,
         take,
-        // orderBy: {
-        //   name: alphabeticalName,
-        //   createdAt: chronologicalDate
-        // }
+        orderBy,
       });
       this.logger.log(`[${this.findAllByRoom.name}] - Method finished,`);
       return storages;
@@ -224,6 +199,19 @@ export class StorageRepository implements IStorageRepository {
       this.logger.error(`[${this.upsert.name}] - Exception thrown: ${error}`);
       throw error;
     }
+  }
+
+  private orderFactory(sortOptions: SortOptions | undefined): OrderBy {
+    if (!sortOptions) return undefined;
+    const orderBy: OrderBy = {};
+    if (sortOptions.alphabeticalName) {
+      orderBy.name = sortOptions.alphabeticalName;
+    }
+    if (sortOptions.chronologicalDate) {
+      orderBy.createdAt = sortOptions.chronologicalDate;
+    }
+
+    return Object.keys(orderBy).length > 0 ? orderBy : undefined;
   }
 }
 

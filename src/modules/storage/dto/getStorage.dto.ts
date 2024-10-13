@@ -28,12 +28,12 @@ class GetStoragesQueryDto {
   @Min(1)
   take?: number;
 
-  @ApiProperty({ required: false, enum: Order, description: 'Order by chronological date (ASC or DESC)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Order by chronological date (asc or desc)' })
   @IsOptional()
   @IsEnum(Order)
   chronologicalDate?: Order;
 
-  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical name (ASC or DESC)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical name (asc or desc)' })
   @IsOptional()
   @IsEnum(Order)
   alphabeticalName?: Order;
