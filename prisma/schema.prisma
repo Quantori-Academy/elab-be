@@ -50,9 +50,9 @@ model Reagent {
   catalogLink   String
   pricePerUnit  Float
   quantityUnit  String
-  totalQuantity String
+  totalQuantity Float
   description   String
-  quantityLeft  Int
+  quantityLeft  Float
   expirationDate  DateTime
   storageId     Int
   createdAt     DateTime @default(now())
