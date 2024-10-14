@@ -11,9 +11,9 @@ export interface IUserService {
   createUser(userInfo: CreateUserDto): Promise<UserPayload>;
   omitPassword(user: IUser): UserPayload;
   omitPasswords(users: IUser[]): UserPayload[];
-  deleteUser(userId: number): any;
-  adminResetPassword(userId: number): any;
-  resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string): any;
+  deleteUser(userId: number): Promise<void>;
+  adminResetPassword(userId: number): Promise<void>;
+  resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string): Promise<void>;
   forgotPassword(email: string): Promise<void>;
   changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void>;
 }

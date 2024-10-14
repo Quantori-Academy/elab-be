@@ -127,7 +127,7 @@ class UserService implements IUserService {
     await this.emailService.sendPasswordResetEmail(email, token);
   }
 
-  async resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string) {
+  async resetPassword(reset_token: ResetToken, newPassword: string, confirmPassword: string): Promise<void> {
     const token = await this.securityService.verifyResetToken(reset_token);
 
     if (!token) {
@@ -148,7 +148,7 @@ class UserService implements IUserService {
     await this.userRepository.setPasswordResetFlag(user, false);
   }
 
-  async adminResetPassword(userId: number) {
+  async adminResetPassword(userId: number): Promise<void> {
     const user = await this.getUserById(userId);
 
     if (!user) {
@@ -163,7 +163,7 @@ class UserService implements IUserService {
     await this.userRepository.setPasswordResetFlag(user, true);
   }
 
-  async deleteUser(userId: number) {
+  async deleteUser(userId: number): Promise<void> {
     const user = await this.getUserById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
