@@ -14,24 +14,20 @@ export class StorageService implements IStorageService {
   async getStorages(options: StorageOptions): Promise<Storage[]> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const { roomName, storageName }: FilterOptions = options.filter;
+      const { roomId, storageName }: FilterOptions = options.filter;
       const pagination: PaginationOptions = options.pagination;
       const sort: SortOptions = options.sort;
 
       let storages: Storage[] | null = [];
-      if (roomName && storageName) {
-        // 1. Unique storage
-        const result: Storage | null = await this.getUniqueStorage(roomName, storageName);
+      if (roomId && storageName) {
+        const result: Storage | null = await this.getUniqueStorage(roomId, storageName);
         storages = result ? [result] : [];
-      } else if (roomName) {
-        //    2. All storages in the room
-        storages = await this.storageRepository.findAllByRoom(roomName, pagination, sort);
+      } else if (roomId) {
+        storages = await this.storageRepository.findAllByRoom(roomId, pagination, sort);
         return storages ? storages : [];
       } else if (storageName) {
-        //     3. The same storage name in  different rooms
         storages = await this.storageRepository.findAllByName(storageName, pagination, sort);
       } else {
-        //  4. Neither room nor storage name is provided (all rooms, all names)
         storages = await this.storageRepository.findAll(pagination, sort);
       }
 
@@ -43,10 +39,10 @@ export class StorageService implements IStorageService {
     }
   }
 
-  async getUniqueStorage(roomName: string, storageName: string): Promise<Storage | null> {
+  async getUniqueStorage(roomId: number, storageName: string): Promise<Storage | null> {
     this.logger.log(`[${this.getUniqueStorage.name}] - Method start`);
     try {
-      const storage: Storage | null = await this.storageRepository.findUniqueStorage(roomName, storageName);
+      const storage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
       this.logger.log(`[${this.getUniqueStorage.name}] - Method finished`);
       return storage;
     } catch (error) {

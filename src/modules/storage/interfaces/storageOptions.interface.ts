@@ -16,7 +16,7 @@ type SortOptions = {
 };
 
 type FilterOptions = {
-  roomName: string | undefined;
+  roomId: number | undefined;
   storageName: string | undefined;
 };
 

@@ -3,5 +3,5 @@ import { StorageOptions } from './storageOptions.interface';
 
 export interface IStorageService {
   getStorages(options: StorageOptions): Promise<Storage[]>;
-  getUniqueStorage(roomName: string, storageName: string): Promise<Storage | null>;
+  getUniqueStorage(roomId: number, storageName: string): Promise<Storage | null>;
 }
