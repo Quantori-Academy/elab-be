@@ -2,10 +2,7 @@ import { Body, Controller, HttpStatus, Inject, Post, UseGuards } from '@nestjs/c
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
 import { CreateReagentDto, CreateReagentSuccessDto } from './dto/createReagent.dto';
 
 const ROUTE = 'reagents';
@@ -17,8 +14,7 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
-  @Roles(Role.Researcher)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @Post('')
   async createReagent(@Body() createReagentDto: CreateReagentDto) {
     return await this.reagentService.create(createReagentDto);
