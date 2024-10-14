@@ -69,6 +69,7 @@ class GetStorageValidationErrorsDto {
       'take must be an integer number',
       'chronologicalDate must be one of the following values: asc, desc',
       'alphabeticalName must be one of the following values: asc, desc',
+      'Only one of alphabeticalName or chronologicalDate must be provided',
     ],
   })
   message: string;
