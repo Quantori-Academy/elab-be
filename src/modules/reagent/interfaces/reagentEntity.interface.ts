@@ -7,7 +7,7 @@ export interface IReagent {
   catalogLink: string;
   pricePerUnit: number;
   quantityUnit: string;
-  totalQuantity: string;
+  totalQuantity: number;
   description: string;
   quantityLeft: number;
   expirationDate: Date;

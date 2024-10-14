@@ -30,9 +30,9 @@ export class CreateReagentDto {
   @IsString()
   quantityUnit: string;
 
-  @ApiProperty({ example: '500 ml' })
+  @ApiProperty({ example: 5.5 })
   @IsString()
-  totalQuantity: string;
+  totalQuantity: number;
 
   @ApiProperty({ example: 'A sample reagent' })
   @IsString()
@@ -84,9 +84,9 @@ export class CreateReagentSuccessDto {
   @IsString()
   quantityUnit: string;
 
-  @ApiProperty({ example: '500 ml' })
+  @ApiProperty({ example: 5.5 })
   @IsString()
-  totalQuantity: string;
+  totalQuantity: number;
 
   @ApiProperty({ example: 'A sample reagent' })
   @IsString()
