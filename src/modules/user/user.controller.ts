@@ -30,12 +30,7 @@ import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { EditUserRoleDto, EditUserRoleErrorResponseDto, EditUserRoleSuccessResponseDto } from './dto/editRole.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import {
-  CreateUserDto,
-  CreateUserErrorDto,
-  CreateUserSuccessDto,
-  CreateUserValidationErrorDto,
-} from './dto/createUser.dto';
+import { CreateUserDto, CreateUserErrorDto, CreateUserSuccessDto, CreateUserValidationErrorDto } from './dto/createUser.dto';
 import { IUserService } from './interfaces/userService.interface';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
@@ -58,10 +53,7 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
-  async editRole(
-    @Param('id', ParseIdPipe) userId: number,
-    @Body(ValidationPipe) body: EditUserRoleDto,
-  ): Promise<UserPayload> {
+  async editRole(@Param('id', ParseIdPipe) userId: number, @Body(ValidationPipe) body: EditUserRoleDto): Promise<UserPayload> {
     const role: Role = body.role;
     return await this.userService.editUserRole(userId, role);
   }
@@ -129,11 +121,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   async changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
     const user: UserPayload = (req as any).user as UserPayload;
-    await this.userService.changePassword(
-      user.id as number,
-      changePasswordDto.oldPassword,
-      changePasswordDto.newPassword,
-    );
+    await this.userService.changePassword(user.id as number, changePasswordDto.oldPassword, changePasswordDto.newPassword);
     return {
       message: 'The password is changed successfully',
     };
@@ -161,6 +149,24 @@ export class UserController {
   }
 
   @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [GetUserSuccessDto] })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getUsers() {
+    this.logger.log(`[${this.getUsers.name}] - Method start`);
+    try {
+      const users: UserPayload[] = await this.userService.getUsers();
+      this.logger.log(`[${this.getUsers.name}] - Method finished`);
+      return users;
+    } catch (error) {
+      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetUserSuccessDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
@@ -183,23 +189,5 @@ export class UserController {
   @Get(':id')
   async getUser(@Param('id', ParseIdPipe) userId: number) {
     return await this.userService.getUser(userId);
-  }
-
-  @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.OK, type: [GetUserSuccessDto] })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
-  @Get('')
-  async getUsers() {
-    this.logger.log(`[${this.getUsers.name}] - Method start`);
-    try {
-      const users: UserPayload[] = await this.userService.getUsers();
-      this.logger.log(`[${this.getUsers.name}] - Method finished`);
-      return users;
-    } catch (error) {
-      this.logger.error(`[${this.getUsers.name}] - Exception thrown` + error);
-      throw error;
-    }
   }
 }

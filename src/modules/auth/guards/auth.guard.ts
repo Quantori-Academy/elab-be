@@ -2,7 +2,7 @@ import { ISecurityService } from 'src/modules/security/interfaces/securityServic
 import { SECURITY_SERVICE_TOKEN } from 'src/modules/security/security.service';
 import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserPayload } from 'src/modules/user/interfaces/userEntity.interface';
-import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
+import { TokenExpiredError } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -29,8 +29,6 @@ export class AuthGuard implements CanActivate {
       if (error instanceof TokenExpiredError && request.method === 'DELETE' && request.url === '/api/v1/auth/logout') {
         request.user = null;
         return true;
-      } else if (error instanceof JsonWebTokenError) {
-        throw new UnauthorizedException('Invalid token');
       }
       this.logger.error(`[${this.canActivate.name}] Exception thrown ` + error);
       throw new UnauthorizedException(error.message);

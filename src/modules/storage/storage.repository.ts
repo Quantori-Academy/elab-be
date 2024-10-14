@@ -1,0 +1,230 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { IStorageRepository } from './interfaces/storageRepository.interface';
+import { Storage } from '@prisma/client';
+import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
+
+@Injectable()
+export class StorageRepository implements IStorageRepository {
+  private readonly logger: Logger = new Logger(StorageRepository.name);
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findById(id: number): Promise<Storage | null> {
+    this.logger.log(`[${this.findById.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.prisma.storage.findUnique({
+        where: { id },
+      });
+      this.logger.log(`[${this.findById.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.findById.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async getRoomIdByName(roomName: string): Promise<number | null> {
+    this.logger.log(`[${this.getRoomIdByName.name}] - Method start`);
+    try {
+      const room = await this.prisma.room.findUnique({
+        where: { name: roomName },
+        select: { id: true },
+      });
+      this.logger.log(`[${this.getRoomIdByName.name}] - Method finished`);
+      return room ? room.id : null;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async getRoomNameById(id: number): Promise<string | null> {
+    this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
+    try {
+      const room = await this.prisma.room.findUnique({
+        where: { id },
+        select: { name: true },
+      });
+      this.logger.log(`[${this.getRoomNameById.name}] - Method finished`);
+      return room ? room.name : null;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomNameById.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findUniqueStorage(roomName: string, storageName: string): Promise<Storage | null> {
+    this.logger.log(`[${this.findUniqueStorage.name}] - Method start`);
+    try {
+      const roomId: number | null = await this.getRoomIdByName(roomName);
+      if (!roomId) return null;
+
+      const storage: Storage | null = await this.prisma.storage.findUnique({
+        where: {
+          roomId_name: {
+            roomId: roomId,
+            name: storageName,
+          },
+        },
+      });
+      this.logger.log(`[${this.findUniqueStorage.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.findUniqueStorage.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findAll(pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+    this.logger.log(`[${this.findAll.name}] - Method start`);
+    try {
+      const { skip = 0, take = 10 } = pagination || {};
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
+      const storages: Storage[] = await this.prisma.storage.findMany({
+        skip,
+        take,
+        orderBy,
+      });
+      this.logger.log(`[${this.findAll.name}] - Method finished,`);
+      return storages;
+    } catch (error) {
+      this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findAllByName(storageName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+    this.logger.log(`[${this.findAllByName.name}] - Method start`);
+    try {
+      const { skip = 0, take = 10 } = pagination || {};
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
+
+      const storages: Storage[] = await this.prisma.storage.findMany({
+        where: {
+          name: storageName,
+        },
+        skip,
+        take,
+        orderBy,
+      });
+      this.logger.log(`[${this.findAllByName.name}] - Method finished,`);
+      return storages;
+    } catch (error) {
+      this.logger.error(`[${this.findAllByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findAllByRoom(roomName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[] | null> {
+    this.logger.log(`[${this.findAllByRoom.name}] - Method start`);
+    try {
+      const { skip = 0, take = 10 } = pagination || {};
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
+
+      const roomId: number | null = await this.getRoomIdByName(roomName);
+      if (!roomId) return null;
+
+      const storages: Storage[] = await this.prisma.storage.findMany({
+        where: { roomId },
+        skip,
+        take,
+        orderBy,
+      });
+      this.logger.log(`[${this.findAllByRoom.name}] - Method finished,`);
+      return storages;
+    } catch (error) {
+      this.logger.error(`[${this.findAllByRoom.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async update(storage: Storage): Promise<Storage> {
+    this.logger.log(`[${this.update.name}] - Method start`);
+    try {
+      const updatedStorage: Storage = await this.prisma.storage.update({
+        where: { id: storage.id },
+        data: storage,
+      });
+      this.logger.log(`[${this.update.name}] - Method finished`);
+      return updatedStorage;
+    } catch (error) {
+      this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async create(storage: Storage): Promise<Storage> {
+    this.logger.log(`[${this.create.name}] - Method start`);
+    try {
+      const newStorage = await this.prisma.storage.create({
+        data: storage,
+      });
+      this.logger.log(`[${this.create.name}] - Method finished`);
+      return newStorage;
+    } catch (error) {
+      this.logger.error(`[${this.create.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async delete(storage: Storage): Promise<Storage> {
+    this.logger.log(`[${this.delete.name}] - Method start`);
+    try {
+      const deletedStorage = await this.prisma.storage.delete({
+        where: { id: storage.id },
+      });
+      this.logger.log(`[${this.delete.name}] - Method finished`);
+      return deletedStorage;
+    } catch (error) {
+      this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async upsert(storage: Storage): Promise<void> {
+    this.logger.log(`[${this.upsert.name}] - Method start`);
+    try {
+      await this.prisma.storage.upsert({
+        where: { id: storage.id },
+        update: {
+          ...storage,
+        },
+        create: {
+          ...storage,
+        },
+      });
+      this.logger.log(`[${this.upsert.name}] - Method finished`);
+    } catch (error) {
+      this.logger.error(`[${this.upsert.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  private orderFactory(sortOptions: SortOptions | undefined): OrderBy {
+    this.logger.log(`[${this.orderFactory.name}] - Method start`);
+    try {
+      if (!sortOptions) return undefined;
+      const orderBy: OrderBy = {};
+      if (sortOptions.alphabeticalName) {
+        orderBy.name = sortOptions.alphabeticalName;
+      }
+      if (sortOptions.chronologicalDate) {
+        orderBy.createdAt = sortOptions.chronologicalDate;
+      }
+      this.logger.log(`[${this.orderFactory.name}] - Method finished`);
+      return Object.keys(orderBy).length > 0 ? orderBy : undefined;
+    } catch (error) {
+      this.logger.error(`[${this.orderFactory.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+}
+
+const STORAGE_REPOSITORY_TOKEN = Symbol('STORAGE_REPOSITORY_TOKEN');
+const StorageRepositoryProvider = {
+  provide: STORAGE_REPOSITORY_TOKEN,
+  useClass: StorageRepository,
+};
+
+export { STORAGE_REPOSITORY_TOKEN, StorageRepositoryProvider };
