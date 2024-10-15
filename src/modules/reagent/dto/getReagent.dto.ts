@@ -1,5 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { Category } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from 'src/modules/storage/interfaces/storageOptions.interface';
@@ -10,10 +11,10 @@ export class getReagent {
   @IsString()
   name?: string;
 
-  @ApiProperty({ required: false, type: String, description: 'Category of reagent: it is reagent or sample' })
+  @ApiProperty({ required: false, type: String, description: 'Category of reagent: it is Reagent or Sample' })
   @IsOptional()
-  @IsString()
-  category?: string;
+  @IsEnum(Category)
+  category?: Category;
 
   @ApiProperty({ required: false, type: Order, description: 'Sorting by the name of Reagent (asc | desc)' })
   @IsOptional()
@@ -50,9 +51,9 @@ export class GetReagentSuccessDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 'Sample' })
-  @IsString()
-  category: string;
+  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @IsEnum(Category)
+  category: Category;
 
   @ApiProperty({ example: 'Description of the reagent' })
   @IsString()

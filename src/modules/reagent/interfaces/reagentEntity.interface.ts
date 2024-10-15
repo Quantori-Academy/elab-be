@@ -1,3 +1,5 @@
+import { Category } from '@prisma/client';
+
 export interface IReagent {
   id?: number;
   name: string;
@@ -12,6 +14,7 @@ export interface IReagent {
   quantityLeft: number;
   expirationDate: Date;
   storageId: number;
+  category: Category;
   createdAt?: Date;
   updatedAt?: Date;
 }

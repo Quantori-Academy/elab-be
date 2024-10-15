@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { Category } from '@prisma/client';
+import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class CreateReagentDto {
   @ApiProperty({ example: 'Reagent A' })
@@ -49,6 +50,10 @@ export class CreateReagentDto {
   @ApiProperty({ example: 2 })
   @IsString()
   storageId: number;
+
+  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @IsEnum(Category)
+  category: Category;
 }
 
 export class CreateReagentSuccessDto {
@@ -103,6 +108,10 @@ export class CreateReagentSuccessDto {
   @ApiProperty({ example: 2 })
   @IsString()
   storageId: number;
+
+  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @IsEnum(Category)
+  category: Category;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()

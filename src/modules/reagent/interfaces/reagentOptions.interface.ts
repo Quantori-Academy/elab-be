@@ -21,7 +21,7 @@ export type PaginationOptions = {
   take: number | undefined;
 };
 
-export type ReagentOprions = {
+export type ReagentOptions = {
   filter: FilterOptions;
   sort: SortOptions;
   pagination: PaginationOptions;
