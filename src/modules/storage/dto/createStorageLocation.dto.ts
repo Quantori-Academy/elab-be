@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsInt, IsString, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 class CreateStorageLocationsDto {
   @ApiProperty({ example: 3 })
@@ -14,18 +14,32 @@ class CreateStorageLocationsDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({ example: 'Description for storage' })
   description?: string | null;
 }
 
-class CreateStorageErrorDto {
+class CreateStorageConflictErrorDto {
   @ApiProperty({
-    example: ['Storage with this name in Room{n} already exists', 'Room with id - N, is not found'],
+    example: ['Storage with this name in Room{n} already exists'],
   })
   message: string;
 
-  @ApiProperty({ example: 'Bad Request' })
+  @ApiProperty({ example: 'Conflict' })
+  error: string;
+
+  @ApiProperty({ example: HttpStatus.CONFLICT })
+  statusCode: number;
+}
+
+class CreateStorageNotFoundErrorDto {
+  @ApiProperty({
+    example: ['Room with id - N, is not found'],
+  })
+  message: string;
+
+  @ApiProperty({ example: 'Not Found' })
   error: string;
 
   @ApiProperty({ example: HttpStatus.NOT_FOUND })
@@ -34,7 +48,7 @@ class CreateStorageErrorDto {
 
 class CreateStorageValidationErrorDto {
   @ApiProperty({
-    example: ['roomId must not be less than 1', 'roomId must be an integer number'],
+    example: ['roomId must not be less than 1', 'roomId must be an integer number', 'name must be a string'],
   })
   message: string;
 
@@ -45,4 +59,9 @@ class CreateStorageValidationErrorDto {
   statusCode: number;
 }
 
-export { CreateStorageLocationsDto, CreateStorageErrorDto, CreateStorageValidationErrorDto };
+export {
+  CreateStorageLocationsDto,
+  CreateStorageConflictErrorDto,
+  CreateStorageValidationErrorDto,
+  CreateStorageNotFoundErrorDto,
+};

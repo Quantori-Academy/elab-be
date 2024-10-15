@@ -12,8 +12,9 @@ import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { StorageOptions } from './interfaces/storageOptions.interface';
 import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pipe';
 import {
-  CreateStorageErrorDto,
+  CreateStorageConflictErrorDto,
   CreateStorageLocationsDto,
+  CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
 
@@ -50,11 +51,12 @@ export class StorageController {
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: GetStorageSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateStorageValidationErrorDto })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: CreateStorageErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: CreateStorageNotFoundErrorDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: CreateStorageConflictErrorDto })
+  // @Roles(Role.Admin)
+  // @UseGuards(AuthGuard, RolesGuard)
   @Post('')
   async createStorageLocation(@Body(ValidationPipe) storageDto: CreateStorageLocationsDto) {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
@@ -63,7 +65,7 @@ export class StorageController {
       this.logger.log(`[${this.createStorageLocation.name}] - Method finished`);
       return storage;
     } catch (error) {
-      this.logger.error(`[${this.createStorageLocation.name}] - Exception thrown` + error);
+      this.logger.error(`[${this.createStorageLocation.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
