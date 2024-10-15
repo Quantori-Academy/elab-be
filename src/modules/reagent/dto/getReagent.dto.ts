@@ -11,22 +11,22 @@ export class GetReagentDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ required: false, type: String, description: 'Category of reagent: it is Reagent or Sample' })
+  @ApiProperty({ required: false, enum: Category, description: 'Category of reagent: it is Reagent or Sample' })
   @IsOptional()
   @IsEnum(Category)
   category?: Category;
 
-  @ApiProperty({ required: false, type: Order, description: 'Sorting by the name of Reagent (asc | desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Sorting by the name of Reagent (asc | desc)' })
   @IsOptional()
   @IsEnum(Order)
   sortByName?: Order;
 
-  @ApiProperty({ required: false, type: Order, description: 'Sorting by the creation date of Reagent (asc | desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Sorting by the creation date of Reagent (asc | desc)' })
   @IsOptional()
   @IsEnum(Order)
   sortByCreationDate?: Order;
 
-  @ApiProperty({ required: false, type: Order, description: 'Sorting by the updated date of Reagent (asc | desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Sorting by the updated date of Reagent (asc | desc)' })
   @IsOptional()
   @IsEnum(Order)
   sortByUpdatedDate?: Order;

@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
-import { Category } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
 
@@ -40,7 +40,7 @@ class ReagentRepository implements IReagentRepository {
 
   async findAll(pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
-    const orderBy: OrderBy = this.orderFactory(sorting);
+    const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       skip,
       take,
@@ -56,7 +56,7 @@ class ReagentRepository implements IReagentRepository {
 
   async getAllByName(name: string, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
-    const orderBy: OrderBy = this.orderFactory(sorting);
+    const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: { name },
       skip,
@@ -67,7 +67,7 @@ class ReagentRepository implements IReagentRepository {
 
   async getAllByCategory(category: Category, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
-    const orderBy: OrderBy = this.orderFactory(sorting);
+    const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: { category },
       skip,
@@ -83,7 +83,7 @@ class ReagentRepository implements IReagentRepository {
     sorting?: SortOptions,
   ): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
-    const orderBy: OrderBy = this.orderFactory(sorting);
+    const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: {
         AND: [{ name }, { category }],
@@ -94,7 +94,9 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  private orderFactory(sortOptions: SortOptions | undefined): OrderBy {
+  private orderFactory(
+    sortOptions: SortOptions | undefined,
+  ): Prisma.ReagentOrderByWithRelationInput | Prisma.ReagentOrderByWithRelationInput[] | undefined {
     this.logger.log(`[${this.orderFactory.name}] - Started`);
     try {
       if (!sortOptions) return undefined;
@@ -110,7 +112,16 @@ class ReagentRepository implements IReagentRepository {
         orderBy.updatedAt = sortOptions.sortByUpdatedDate;
       }
       this.logger.log(`[${this.orderFactory.name}] - Finished`);
-      return Object.keys(orderBy).length > 0 ? orderBy : undefined;
+      if (Object.keys(orderBy).length === 1) {
+        return orderBy;
+      } else if (Object.keys(orderBy).length > 1) {
+        const res = Object.entries(orderBy).map(([key, value]) => {
+          return { [key]: value };
+        });
+        return res;
+      } else {
+        return undefined;
+      }
     } catch (error) {
       this.logger.error(`[${this.orderFactory.name}] - Error: ${error}`);
       throw error;

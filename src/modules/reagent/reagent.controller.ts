@@ -24,7 +24,7 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
-  @ApiQuery({ type: GetReagentDto })
+  @ApiQuery({ type: () => GetReagentDto })
   @ApiResponse({ status: HttpStatus.OK, type: [GetReagentSuccessDto] })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetReagentErrorDto })
   @UseGuards(AuthGuard)
