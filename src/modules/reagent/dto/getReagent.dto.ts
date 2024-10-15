@@ -5,7 +5,7 @@ import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from 'src/modules/storage/interfaces/storageOptions.interface';
 
-export class getReagent {
+export class GetReagentDto {
   @ApiProperty({ required: false, type: String, description: 'Name of the reagent or sample' })
   @IsOptional()
   @IsString()

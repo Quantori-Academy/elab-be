@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class CreateReagentDto {
@@ -24,6 +25,7 @@ export class CreateReagentDto {
   catalogLink: string;
 
   @ApiProperty({ example: 234 })
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   pricePerUnit: number;
 
@@ -32,6 +34,7 @@ export class CreateReagentDto {
   quantityUnit: string;
 
   @ApiProperty({ example: 5.5 })
+  @Transform(({ value }) => Number(value))
   @IsString()
   totalQuantity: number;
 
@@ -40,6 +43,7 @@ export class CreateReagentDto {
   description: string;
 
   @ApiProperty({ example: 0 })
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   quantityLeft: number;
 
@@ -48,6 +52,7 @@ export class CreateReagentDto {
   expirationDate: Date;
 
   @ApiProperty({ example: 2 })
+  @Transform(({ value }) => Number(value))
   @IsString()
   storageId: number;
 
