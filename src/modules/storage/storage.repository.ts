@@ -54,18 +54,18 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findUniqueStorage(roomName: string, storageName: string): Promise<Storage | null> {
+  async findUniqueStorage(roomId: number, storageName: string): Promise<Storage | null> {
     this.logger.log(`[${this.findUniqueStorage.name}] - Method start`);
     try {
-      const roomId: number | null = await this.getRoomIdByName(roomName);
-      if (!roomId) return null;
-
       const storage: Storage | null = await this.prisma.storage.findUnique({
         where: {
           roomId_name: {
-            roomId: roomId,
+            roomId,
             name: storageName,
           },
+        },
+        include: {
+          room: true,
         },
       });
       this.logger.log(`[${this.findUniqueStorage.name}] - Method finished`);
@@ -85,6 +85,9 @@ export class StorageRepository implements IStorageRepository {
         skip,
         take,
         orderBy,
+        include: {
+          room: true,
+        },
       });
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
       return storages;
@@ -107,6 +110,9 @@ export class StorageRepository implements IStorageRepository {
         skip,
         take,
         orderBy,
+        include: {
+          room: true,
+        },
       });
       this.logger.log(`[${this.findAllByName.name}] - Method finished,`);
       return storages;
@@ -116,20 +122,19 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByRoom(roomName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[] | null> {
+  async findAllByRoom(roomId: number, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[] | null> {
     this.logger.log(`[${this.findAllByRoom.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
-
-      const roomId: number | null = await this.getRoomIdByName(roomName);
-      if (!roomId) return null;
-
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: { roomId },
         skip,
         take,
         orderBy,
+        include: {
+          room: true,
+        },
       });
       this.logger.log(`[${this.findAllByRoom.name}] - Method finished,`);
       return storages;

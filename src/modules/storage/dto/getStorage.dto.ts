@@ -5,10 +5,12 @@ import { Transform } from 'class-transformer';
 import { HttpStatus } from '@nestjs/common';
 
 class GetStoragesQueryDto {
-  @ApiProperty({ required: false, type: String, description: 'Name of the room' })
+  @ApiProperty({ required: false, type: Number, description: 'Id of the room' })
   @IsOptional()
-  @IsString()
-  roomName?: string;
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  roomId?: number;
 
   @ApiProperty({ required: false, type: String, description: 'Name of the storage' })
   @IsOptional()
@@ -63,6 +65,8 @@ class GetStorageSuccessDto {
 class GetStorageValidationErrorsDto {
   @ApiProperty({
     example: [
+      'roomId must not be less than 1',
+      'roomId must be an integer number',
       'skip must not be less than 0',
       'skip must be an integer number',
       'take must not be less than 1',
