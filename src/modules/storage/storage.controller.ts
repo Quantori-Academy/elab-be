@@ -55,8 +55,8 @@ export class StorageController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.CONFLICT, type: CreateStorageConflictErrorDto })
-  // @Roles(Role.Admin)
-  // @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Post('')
   async createStorageLocation(@Body(ValidationPipe) storageDto: CreateStorageLocationsDto) {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
