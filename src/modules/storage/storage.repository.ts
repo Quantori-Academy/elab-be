@@ -65,7 +65,6 @@ export class StorageRepository implements IStorageRepository {
           },
         },
         include: {
-          reagents: true,
           room: true,
         },
       });
@@ -87,7 +86,6 @@ export class StorageRepository implements IStorageRepository {
         take,
         orderBy,
         include: {
-          reagents: true,
           room: true,
         },
       });
@@ -113,7 +111,6 @@ export class StorageRepository implements IStorageRepository {
         take,
         orderBy,
         include: {
-          reagents: true,
           room: true,
         },
       });
@@ -136,7 +133,6 @@ export class StorageRepository implements IStorageRepository {
         take,
         orderBy,
         include: {
-          reagents: true,
           room: true,
         },
       });
