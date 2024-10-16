@@ -74,7 +74,7 @@ export class StorageController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
-  async createStorageLocation(@Body(ValidationPipe) storageDto: CreateStorageLocationsDto) {
+  async createStorageLocation(@Body(new ValidationPipe({ transform: true })) storageDto: CreateStorageLocationsDto) {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
     try {
       const storage: Storage = await this.storageService.createStorageLocation(storageDto);
