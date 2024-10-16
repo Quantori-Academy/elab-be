@@ -71,6 +71,17 @@ export class StorageService implements IStorageService {
       throw error;
     }
   }
+
+  async delete(id: number): Promise<void> {
+    this.logger.log(`[${this.delete.name}] - Method start`);
+    try {
+      await this.storageRepository.delete({ id });
+      this.logger.log(`[${this.delete.name}] - Method finished`);
+    } catch (error) {
+      this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
 }
 
 const STORAGE_SERVICE_TOKEN = Symbol('STORAGE_SERVICE_TOKEN');
