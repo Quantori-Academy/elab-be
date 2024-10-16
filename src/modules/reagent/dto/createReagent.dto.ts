@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateReagentDto {
   @ApiProperty({ example: 'Reagent A' })
@@ -59,6 +59,11 @@ export class CreateReagentDto {
   @ApiProperty({ examples: ['Reagent', 'Sample'] })
   @IsEnum(Category)
   category: Category;
+
+  @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1' })
+  @IsOptional()
+  @IsString()
+  structure?: string;
 }
 
 export class CreateReagentSuccessDto {
@@ -117,6 +122,10 @@ export class CreateReagentSuccessDto {
   @ApiProperty({ examples: ['Reagent', 'Sample'] })
   @IsEnum(Category)
   category: Category;
+
+  @ApiProperty({ examples: ['Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1', null] })
+  @IsString()
+  structure: string | null;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()
