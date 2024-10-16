@@ -20,7 +20,6 @@ export class StorageRepository implements IStorageRepository {
           room: true,
         },
       });
-      console.log(storage, '---');
       this.logger.log(`[${this.findById.name}] - Method finished`);
       return storage;
     } catch (error) {
