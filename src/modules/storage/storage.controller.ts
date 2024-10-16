@@ -1,4 +1,17 @@
-import { Body, Controller, Get, HttpStatus, Inject, Logger, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Inject,
+  Logger,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { STORAGE_SERVICE_TOKEN } from './storage.service';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IStorageService } from './interfaces/storageService.interface';
@@ -17,6 +30,9 @@ import {
   CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
+import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'storages';
 
@@ -66,6 +82,30 @@ export class StorageController {
       return storage;
     } catch (error) {
       this.logger.error(`[${this.createStorageLocation.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: DeleteStorageSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: DeleteStorageNotFoundErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete(':id')
+  async deleteStorage(@Param('id', ParseIdPipe) id: number) {
+    this.logger.log(`[${this.deleteStorage.name}] - Method start`);
+    try {
+      await this.storageService.delete(id);
+      this.logger.log(`[${this.deleteStorage.name}] - Method finished`);
+      return {
+        message: 'Storage Successfully deleted',
+        code: HttpStatus.OK,
+      };
+    } catch (error) {
+      this.logger.error(`[${this.deleteStorage.name}] - Exception thrown: ` + error);
       throw error;
     }
   }

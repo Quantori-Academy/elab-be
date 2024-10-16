@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
-import { Storage } from '@prisma/client';
+import { Prisma, Storage } from '@prisma/client';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 
@@ -81,10 +81,12 @@ export class StorageRepository implements IStorageRepository {
   }
 
   async findAll(pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+    console.log(pagination, sortOptions);
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
+      console.log(orderBy);
       const storages: Storage[] = await this.prisma.storage.findMany({
         skip,
         take,
@@ -180,7 +182,7 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async delete(storage: Storage): Promise<Storage> {
+  async delete(storage: Partial<Storage>): Promise<Storage> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
       const deletedStorage = await this.prisma.storage.delete({
@@ -189,6 +191,9 @@ export class StorageRepository implements IStorageRepository {
       this.logger.log(`[${this.delete.name}] - Method finished`);
       return deletedStorage;
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        error = new NotFoundException('Storage Not Found');
+      }
       this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
       throw error;
     }
