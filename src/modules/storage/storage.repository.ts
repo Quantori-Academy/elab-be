@@ -82,7 +82,6 @@ export class StorageRepository implements IStorageRepository {
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
-      console.log(orderBy);
       const storages: Storage[] = await this.prisma.storage.findMany({
         skip,
         take,
