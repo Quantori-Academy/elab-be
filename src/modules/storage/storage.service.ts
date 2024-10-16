@@ -21,7 +21,7 @@ export class StorageService implements IStorageService {
 
       let storages: Storage[] | null = [];
       if (roomId && storageName) {
-        const result: Storage | null = await this.getUniqueStorage(roomId, storageName);
+        const result: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
         storages = result ? [result] : [];
       } else if (roomId) {
         storages = await this.storageRepository.findAllByRoom(roomId, pagination, sort);
@@ -39,19 +39,7 @@ export class StorageService implements IStorageService {
       throw error;
     }
   }
-
-  async getUniqueStorage(roomId: number, storageName: string): Promise<Storage | null> {
-    this.logger.log(`[${this.getUniqueStorage.name}] - Method start`);
-    try {
-      const storage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
-      this.logger.log(`[${this.getUniqueStorage.name}] - Method finished`);
-      return storage;
-    } catch (error) {
-      this.logger.error(`[${this.getUniqueStorage.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
+  
   async createStorageLocation(storageDto: CreateStorageLocationsDto): Promise<Storage> {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
     try {
