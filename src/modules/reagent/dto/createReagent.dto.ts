@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { Category } from '@prisma/client';
+import { Transform } from 'class-transformer';
+import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class CreateReagentDto {
   @ApiProperty({ example: 'Reagent A' })
@@ -23,6 +25,7 @@ export class CreateReagentDto {
   catalogLink: string;
 
   @ApiProperty({ example: 234 })
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   pricePerUnit: number;
 
@@ -31,6 +34,7 @@ export class CreateReagentDto {
   quantityUnit: string;
 
   @ApiProperty({ example: 5.5 })
+  @Transform(({ value }) => Number(value))
   @IsString()
   totalQuantity: number;
 
@@ -39,6 +43,7 @@ export class CreateReagentDto {
   description: string;
 
   @ApiProperty({ example: 0 })
+  @Transform(({ value }) => Number(value))
   @IsNumber()
   quantityLeft: number;
 
@@ -47,8 +52,13 @@ export class CreateReagentDto {
   expirationDate: Date;
 
   @ApiProperty({ example: 2 })
+  @Transform(({ value }) => Number(value))
   @IsString()
   storageId: number;
+
+  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @IsEnum(Category)
+  category: Category;
 }
 
 export class CreateReagentSuccessDto {
@@ -103,6 +113,10 @@ export class CreateReagentSuccessDto {
   @ApiProperty({ example: 2 })
   @IsString()
   storageId: number;
+
+  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @IsEnum(Category)
+  category: Category;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()
