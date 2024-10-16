@@ -81,7 +81,6 @@ export class StorageRepository implements IStorageRepository {
   }
 
   async findAll(pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
-    console.log(pagination, sortOptions);
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
