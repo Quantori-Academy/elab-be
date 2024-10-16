@@ -37,6 +37,7 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
     }
 
     const filters: FilterOptions = {
+      id: queryDto.id,
       roomId: queryDto.roomId,
       storageName: queryDto.storageName,
     };
