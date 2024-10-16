@@ -1,9 +1,10 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
 import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from './interfaces/storageOptions.interface';
+import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -47,6 +48,26 @@ export class StorageService implements IStorageService {
       return storage;
     } catch (error) {
       this.logger.error(`[${this.getUniqueStorage.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async createStorageLocation(storageDto: CreateStorageLocationsDto): Promise<Storage> {
+    this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
+    try {
+      const { roomId, name, description = null } = storageDto;
+
+      const roomExist: string | null = await this.storageRepository.getRoomNameById(roomId);
+      if (!roomExist) throw new NotFoundException(`Room with id - ${roomId} - Doesn't exists`);
+
+      const existingStorage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, name);
+      if (existingStorage) throw new ConflictException(`Storage with this - ${name} - in Room${roomId} already exists`);
+
+      const storage: Storage = await this.storageRepository.create({ roomId, name, description });
+      this.logger.log(`[${this.createStorageLocation.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.createStorageLocation.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
