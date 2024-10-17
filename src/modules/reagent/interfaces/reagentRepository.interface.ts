@@ -12,4 +12,5 @@ export interface IReagentRepository extends IRepository<IReagent> {
     sorting?: SortOptions,
   ): Promise<IReagent[]>;
   findAll(pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
+  getAllByStructure(structure: string, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent | IReagent[]>;
 }

@@ -94,7 +94,11 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async getAllByStructure(structure: string, pagination?: PaginationOptions, sorting?: SortOptions) {
+  async getAllByStructure(
+    structure: string,
+    pagination?: PaginationOptions,
+    sorting?: SortOptions,
+  ): Promise<IReagent | IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     let inputString = `SELECT name, category, structure, description, quantityLeft, storageId FROM reagent WHERE structure @> ${structure}`;

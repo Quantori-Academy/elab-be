@@ -44,6 +44,15 @@ class ReagentService implements IReagentService {
       throw new InternalServerErrorException('Failed to fetch a reagents!');
     }
   }
+
+  async searchByStructure(structure: string): Promise<IReagent | IReagent[]> {
+    try {
+      return await this.reagentRepository.getAllByStructure(structure);
+    } catch (error) {
+      this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
+      throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
+    }
+  }
 }
 
 const REAGENT_SERVICE_TOKEN = Symbol('REAGENT_SERVICE_TOKEN');
