@@ -74,8 +74,8 @@ export class StorageService implements IStorageService {
       const storage: Storage | null = await this.storageRepository.findById(id, true);
       if (!storage) throw new NotFoundException('Storage Not Found');
 
-      const emtpyStorage: boolean = (storage as any).reagents.length === 0;
-      if (!emtpyStorage) throw new ConflictException('Cannot delete storage because it has associated reagents.');
+      const emptyStorage: boolean = (storage as any).reagents.length === 0;
+      if (!emptyStorage) throw new ConflictException('Cannot delete storage because it has associated reagents.');
 
       await this.storageRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);
