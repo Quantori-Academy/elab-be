@@ -16,6 +16,9 @@ export class StorageRepository implements IStorageRepository {
     try {
       const storage: Storage | null = await this.prisma.storage.findUnique({
         where: { id },
+        include: {
+          room: true,
+        },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);
       return storage;

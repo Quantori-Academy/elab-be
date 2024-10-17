@@ -15,12 +15,15 @@ export class StorageService implements IStorageService {
   async getStorages(options: StorageOptions): Promise<Storage[]> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const { roomId, storageName }: FilterOptions = options.filter;
+      const { id, roomId, storageName }: FilterOptions = options.filter;
       const pagination: PaginationOptions = options.pagination;
       const sort: SortOptions = options.sort;
 
       let storages: Storage[] | null = [];
-      if (roomId && storageName) {
+      if (id) {
+        const result: Storage | null = await this.storageRepository.findById(id);
+        storages = result ? [result] : [];
+      } else if (roomId && storageName) {
         const result: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
         storages = result ? [result] : [];
       } else if (roomId) {
