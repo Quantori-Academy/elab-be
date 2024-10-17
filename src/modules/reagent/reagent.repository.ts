@@ -76,7 +76,7 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async getAllByBoth(
+  async getAllByNameAndCategory(
     name: string,
     category: Category,
     pagination?: PaginationOptions,
@@ -93,7 +93,13 @@ class ReagentRepository implements IReagentRepository {
       orderBy,
     });
   }
-
+  /*
+  async getAllByStructure(structure: string, pagination?: PaginationOptions, sorting?: SortOptions) {
+    //const { skip = 0, take = 10 } = pagination || {};
+    //const orderBy = this.orderFactory(sorting);
+    
+  }
+*/
   private orderFactory(
     sortOptions: SortOptions | undefined,
   ): Prisma.ReagentOrderByWithRelationInput | Prisma.ReagentOrderByWithRelationInput[] | undefined {

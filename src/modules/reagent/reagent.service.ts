@@ -28,7 +28,7 @@ class ReagentService implements IReagentService {
       const { filter, pagination, sort } = options || {};
       if (filter.category && filter.name) {
         this.logger.log('Fetching reagents by both name and category');
-        return await this.reagentRepository.getAllByBoth(filter.name, filter.category, pagination, sort);
+        return await this.reagentRepository.getAllByNameAndCategory(filter.name, filter.category, pagination, sort);
       } else if (filter.category) {
         this.logger.log('Fetching reagents by category');
         return await this.reagentRepository.getAllByCategory(filter.category, pagination, sort);
