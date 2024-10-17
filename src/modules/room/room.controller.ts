@@ -6,7 +6,12 @@ import { Role, Room } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { CreateRoomConflictErrorDto, CreateRoomDto, CreateRoomValidationErrorDto } from './dto/createRoom.dto';
+import {
+  CreateRoomConflictErrorDto,
+  CreateRoomDto,
+  CreateRoomSuccessDto,
+  CreateRoomValidationErrorDto,
+} from './dto/createRoom.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
@@ -18,7 +23,7 @@ export class RoomController {
   private readonly logger: Logger = new Logger(RoomController.name);
 
   @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.CREATED, type: CreateRoomDto })
+  @ApiResponse({ status: HttpStatus.CREATED, type: CreateRoomSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateRoomValidationErrorDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
