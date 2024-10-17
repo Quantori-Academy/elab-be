@@ -7,12 +7,12 @@ export class ParseIdPipe implements PipeTransform {
       throw new BadRequestException('Value is required.');
     }
 
-    const message = `Invalid value for parameter "${metadata.data}": "${value}" is not a valid id.`;
     const isValidInteger = /^\d+$/.test(value);
-    if (!isValidInteger) throw new BadRequestException(message);
+    const parsedValue = isValidInteger ? parseInt(value, 10) : NaN;
 
-    const parsedValue = parseInt(value, 10);
-    if (isNaN(parsedValue) || parsedValue === 0) throw new BadRequestException(message);
+    if (!isValidInteger || isNaN(parsedValue) || parsedValue === 0) {
+      throw new BadRequestException(`Invalid value for parameter "${metadata.data}": "${value}" is not a valid id.`);
+    }
 
     return parsedValue;
   }
