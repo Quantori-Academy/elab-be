@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { Prisma, Room } from '@prisma/client';
+import { CreateRoomDto } from './dto/createRoom.dto';
 
 @Injectable()
 export class RoomRepository implements IRoomRepository {
@@ -78,7 +79,7 @@ export class RoomRepository implements IRoomRepository {
     }
   }
 
-  async create(roomDto: any): Promise<Room> {
+  async create(roomDto: CreateRoomDto): Promise<Room> {
     this.logger.log(`[${this.create.name}] - Method start`);
     try {
       const room: Room = await this.prisma.room.create({
