@@ -21,32 +21,32 @@ export class RoomRepository implements IRoomRepository {
     }
   }
 
-  async getRoomIdByName(roomName: string): Promise<number | null> {
-    this.logger.log(`[${this.getRoomIdByName.name}] - Method start`);
+  async findRoomIdByName(roomName: string): Promise<number | null> {
+    this.logger.log(`[${this.findRoomIdByName.name}] - Method start`);
     try {
       const room = await this.prisma.room.findUnique({
         where: { name: roomName },
         select: { id: true },
       });
-      this.logger.log(`[${this.getRoomIdByName.name}] - Method finished`);
+      this.logger.log(`[${this.findRoomIdByName.name}] - Method finished`);
       return room ? room.id : null;
     } catch (error) {
-      this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.findRoomIdByName.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
 
-  async getRoomNameById(id: number): Promise<string | null> {
-    this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
+  async findRoomNameById(id: number): Promise<string | null> {
+    this.logger.log(`[${this.findRoomNameById.name}] - Method start`);
     try {
       const room = await this.prisma.room.findUnique({
         where: { id },
         select: { name: true },
       });
-      this.logger.log(`[${this.getRoomNameById.name}] - Method finished`);
+      this.logger.log(`[${this.findRoomNameById.name}] - Method finished`);
       return room ? room.name : null;
     } catch (error) {
-      this.logger.error(`[${this.getRoomNameById.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.findRoomNameById.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
