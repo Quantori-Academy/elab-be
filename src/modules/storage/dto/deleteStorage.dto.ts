@@ -21,4 +21,17 @@ class DeleteStorageNotFoundErrorDto {
   statusCode: number;
 }
 
-export { DeleteStorageSuccessDto, DeleteStorageNotFoundErrorDto };
+class DeleteStorageBadRequestErrorDto {
+  @ApiProperty({
+    example: 'Cannot delete storage because it has associated reagents.',
+  })
+  message: string;
+
+  @ApiProperty({ example: 'Bad Request' })
+  error: string;
+
+  @ApiProperty({ example: HttpStatus.BAD_REQUEST })
+  statusCode: number;
+}
+
+export { DeleteStorageSuccessDto, DeleteStorageNotFoundErrorDto, DeleteStorageBadRequestErrorDto };

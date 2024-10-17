@@ -11,13 +11,20 @@ export class StorageRepository implements IStorageRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number): Promise<Storage | null> {
+  async findById(id: number, includeReagents: boolean = false): Promise<Storage | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
       const storage: Storage | null = await this.prisma.storage.findUnique({
         where: { id },
         include: {
           room: true,
+          reagents: includeReagents
+            ? {
+                select: {
+                  id: true,
+                },
+              }
+            : false,
         },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);

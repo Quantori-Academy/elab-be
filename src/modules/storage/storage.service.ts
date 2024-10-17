@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
@@ -66,6 +66,12 @@ export class StorageService implements IStorageService {
   async delete(id: number): Promise<void> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
+      const storage: Storage | null = await this.storageRepository.findById(id, true);
+      if (!storage) throw new NotFoundException('Storage Not Found');
+
+      const emtpyReagents: boolean = (storage as any).reagents.length === 0;
+      if (!emtpyReagents) throw new BadRequestException('Cannot delete storage because it has associated reagents.');
+
       await this.storageRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);
     } catch (error) {
