@@ -4,5 +4,5 @@ export interface IRepository<T> {
   create(entity: T): Promise<T>;
   update(entity: T): Promise<T>;
   upsert(entity: T): Promise<void>;
-  delete(entity: Partial<T>): Promise<T>;
+  delete(id: number): Promise<T>;
 }

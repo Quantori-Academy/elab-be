@@ -181,11 +181,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async delete(storage: Partial<Storage>): Promise<Storage> {
+  async delete(id: number): Promise<Storage> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
       const deletedStorage = await this.prisma.storage.delete({
-        where: { id: storage.id },
+        where: { id },
       });
       this.logger.log(`[${this.delete.name}] - Method finished`);
       return deletedStorage;

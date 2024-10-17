@@ -42,7 +42,7 @@ export class StorageService implements IStorageService {
       throw error;
     }
   }
-  
+
   async createStorageLocation(storageDto: CreateStorageLocationsDto): Promise<Storage> {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
     try {
@@ -66,7 +66,7 @@ export class StorageService implements IStorageService {
   async delete(id: number): Promise<void> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
-      await this.storageRepository.delete({ id });
+      await this.storageRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);
     } catch (error) {
       this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
