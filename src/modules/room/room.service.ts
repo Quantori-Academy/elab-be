@@ -65,7 +65,7 @@ export class RoomService implements IRoomService {
       if (!room) throw new NotFoundException('Room Not Found');
 
       const emtpyRoom: boolean = (room as any).storages.length === 0;
-      if (!emtpyRoom) throw new ConflictException('Cannot delete storage because it has associated storage locations.');
+      if (!emtpyRoom) throw new ConflictException('Cannot delete Room because it has associated storage locations.');
 
       await this.roomRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);
