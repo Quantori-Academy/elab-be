@@ -124,7 +124,6 @@ export class CreateReagentSuccessDto {
   category: Category;
 
   @ApiProperty({ examples: ['Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1', null] })
-  @IsString()
   structure: string | null;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })

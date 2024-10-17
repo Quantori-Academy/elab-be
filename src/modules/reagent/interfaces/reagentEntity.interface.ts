@@ -15,7 +15,7 @@ export interface IReagent {
   expirationDate: Date;
   storageId: number;
   category: Category;
-  structure?: string;
+  structure?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
