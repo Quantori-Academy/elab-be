@@ -92,7 +92,6 @@ export class StorageRepository implements IStorageRepository {
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
-      console.log(orderBy);
       const storages: Storage[] = await this.prisma.storage.findMany({
         skip,
         take,
@@ -191,7 +190,7 @@ export class StorageRepository implements IStorageRepository {
   async delete(id: number): Promise<Storage> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
-      const deletedStorage = await this.prisma.storage.delete({
+      const deletedStorage: Storage = await this.prisma.storage.delete({
         where: { id },
       });
       this.logger.log(`[${this.delete.name}] - Method finished`);
