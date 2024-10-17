@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ParseIdPipeErrorDto {
@@ -7,6 +8,6 @@ export class ParseIdPipeErrorDto {
   @ApiProperty({ example: 'Bad Request' })
   error: string;
 
-  @ApiProperty({ example: 400 })
+  @ApiProperty({ example: HttpStatus.BAD_REQUEST })
   statusCode: number;
 }

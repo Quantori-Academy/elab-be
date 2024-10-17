@@ -168,7 +168,7 @@ class UserService implements IUserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.userRepository.delete(user);
+    await this.userRepository.delete(userId);
   }
 
   async getUser(userId: number): Promise<UserPayload> {

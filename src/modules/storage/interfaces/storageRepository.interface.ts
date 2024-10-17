@@ -4,6 +4,7 @@ import { PaginationOptions, SortOptions } from './storageOptions.interface';
 import { CreateStorageLocationsDto } from '../dto/createStorageLocation.dto';
 
 export interface IStorageRepository extends IRepository<Storage> {
+  findById(id: number, includeReagents?: boolean): Promise<Storage | null>;
   findUniqueStorage(roomId: number, storageName: string): Promise<Storage | null>;
   create(storageDto: CreateStorageLocationsDto): Promise<Storage>;
   getRoomNameById(id: number): Promise<string | null>;

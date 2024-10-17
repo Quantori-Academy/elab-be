@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
@@ -24,7 +24,7 @@ export class StorageService implements IStorageService {
         const result: Storage | null = await this.storageRepository.findById(id);
         storages = result ? [result] : [];
       } else if (roomId && storageName) {
-        const result: Storage | null = await this.getUniqueStorage(roomId, storageName);
+        const result: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
         storages = result ? [result] : [];
       } else if (roomId) {
         storages = await this.storageRepository.findAllByRoom(roomId, pagination, sort);
@@ -39,18 +39,6 @@ export class StorageService implements IStorageService {
       return storages;
     } catch (error) {
       this.logger.error(`[${this.getStorages.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
-  async getUniqueStorage(roomId: number, storageName: string): Promise<Storage | null> {
-    this.logger.log(`[${this.getUniqueStorage.name}] - Method start`);
-    try {
-      const storage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
-      this.logger.log(`[${this.getUniqueStorage.name}] - Method finished`);
-      return storage;
-    } catch (error) {
-      this.logger.error(`[${this.getUniqueStorage.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
@@ -71,6 +59,23 @@ export class StorageService implements IStorageService {
       return storage;
     } catch (error) {
       this.logger.error(`[${this.createStorageLocation.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async delete(id: number): Promise<void> {
+    this.logger.log(`[${this.delete.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.storageRepository.findById(id, true);
+      if (!storage) throw new NotFoundException('Storage Not Found');
+
+      const emtpyReagents: boolean = (storage as any).reagents.length === 0;
+      if (!emtpyReagents) throw new BadRequestException('Cannot delete storage because it has associated reagents.');
+
+      await this.storageRepository.delete(id);
+      this.logger.log(`[${this.delete.name}] - Method finished`);
+    } catch (error) {
+      this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

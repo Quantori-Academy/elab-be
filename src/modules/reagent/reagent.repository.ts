@@ -48,9 +48,9 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async delete(reagent: IReagent): Promise<IReagent> {
+  async delete(id: number): Promise<IReagent> {
     return await this.prisma.reagent.delete({
-      where: { id: reagent.id },
+      where: { id },
     });
   }
 

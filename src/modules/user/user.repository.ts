@@ -67,9 +67,9 @@ class UserRepository implements IRepository<IUser> {
     });
   }
 
-  async delete(user: IUser): Promise<IUser> {
+  async delete(id: number): Promise<IUser> {
     return await this.prisma.user.delete({
-      where: { id: user.id },
+      where: { id },
     });
   }
 }
