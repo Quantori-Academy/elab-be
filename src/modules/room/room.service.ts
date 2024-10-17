@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ROOM_REPOSITORY_TOKEN } from './room.repository';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
@@ -61,6 +61,12 @@ export class RoomService implements IRoomService {
   async delete(id: number): Promise<void> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
+      const room: Room | null = await this.roomRepository.findById(id, true);
+      if (!room) throw new NotFoundException('Storage Not Found');
+
+      const emtpyRoom: boolean = (room as any).storages.length === 0;
+      if (!emtpyRoom) throw new ConflictException('Cannot delete storage because it has associated storage locations.');
+
       await this.roomRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);
     } catch (error) {

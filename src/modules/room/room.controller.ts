@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Inject, Logger, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, HttpStatus, Inject, Logger, Param, Post, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ROOM_SERVICE_TOKEN } from './room.service';
 import { IRoomService } from './interfaces/roomService.interface';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -14,6 +14,9 @@ import {
 } from './dto/createRoom.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { DeleteRoomConflictErrorDto, DeleteRoomNotFoundErrorDto, DeleteRoomSuccessDto } from './dto/deleteRoom.dto';
+import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'rooms';
 
@@ -39,6 +42,31 @@ export class RoomController {
       return room;
     } catch (error) {
       this.logger.error(`[${this.createRoom.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: DeleteRoomSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: DeleteRoomNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: DeleteRoomConflictErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete(':id')
+  async deleteRoom(@Param('id', ParseIdPipe) id: number) {
+    this.logger.log(`[${this.deleteRoom.name}] - Method start`);
+    try {
+      await this.roomService.delete(id);
+      this.logger.log(`[${this.deleteRoom.name}] - Method finished`);
+      return {
+        message: 'Room Successfully deleted',
+        code: HttpStatus.OK,
+      };
+    } catch (error) {
+      this.logger.error(`[${this.deleteRoom.name}] - Exception thrown: ` + error);
       throw error;
     }
   }

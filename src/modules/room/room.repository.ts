@@ -10,10 +10,23 @@ export class RoomRepository implements IRoomRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number): Promise<Room | null> {
+  async findById(id: number, includeStorages: boolean = false): Promise<Room | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
-      const room: Room | null = await this.prisma.room.findUnique({ where: { id } });
+      const room: Room | null = await this.prisma.room.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          storages: includeStorages
+            ? {
+                select: {
+                  id: true,
+                },
+              }
+            : false,
+        },
+      });
       this.logger.log(`[${this.findById.name}] - Method finished`);
       return room;
     } catch (error) {

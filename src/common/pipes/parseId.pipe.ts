@@ -6,7 +6,6 @@ export class ParseIdPipe implements PipeTransform {
     if (!value) {
       throw new BadRequestException('Value is required.');
     }
-
     const isValidInteger = /^\d+$/.test(value);
     const parsedValue = isValidInteger ? parseInt(value, 10) : NaN;
 

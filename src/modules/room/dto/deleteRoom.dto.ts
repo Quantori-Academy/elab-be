@@ -1,16 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { HttpStatus } from '@nestjs/common';
 
-class DeleteStorageSuccessDto {
+class DeleteRoomSuccessDto {
   @ApiProperty({ example: 'Storage Successfully deleted' })
   message: number;
   @ApiProperty({ example: 200 })
   code: number;
 }
 
-class DeleteStorageNotFoundErrorDto {
+class DeleteRoomNotFoundErrorDto {
   @ApiProperty({
-    example: 'Storage Not Found',
+    example: 'Room Not Found',
   })
   message: string;
 
@@ -21,9 +21,9 @@ class DeleteStorageNotFoundErrorDto {
   statusCode: number;
 }
 
-class DeleteStorageConflictErrorDto {
+class DeleteRoomConflictErrorDto {
   @ApiProperty({
-    example: 'Cannot delete storage because it has associated reagents.',
+    example: 'Cannot delete storage because it has associated storage locations.',
   })
   message: string;
 
@@ -34,4 +34,4 @@ class DeleteStorageConflictErrorDto {
   statusCode: number;
 }
 
-export { DeleteStorageSuccessDto, DeleteStorageNotFoundErrorDto, DeleteStorageConflictErrorDto };
+export { DeleteRoomSuccessDto, DeleteRoomNotFoundErrorDto, DeleteRoomConflictErrorDto };

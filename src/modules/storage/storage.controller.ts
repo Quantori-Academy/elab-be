@@ -31,7 +31,7 @@ import {
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
-import { DeleteStorageBadRequestErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
+import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'storages';
@@ -89,7 +89,7 @@ export class StorageController {
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: DeleteStorageSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
-  @ApiResponse({ status: HttpStatus.CONFLICT, type: DeleteStorageBadRequestErrorDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: DeleteStorageConflictErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: DeleteStorageNotFoundErrorDto })
