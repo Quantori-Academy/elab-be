@@ -1,8 +1,9 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
 import { ROOM_REPOSITORY_TOKEN } from './room.repository';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
 import { PrismaService } from '../prisma/prisma.service';
+import { Room } from '@prisma/client';
 @Injectable()
 export class RoomService implements IRoomService {
   private readonly logger: Logger = new Logger(RoomService.name);
@@ -38,6 +39,32 @@ export class RoomService implements IRoomService {
       return room ? room.id : null;
     } catch (error) {
       this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async createRoom(roomDto: Room): Promise<Room> {
+    this.logger.log(`[${this.createRoom.name}] - Method start`);
+    try {
+      const roomExists = await this.roomRepository.findRoomIdByName(roomDto.name);
+      if (roomExists) throw new ConflictException(`Room with name ${roomDto.name} already exists`);
+
+      const room: Room = await this.roomRepository.create(roomDto);
+      this.logger.log(`[${this.createRoom.name}] - Method finished`);
+      return room;
+    } catch (error) {
+      this.logger.error(`[${this.createRoom.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async delete(id: number): Promise<void> {
+    this.logger.log(`[${this.delete.name}] - Method start`);
+    try {
+      await this.roomRepository.delete(id);
+      this.logger.log(`[${this.delete.name}] - Method finished`);
+    } catch (error) {
+      this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
