@@ -27,10 +27,10 @@ class DeleteStorageBadRequestErrorDto {
   })
   message: string;
 
-  @ApiProperty({ example: 'Bad Request' })
+  @ApiProperty({ example: 'Conflict' })
   error: string;
 
-  @ApiProperty({ example: HttpStatus.BAD_REQUEST })
+  @ApiProperty({ example: HttpStatus.CONFLICT })
   statusCode: number;
 }
 

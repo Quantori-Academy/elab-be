@@ -89,7 +89,7 @@ export class StorageController {
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: DeleteStorageSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: DeleteStorageBadRequestErrorDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: DeleteStorageBadRequestErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: DeleteStorageNotFoundErrorDto })
