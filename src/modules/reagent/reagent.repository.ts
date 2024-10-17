@@ -93,13 +93,28 @@ class ReagentRepository implements IReagentRepository {
       orderBy,
     });
   }
-  /*
+
   async getAllByStructure(structure: string, pagination?: PaginationOptions, sorting?: SortOptions) {
-    //const { skip = 0, take = 10 } = pagination || {};
-    //const orderBy = this.orderFactory(sorting);
-    
+    const { skip = 0, take = 10 } = pagination || {};
+    const orderBy = this.orderFactory(sorting);
+    let inputString = `SELECT name, category, structure, description, quantityLeft, storageId FROM reagent WHERE structure @> ${structure}`;
+
+    if (orderBy) {
+      if (Object.keys(orderBy).length === 1) {
+        const [key, value] = Object.entries(orderBy);
+        inputString += ` ORDER BY ${key} ${value} `;
+      } else {
+        const order = Object.entries(orderBy).map(([key, value]) => {
+          return `${key} ${value}`;
+        });
+        inputString += ` ORDER BY ${order.join(', ')} `;
+      }
+    }
+
+    inputString += `LIMIT ${take} OFFSET ${skip}`;
+    return await this.prisma.$queryRaw`${inputString}`;
   }
-*/
+
   private orderFactory(
     sortOptions: SortOptions | undefined,
   ): Prisma.ReagentOrderByWithRelationInput | Prisma.ReagentOrderByWithRelationInput[] | undefined {
