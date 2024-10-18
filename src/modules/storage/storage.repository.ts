@@ -4,6 +4,7 @@ import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
+import { StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -11,20 +12,18 @@ export class StorageRepository implements IStorageRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number, includeReagents: boolean = false): Promise<Storage | null> {
+  findById(id: number): Promise<Storage | null>; // base
+  findById(id: number, includeReagents: true): Promise<StorageWithReagents | null>; // overload
+
+  // implementation signature
+  async findById(id: number, includeReagents: boolean = false): Promise<Storage | StorageWithReagents | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
       const storage: Storage | null = await this.prisma.storage.findUnique({
         where: { id },
         include: {
           room: true,
-          reagents: includeReagents
-            ? {
-                select: {
-                  id: true,
-                },
-              }
-            : false,
+          reagents: includeReagents,
         },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);

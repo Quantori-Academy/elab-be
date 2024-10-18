@@ -7,6 +7,7 @@ import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from '.
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
+import { StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -71,11 +72,11 @@ export class StorageService implements IStorageService {
   async delete(id: number): Promise<void> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
-      const storage: Storage | null = await this.storageRepository.findById(id, true);
+      const storage: StorageWithReagents | null = await this.storageRepository.findById(id, true);
       if (!storage) throw new NotFoundException('Storage Not Found');
-
-      const emptyStorage: boolean = (storage as any).reagents.length === 0;
-      if (!emptyStorage) throw new ConflictException('Cannot delete storage because it has associated reagents.');
+      if (storage.reagents.length !== 0) {
+        throw new ConflictException('Cannot delete storage because it has associated reagents.');
+      }
 
       await this.storageRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);
