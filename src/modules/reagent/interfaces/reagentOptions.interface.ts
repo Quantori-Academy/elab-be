@@ -26,3 +26,9 @@ export type ReagentOptions = {
   sort: SortOptions;
   pagination: PaginationOptions;
 };
+
+export type SearchOptions = {
+  sort: SortOptions;
+  pagination: PaginationOptions;
+  structure: string;
+};
