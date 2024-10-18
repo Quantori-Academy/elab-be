@@ -4,6 +4,7 @@ import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { Room } from '@prisma/client';
+import { RoomWithStorages } from './types/room.type';
 @Injectable()
 export class RoomService implements IRoomService {
   private readonly logger: Logger = new Logger(RoomService.name);
@@ -61,11 +62,10 @@ export class RoomService implements IRoomService {
   async delete(id: number): Promise<void> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
-      const room: Room | null = await this.roomRepository.findById(id, true);
+      const room: RoomWithStorages | null = await this.roomRepository.findById(id, true);
       if (!room) throw new NotFoundException('Room Not Found');
-
-      const emptyRoom: boolean = (room as any).storages.length === 0;
-      if (!emptyRoom) throw new ConflictException('Cannot delete Room because it has associated storage locations.');
+      if (room.storages.length !== 0)
+        throw new ConflictException('Cannot delete Room because it has associated storage locations.');
 
       await this.roomRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);

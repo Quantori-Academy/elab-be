@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { Prisma, Room } from '@prisma/client';
 import { CreateRoomDto } from './dto/createRoom.dto';
+import { RoomWithStorages } from './types/room.type';
 
 @Injectable()
 export class RoomRepository implements IRoomRepository {
@@ -10,7 +11,11 @@ export class RoomRepository implements IRoomRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number, includeStorages: boolean = false): Promise<Room | null> {
+  findById(id: number): Promise<Room | null>; // base
+  findById(id: number, includeStorages: true): Promise<RoomWithStorages | null>; // overload
+  async findById(id: number, includeStorages: boolean = false): Promise<Room | RoomWithStorages | null> {
+    // implementation signature
+    console.log(includeStorages);
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
       const room: Room | null = await this.prisma.room.findUnique({
@@ -18,13 +23,7 @@ export class RoomRepository implements IRoomRepository {
           id,
         },
         include: {
-          storages: includeStorages
-            ? {
-                select: {
-                  id: true,
-                },
-              }
-            : false,
+          storages: includeStorages,
         },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);

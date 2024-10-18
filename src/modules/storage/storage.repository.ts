@@ -35,21 +35,6 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async getRoomIdByName(roomName: string): Promise<number | null> {
-    this.logger.log(`[${this.getRoomIdByName.name}] - Method start`);
-    try {
-      const room = await this.prisma.room.findUnique({
-        where: { name: roomName },
-        select: { id: true },
-      });
-      this.logger.log(`[${this.getRoomIdByName.name}] - Method finished`);
-      return room ? room.id : null;
-    } catch (error) {
-      this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
   async findUniqueStorage(roomId: number, storageName: string): Promise<Storage | null> {
     this.logger.log(`[${this.findUniqueStorage.name}] - Method start`);
     try {
