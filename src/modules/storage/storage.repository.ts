@@ -23,13 +23,7 @@ export class StorageRepository implements IStorageRepository {
         where: { id },
         include: {
           room: true,
-          reagents: includeReagents
-            ? {
-                select: {
-                  id: true,
-                },
-              }
-            : false,
+          reagents: includeReagents,
         },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);
