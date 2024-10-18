@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
-import { ReagentOptions } from './interfaces/reagentOptions.interface';
+import { ReagentOptions, SearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
 
@@ -45,9 +45,11 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async searchByStructure(structure: string): Promise<IReagent | IReagent[]> {
+  async searchByStructure(options: SearchOptions): Promise<IReagent | IReagent[]> {
     try {
-      return await this.reagentRepository.getAllByStructure(structure);
+      this.logger.log('searchByStructure method start');
+      const { pagination, sort, structure } = options || {};
+      return await this.reagentRepository.getAllByStructure(structure, pagination, sort);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
