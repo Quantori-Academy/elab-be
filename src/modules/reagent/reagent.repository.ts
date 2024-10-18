@@ -101,22 +101,28 @@ class ReagentRepository implements IReagentRepository {
   ): Promise<IReagent | IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
-    let inputString = `SELECT name, category, structure, description, quantityLeft, storageId FROM reagent WHERE structure @> ${structure}`;
-
+    let inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
+                   FROM "Reagent" 
+                   WHERE structure @>$1`;
     if (orderBy) {
-      if (Object.keys(orderBy).length === 1) {
-        const [key, value] = Object.entries(orderBy);
-        inputString += ` ORDER BY ${key} ${value} `;
-      } else {
-        const order = Object.entries(orderBy).map(([key, value]) => {
-          return `${key} ${value}`;
+      if (Array.isArray(orderBy)) {
+        const orderClause = orderBy.map((order) => {
+          const [key, value] = Object.entries(order)[0];
+          return `"${key}" ${value}`;
         });
-        inputString += ` ORDER BY ${order.join(', ')} `;
+        inputString += ` ORDER BY ${orderClause.join(' ,')}`;
+        console.log(` ORDER BY ${orderClause.join(' ,')}`);
+      } else {
+        const orderClause = Object.entries(orderBy).map(([key, value]) => {
+          return `"${key}" ${value}`;
+        });
+        inputString += ` ORDER BY ${orderClause[0]} `;
       }
     }
 
-    inputString += `LIMIT ${take} OFFSET ${skip}`;
-    return await this.prisma.$queryRaw`${inputString}`;
+    inputString += ` LIMIT ${take} OFFSET ${skip}`;
+    console.log(inputString);
+    return await this.prisma.$queryRawUnsafe(inputString, structure);
   }
 
   private orderFactory(

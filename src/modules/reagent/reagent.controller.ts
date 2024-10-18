@@ -40,7 +40,7 @@ export class ReagentController {
   @ApiResponse({ status: HttpStatus.OK, type: [SearchByStructureSuccessDto] })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: SearchByStructureErrorDto })
   @UseGuards(AuthGuard)
-  @Get('')
+  @Get('/search')
   async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: SearchOptions) {
     return await this.reagentService.searchByStructure(searchByStructureDto);
   }
