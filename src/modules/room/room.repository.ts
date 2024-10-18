@@ -15,7 +15,6 @@ export class RoomRepository implements IRoomRepository {
   findById(id: number, includeStorages: true): Promise<RoomWithStorages | null>; // overload
   async findById(id: number, includeStorages: boolean = false): Promise<Room | RoomWithStorages | null> {
     // implementation signature
-    console.log(includeStorages);
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
       const room: Room | null = await this.prisma.room.findUnique({
