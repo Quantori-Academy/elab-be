@@ -5,8 +5,8 @@ type StorageWithReagents = Storage & {
 };
 
 type FilterBy = {
-  roomIds: number[] | undefined;
-  name: string | undefined;
+  roomIds?: number[] | undefined;
+  name?: string | undefined;
 };
 
 export { StorageWithReagents, FilterBy };
