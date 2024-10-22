@@ -28,9 +28,13 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
         error: 'Bad Request',
       });
     }
-    if (queryDto.alphabeticalStorageName && queryDto.chronologicalDate) {
+
+    if (
+      (queryDto.alphabeticalStorageName && (queryDto.chronologicalDate || queryDto.alphabeticalRoomName)) ||
+      (queryDto.chronologicalDate && queryDto.alphabeticalRoomName)
+    ) {
       throw new BadRequestException({
-        message: 'Only one of alphabeticalName or chronologicalDate must be provided',
+        message: 'Only one of alphabeticalStorageName, alphabeticalRoomName, or chronologicalDate must be provided',
         statusCode: HttpStatus.BAD_REQUEST,
         error: 'Bad Request',
       });
@@ -44,6 +48,7 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
 
     const sorts: SortOptions = {
       alphabeticalStorageName: queryDto.alphabeticalStorageName,
+      alphabeticalRoomName: queryDto.alphabeticalRoomName,
       chronologicalDate: queryDto.chronologicalDate,
     };
 

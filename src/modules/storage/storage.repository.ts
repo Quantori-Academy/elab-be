@@ -73,7 +73,7 @@ export class StorageRepository implements IStorageRepository {
         },
         skip,
         take,
-        orderBy,
+        orderBy: orderBy,
         include: {
           room: true,
         },
@@ -211,9 +211,10 @@ export class StorageRepository implements IStorageRepository {
       const orderBy: OrderBy = {};
       if (sortOptions.alphabeticalStorageName) {
         orderBy.name = sortOptions.alphabeticalStorageName;
-      }
-      if (sortOptions.chronologicalDate) {
+      } else if (sortOptions.chronologicalDate) {
         orderBy.updatedAt = sortOptions.chronologicalDate;
+      } else {
+        orderBy.room = { name: sortOptions.alphabeticalRoomName };
       }
       this.logger.log(`[${this.orderFactory.name}] - Method finished`);
       return Object.keys(orderBy).length > 0 ? orderBy : undefined;

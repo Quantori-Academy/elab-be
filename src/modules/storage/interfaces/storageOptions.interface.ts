@@ -7,12 +7,14 @@ type OrderBy =
   | {
       name?: Order;
       updatedAt?: Order;
+      room?: { name?: Order };
     }
   | undefined;
 
 type SortOptions = {
   chronologicalDate?: Order | undefined;
   alphabeticalStorageName?: Order | undefined;
+  alphabeticalRoomName?: Order | undefined;
 };
 
 type FilterOptions = {

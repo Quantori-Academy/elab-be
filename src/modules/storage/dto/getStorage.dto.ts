@@ -46,6 +46,11 @@ class GetStoragesQueryDto {
   @IsOptional()
   @IsEnum(Order)
   alphabeticalStorageName?: Order;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical room (asc or desc)' })
+  @IsOptional()
+  @IsEnum(Order)
+  alphabeticalRoomName?: Order;
 }
 
 class GetStorageSuccessDto {
@@ -90,7 +95,8 @@ class GetStorageValidationErrorsDto {
       'take must be an integer number',
       'chronologicalDate must be one of the following values: asc, desc',
       'alphabeticalStorageName must be one of the following values: asc, desc',
-      'Only one of alphabeticalStorageName or chronologicalDate must be provided',
+      'alphabeticalRoomName must be one of the following values: asc, desc',
+      'Only one of alphabeticalStorageName, alphabeticalRoomName or chronologicalDate must be provided',
     ],
   })
   message: string;
