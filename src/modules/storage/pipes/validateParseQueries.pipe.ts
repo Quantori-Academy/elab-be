@@ -2,7 +2,12 @@ import { Injectable, PipeTransform, BadRequestException, HttpStatus } from '@nes
 import { validate, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { GetStoragesQueryDto } from '../dto/getStorage.dto';
-import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from '../interfaces/storageOptions.interface';
+import {
+  StorageFilterOptions,
+  StoragePaginationOptions,
+  StorageSortOptions,
+  StorageOptions,
+} from '../interfaces/storageOptions.interface';
 
 @Injectable()
 export class ValidateParseStorageOptionsPipe implements PipeTransform {
@@ -40,19 +45,19 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
       });
     }
 
-    const filters: FilterOptions = {
+    const filters: StorageFilterOptions = {
       id: queryDto.id,
       roomName: queryDto.roomName,
       storageName: queryDto.storageName,
     };
 
-    const sorts: SortOptions = {
+    const sorts: StorageSortOptions = {
       alphabeticalStorageName: queryDto.alphabeticalStorageName,
       alphabeticalRoomName: queryDto.alphabeticalRoomName,
       chronologicalDate: queryDto.chronologicalDate,
     };
 
-    const paginations: PaginationOptions = {
+    const paginations: StoragePaginationOptions = {
       skip: queryDto.skip,
       take: queryDto.take,
     };

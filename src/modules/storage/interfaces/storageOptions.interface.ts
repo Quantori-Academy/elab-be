@@ -11,27 +11,27 @@ type OrderBy =
     }
   | undefined;
 
-type SortOptions = {
+type StorageSortOptions = {
   chronologicalDate?: Order | undefined;
   alphabeticalStorageName?: Order | undefined;
   alphabeticalRoomName?: Order | undefined;
 };
 
-type FilterOptions = {
+type StorageFilterOptions = {
   id?: number | undefined;
   roomName?: string | undefined;
   storageName?: string | undefined;
 };
 
-type PaginationOptions = {
+type StoragePaginationOptions = {
   skip?: number | undefined;
   take?: number | undefined;
 };
 
 type StorageOptions = {
-  filter: FilterOptions;
-  sort: SortOptions;
-  pagination: PaginationOptions;
+  filter: StorageFilterOptions;
+  sort: StorageSortOptions;
+  pagination: StoragePaginationOptions;
 };
 
-export { StorageOptions, FilterOptions, SortOptions, PaginationOptions, Order, OrderBy };
+export { StorageOptions, StorageFilterOptions, StorageSortOptions, StoragePaginationOptions, Order, OrderBy };

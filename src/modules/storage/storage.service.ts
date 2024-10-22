@@ -3,7 +3,12 @@ import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
-import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from './interfaces/storageOptions.interface';
+import {
+  StorageFilterOptions,
+  StoragePaginationOptions,
+  StorageSortOptions,
+  StorageOptions,
+} from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
@@ -22,9 +27,9 @@ export class StorageService implements IStorageService {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
       let storages: Storage[] | null = [];
-      const { id, roomName, storageName }: FilterOptions = options.filter;
-      const pagination: PaginationOptions = options.pagination;
-      const sort: SortOptions = options.sort;
+      const { id, roomName, storageName }: StorageFilterOptions = options.filter;
+      const pagination: StoragePaginationOptions = options.pagination;
+      const sort: StorageSortOptions = options.sort;
 
       const filterBy: FilterBy = {
         name: storageName,

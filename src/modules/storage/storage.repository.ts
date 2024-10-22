@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
-import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
+import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { FilterBy, StorageWithReagents } from './types/storage.types';
 
@@ -56,7 +56,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAll(filterBy?: FilterBy, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+  async findAll(
+    filterBy?: FilterBy,
+    pagination?: StoragePaginationOptions,
+    sortOptions?: StorageSortOptions,
+  ): Promise<Storage[]> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
@@ -86,7 +90,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByName(storageName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+  async findAllByName(
+    storageName: string,
+    pagination?: StoragePaginationOptions,
+    sortOptions?: StorageSortOptions,
+  ): Promise<Storage[]> {
     this.logger.log(`[${this.findAllByName.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
@@ -114,7 +122,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByRoom(roomId: number, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[] | null> {
+  async findAllByRoom(
+    roomId: number,
+    pagination?: StoragePaginationOptions,
+    sortOptions?: StorageSortOptions,
+  ): Promise<Storage[] | null> {
     this.logger.log(`[${this.findAllByRoom.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
@@ -204,7 +216,7 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  private orderFactory(sortOptions: SortOptions | undefined): OrderBy {
+  private orderFactory(sortOptions: StorageSortOptions | undefined): OrderBy {
     this.logger.log(`[${this.orderFactory.name}] - Method start`);
     try {
       if (!sortOptions) return undefined;
