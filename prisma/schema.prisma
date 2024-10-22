@@ -34,7 +34,8 @@ model User {
   password                String
   role                    Role
   isPasswordResetRequired Boolean  @default(false)
-  sessions Session[]  @ignore
+  sessions                Session[]  @ignore
+  reagentRequests         ReagentRequest[]
 }
 
 model Session {
@@ -89,4 +90,25 @@ model Room {
   storages   Storage[] 
 }
 
+enum Status {
+  Pending
+  Ordered
+  Fulfilled
+  Declined
+}
 
+model ReagentRequest {
+  id                    Int      @id @default(autoincrement())
+  userId                Int
+  user                  User     @relation(fields: [userId], references: [id])
+  name                  String
+  structureSmiles       String?
+  structureImage        String?
+  casNumber             String?
+  desiredQuantity       String
+  userComments          String?
+  procurementComments   String?
+  status                Status   @default(Pending)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt 
+}
