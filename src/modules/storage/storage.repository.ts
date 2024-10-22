@@ -201,7 +201,7 @@ export class StorageRepository implements IStorageRepository {
         orderBy.name = sortOptions.alphabeticalName;
       }
       if (sortOptions.chronologicalDate) {
-        orderBy.createdAt = sortOptions.chronologicalDate;
+        orderBy.updatedAt = sortOptions.chronologicalDate;
       }
       this.logger.log(`[${this.orderFactory.name}] - Method finished`);
       return Object.keys(orderBy).length > 0 ? orderBy : undefined;

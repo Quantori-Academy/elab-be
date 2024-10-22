@@ -6,7 +6,7 @@ enum Order {
 type OrderBy =
   | {
       name?: Order;
-      createdAt?: Order;
+      updatedAt?: Order;
     }
   | undefined;
 
