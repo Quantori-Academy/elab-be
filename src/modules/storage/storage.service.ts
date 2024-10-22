@@ -1,16 +1,22 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
 import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
+import { ROOM_SERVICE_TOKEN } from '../room/room.service';
+import { IRoomService } from '../room/interfaces/roomService.interface';
+import { StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageService implements IStorageService {
   private readonly logger: Logger = new Logger(StorageService.name);
 
-  constructor(@Inject(STORAGE_REPOSITORY_TOKEN) private storageRepository: IStorageRepository) {}
+  constructor(
+    @Inject(STORAGE_REPOSITORY_TOKEN) private storageRepository: IStorageRepository,
+    @Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService,
+  ) {}
 
   async getStorages(options: StorageOptions): Promise<Storage[]> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
@@ -48,7 +54,7 @@ export class StorageService implements IStorageService {
     try {
       const { roomId, name, description = null } = storageDto;
 
-      const roomExist: string | null = await this.storageRepository.getRoomNameById(roomId);
+      const roomExist: string | null = await this.roomService.getRoomNameById(roomId);
       if (!roomExist) throw new NotFoundException(`Room with id - ${roomId} - Doesn't exists`);
 
       const existingStorage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, name);
@@ -66,11 +72,11 @@ export class StorageService implements IStorageService {
   async delete(id: number): Promise<void> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
-      const storage: Storage | null = await this.storageRepository.findById(id, true);
+      const storage: StorageWithReagents | null = await this.storageRepository.findById(id, true);
       if (!storage) throw new NotFoundException('Storage Not Found');
-
-      const emtpyReagents: boolean = (storage as any).reagents.length === 0;
-      if (!emtpyReagents) throw new BadRequestException('Cannot delete storage because it has associated reagents.');
+      if (storage.reagents.length !== 0) {
+        throw new ConflictException('Cannot delete storage because it has associated reagents.');
+      }
 
       await this.storageRepository.delete(id);
       this.logger.log(`[${this.delete.name}] - Method finished`);

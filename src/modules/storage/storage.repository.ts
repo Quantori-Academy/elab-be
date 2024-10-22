@@ -4,6 +4,7 @@ import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
+import { StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -11,56 +12,24 @@ export class StorageRepository implements IStorageRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: number, includeReagents: boolean = false): Promise<Storage | null> {
+  findById(id: number): Promise<Storage | null>; // base
+  findById(id: number, includeReagents: true): Promise<StorageWithReagents | null>; // overload
+
+  // implementation signature
+  async findById(id: number, includeReagents: boolean = false): Promise<Storage | StorageWithReagents | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
       const storage: Storage | null = await this.prisma.storage.findUnique({
         where: { id },
         include: {
           room: true,
-          reagents: includeReagents
-            ? {
-                select: {
-                  id: true,
-                },
-              }
-            : false,
+          reagents: includeReagents,
         },
       });
       this.logger.log(`[${this.findById.name}] - Method finished`);
       return storage;
     } catch (error) {
       this.logger.error(`[${this.findById.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
-  async getRoomIdByName(roomName: string): Promise<number | null> {
-    this.logger.log(`[${this.getRoomIdByName.name}] - Method start`);
-    try {
-      const room = await this.prisma.room.findUnique({
-        where: { name: roomName },
-        select: { id: true },
-      });
-      this.logger.log(`[${this.getRoomIdByName.name}] - Method finished`);
-      return room ? room.id : null;
-    } catch (error) {
-      this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
-  async getRoomNameById(id: number): Promise<string | null> {
-    this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
-    try {
-      const room = await this.prisma.room.findUnique({
-        where: { id },
-        select: { name: true },
-      });
-      this.logger.log(`[${this.getRoomNameById.name}] - Method finished`);
-      return room ? room.name : null;
-    } catch (error) {
-      this.logger.error(`[${this.getRoomNameById.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
@@ -92,7 +61,6 @@ export class StorageRepository implements IStorageRepository {
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
-      console.log(orderBy);
       const storages: Storage[] = await this.prisma.storage.findMany({
         skip,
         take,
@@ -191,7 +159,7 @@ export class StorageRepository implements IStorageRepository {
   async delete(id: number): Promise<Storage> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
-      const deletedStorage = await this.prisma.storage.delete({
+      const deletedStorage: Storage = await this.prisma.storage.delete({
         where: { id },
       });
       this.logger.log(`[${this.delete.name}] - Method finished`);

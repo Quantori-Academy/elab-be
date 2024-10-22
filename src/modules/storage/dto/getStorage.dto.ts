@@ -3,6 +3,7 @@ import { IsOptional, IsString, IsInt, Min, IsEnum } from 'class-validator';
 import { Order } from '../interfaces/storageOptions.interface';
 import { Transform } from 'class-transformer';
 import { HttpStatus } from '@nestjs/common';
+import { Room } from '@prisma/client';
 
 class GetStoragesQueryDto {
   @ApiProperty({ required: false, type: Number, description: 'Id of the storage' })
@@ -67,6 +68,15 @@ class GetStorageSuccessDto {
 
   @ApiProperty({ example: '2024-10-11T09:04:23.426Z' })
   updatedAt: Date;
+
+  @ApiProperty({
+    example: {
+      id: 6,
+      name: 'Unique name2',
+      description: 'Description for storage',
+    },
+  })
+  room: Room;
 }
 
 class GetStorageValidationErrorsDto {
