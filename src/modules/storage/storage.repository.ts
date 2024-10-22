@@ -3,8 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
-import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
-import { StorageWithReagents } from './types/storage.types';
+import { StorageCreation, StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -139,11 +138,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async create(storageDto: CreateStorageLocationsDto): Promise<Storage> {
+  async create(data: StorageCreation): Promise<Storage> {
     this.logger.log(`[${this.create.name}] - Method start`);
     try {
       const storage: Storage = await this.prisma.storage.create({
-        data: storageDto,
+        data,
         include: {
           room: true,
         },
