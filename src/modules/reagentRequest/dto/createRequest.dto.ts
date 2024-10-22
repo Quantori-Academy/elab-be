@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateRequestDto {
@@ -8,6 +9,7 @@ export class CreateRequestDto {
   name: string;
 
   @ApiProperty({ example: 2 })
+  @Transform((value) => Number(value))
   @IsInt()
   userId: number;
 
