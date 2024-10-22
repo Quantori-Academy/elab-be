@@ -21,9 +21,15 @@ export class StorageService implements IStorageService {
   async getStorages(options: StorageOptions): Promise<Storage[]> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const { id, roomId, storageName }: FilterOptions = options.filter;
+      const { id, roomName, storageName }: FilterOptions = options.filter;
       const pagination: PaginationOptions = options.pagination;
       const sort: SortOptions = options.sort;
+
+      let roomId: number | null = null;
+      if (roomName) {
+        roomId = await this.roomService.getRoomIdByName(roomName);
+        if (!roomId) return [];
+      }
 
       let storages: Storage[] | null = [];
       if (id) {
@@ -40,7 +46,6 @@ export class StorageService implements IStorageService {
       } else {
         storages = await this.storageRepository.findAll(pagination, sort);
       }
-
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {

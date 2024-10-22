@@ -85,7 +85,10 @@ export class StorageRepository implements IStorageRepository {
 
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: {
-          name: storageName,
+          name: {
+            contains: storageName, // match by substring
+            mode: 'insensitive',
+          },
         },
         skip,
         take,

@@ -13,12 +13,10 @@ class GetStoragesQueryDto {
   @Min(1)
   id?: number;
 
-  @ApiProperty({ required: false, type: Number, description: 'Id of the room' })
+  @ApiProperty({ required: false, type: String, description: 'name of the room' })
   @IsOptional()
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  @Min(1)
-  roomId?: number;
+  @IsString()
+  roomName?: string;
 
   @ApiProperty({ required: false, type: String, description: 'Name of the storage' })
   @IsOptional()
