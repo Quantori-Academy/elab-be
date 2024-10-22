@@ -197,8 +197,8 @@ export class StorageRepository implements IStorageRepository {
     try {
       if (!sortOptions) return undefined;
       const orderBy: OrderBy = {};
-      if (sortOptions.alphabeticalName) {
-        orderBy.name = sortOptions.alphabeticalName;
+      if (sortOptions.alphabeticalStorageName) {
+        orderBy.name = sortOptions.alphabeticalStorageName;
       }
       if (sortOptions.chronologicalDate) {
         orderBy.updatedAt = sortOptions.chronologicalDate;

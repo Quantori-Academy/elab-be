@@ -12,7 +12,7 @@ type OrderBy =
 
 type SortOptions = {
   chronologicalDate: Order | undefined;
-  alphabeticalName: Order | undefined;
+  alphabeticalStorageName: Order | undefined;
 };
 
 type FilterOptions = {
