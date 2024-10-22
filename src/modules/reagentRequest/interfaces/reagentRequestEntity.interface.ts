@@ -9,7 +9,7 @@ export interface IReagentRequest {
   structureImage?: string | null;
   casNumber?: string | null;
   userComments?: string | null;
-  procurementComments: string | null;
+  procurementComments?: string | null;
   status?: Status;
   createdAt?: Date;
   updatedAt?: Date;
