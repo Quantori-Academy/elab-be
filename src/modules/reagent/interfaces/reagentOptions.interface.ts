@@ -27,7 +27,7 @@ export type ReagentOptions = {
   pagination: PaginationOptions;
 };
 
-export type SearchOptions = {
+export type ReagentSearchOptions = {
   sort: SortOptions;
   pagination: PaginationOptions;
   structure: string;

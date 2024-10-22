@@ -1,12 +1,12 @@
 import { BadRequestException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common';
-import { PaginationOptions, SearchOptions, SortOptions } from '../interfaces/reagentOptions.interface';
+import { PaginationOptions, ReagentSearchOptions, SortOptions } from '../interfaces/reagentOptions.interface';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import { SearchByStructureDto } from '../dto/searchByStructure.dto';
 
 @Injectable()
 export class ValidateParseForSearchPipe implements PipeTransform {
-  async transform(queries: any): Promise<SearchOptions> {
+  async transform(queries: any): Promise<ReagentSearchOptions> {
     const queryDto = plainToClass(SearchByStructureDto, queries);
     const errors: ValidationError[] = await validate(queryDto);
 
@@ -38,7 +38,7 @@ export class ValidateParseForSearchPipe implements PipeTransform {
       take: queryDto.take,
     };
 
-    const options: SearchOptions = {
+    const options: ReagentSearchOptions = {
       sort,
       pagination,
       structure: queryDto.structure,

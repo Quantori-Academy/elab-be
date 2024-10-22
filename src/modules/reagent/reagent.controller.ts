@@ -6,7 +6,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { CreateReagentDto, CreateReagentSuccessDto } from './dto/createReagent.dto';
 import { GetReagentDto, GetReagentErrorDto, GetReagentSuccessDto } from './dto/getReagent.dto';
 import { ValidateParseReagentOptionsPipe } from './pipes/validateParseQueries.pipe';
-import { ReagentOptions, SearchOptions } from './interfaces/reagentOptions.interface';
+import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { SearchByStructureDto, SearchByStructureErrorDto, SearchByStructureSuccessDto } from './dto/searchByStructure.dto';
 import { ValidateParseForSearchPipe } from './pipes/validateParseForSearch.pipe';
 
@@ -41,7 +41,7 @@ export class ReagentController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: SearchByStructureErrorDto })
   @UseGuards(AuthGuard)
   @Get('/search')
-  async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: SearchOptions) {
+  async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
     return await this.reagentService.searchByStructure(searchByStructureDto);
   }
 }
