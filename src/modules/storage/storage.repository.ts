@@ -4,7 +4,7 @@ import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
-import { StorageWithReagents } from './types/storage.types';
+import { FilterBy, StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -56,12 +56,21 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAll(pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+  async findAll(filterBy?: FilterBy, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
       const storages: Storage[] = await this.prisma.storage.findMany({
+        where: {
+          roomId: {
+            in: filterBy?.roomIds,
+          },
+          name: {
+            contains: filterBy?.name,
+            mode: 'insensitive',
+          },
+        },
         skip,
         take,
         orderBy,
@@ -86,7 +95,7 @@ export class StorageRepository implements IStorageRepository {
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: {
           name: {
-            contains: storageName, // match by substring
+            contains: storageName,
             mode: 'insensitive',
           },
         },

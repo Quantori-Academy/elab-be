@@ -11,19 +11,19 @@ type OrderBy =
   | undefined;
 
 type SortOptions = {
-  chronologicalDate: Order | undefined;
-  alphabeticalStorageName: Order | undefined;
+  chronologicalDate?: Order | undefined;
+  alphabeticalStorageName?: Order | undefined;
 };
 
 type FilterOptions = {
-  id: number | undefined;
-  roomName: string | undefined;
-  storageName: string | undefined;
+  id?: number | undefined;
+  roomName?: string | undefined;
+  storageName?: string | undefined;
 };
 
 type PaginationOptions = {
-  skip: number | undefined;
-  take: number | undefined;
+  skip?: number | undefined;
+  take?: number | undefined;
 };
 
 type StorageOptions = {

@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { Prisma, Room } from '@prisma/client';
 import { CreateRoomDto } from './dto/createRoom.dto';
-import { RoomWithStorages } from './types/room.type';
+import { IdOnly, RoomWithStorages } from './types/room.type';
 
 @Injectable()
 export class RoomRepository implements IRoomRepository {
@@ -45,6 +45,27 @@ export class RoomRepository implements IRoomRepository {
       return room ? room.id : null;
     } catch (error) {
       this.logger.error(`[${this.findRoomIdByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async findRoomIdsBySubName(roomName: string): Promise<number[]> {
+    this.logger.log(`[${this.findRoomIdsBySubName.name}] - Method start`);
+    try {
+      const rooms: IdOnly[] = await this.prisma.room.findMany({
+        where: {
+          name: {
+            contains: roomName,
+            mode: 'insensitive',
+          },
+        },
+        select: { id: true },
+      });
+      this.logger.log(`[${this.findRoomIdsBySubName.name}] - Method finished`);
+      const roomIds: number[] = rooms.map((room: Room) => room.id);
+      return roomIds;
+    } catch (error) {
+      this.logger.error(`[${this.findRoomIdsBySubName.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

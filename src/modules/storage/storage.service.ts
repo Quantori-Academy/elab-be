@@ -7,7 +7,7 @@ import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from '.
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
-import { StorageWithReagents } from './types/storage.types';
+import { FilterBy, StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -21,31 +21,29 @@ export class StorageService implements IStorageService {
   async getStorages(options: StorageOptions): Promise<Storage[]> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
+      let storages: Storage[] | null = [];
       const { id, roomName, storageName }: FilterOptions = options.filter;
       const pagination: PaginationOptions = options.pagination;
       const sort: SortOptions = options.sort;
 
-      let roomId: number | null = null;
-      if (roomName) {
-        roomId = await this.roomService.getRoomIdByName(roomName);
-        if (!roomId) return [];
+      const filterBy: FilterBy = {
+        name: storageName,
+        roomIds: undefined,
+      };
+
+      if (id) {
+        const storage: Storage | null = await this.storageRepository.findById(id);
+        storages = storage ? [storage] : [];
+        this.logger.log(`[${this.getStorages.name}] - byIdOption Method finished `);
+        return storages;
       }
 
-      let storages: Storage[] | null = [];
-      if (id) {
-        const result: Storage | null = await this.storageRepository.findById(id);
-        storages = result ? [result] : [];
-      } else if (roomId && storageName) {
-        const result: Storage | null = await this.storageRepository.findUniqueStorage(roomId, storageName);
-        storages = result ? [result] : [];
-      } else if (roomId) {
-        storages = await this.storageRepository.findAllByRoom(roomId, pagination, sort);
-        return storages ? storages : [];
-      } else if (storageName) {
-        storages = await this.storageRepository.findAllByName(storageName, pagination, sort);
-      } else {
-        storages = await this.storageRepository.findAll(pagination, sort);
+      if (roomName) {
+        const roomIds: number[] = await this.roomService.getRoomIdsBySubName(roomName);
+        filterBy.roomIds = roomIds;
       }
+
+      storages = await this.storageRepository.findAll(filterBy, pagination, sort);
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {
