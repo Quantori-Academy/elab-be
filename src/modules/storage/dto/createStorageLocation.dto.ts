@@ -1,16 +1,15 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 class CreateStorageLocationsDto {
-  @IsOptional()
-  roomId?: number;
-
   @ApiProperty({ example: 'Room1' })
+  @IsNotEmpty()
   @IsString()
   roomName: string;
 
   @ApiProperty({ example: 'StorageName' })
+  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -48,7 +47,7 @@ class CreateStorageNotFoundErrorDto {
 
 class CreateStorageValidationErrorDto {
   @ApiProperty({
-    example: ['roomName must be a string', 'name must be a string'],
+    example: ['roomName must be a string', 'name must be a string', 'name should not be empty', 'roomName should not be empty'],
   })
   message: string;
 
