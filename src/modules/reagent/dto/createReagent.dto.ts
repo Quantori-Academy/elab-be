@@ -56,7 +56,7 @@ export class CreateReagentDto {
   @IsString()
   storageId: number;
 
-  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @ApiProperty({ enum: Category, description: 'Category is either Reagent or Sample' })
   @IsEnum(Category)
   category: Category;
 
@@ -119,7 +119,7 @@ export class CreateReagentSuccessDto {
   @IsString()
   storageId: number;
 
-  @ApiProperty({ examples: ['Reagent', 'Sample'] })
+  @ApiProperty({ enum: Category, description: 'Category is either Reagent or Sample' })
   @IsEnum(Category)
   category: Category;
 
