@@ -15,4 +15,9 @@ type FilterBy = {
   name?: string | undefined;
 };
 
-export { StorageWithReagents, StorageCreation, FilterBy };
+type StorageList = {
+  size: number;
+  storages: Storage[];
+};
+
+export { StorageWithReagents, StorageCreation, FilterBy, StorageList };

@@ -6,7 +6,7 @@ import { Storage } from '@prisma/client';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
-import { FilterBy, StorageWithReagents } from './types/storage.types';
+import { FilterBy, StorageList, StorageWithReagents } from './types/storage.types';
 import {
   StorageFilterOptions,
   StoragePaginationOptions,
@@ -23,10 +23,13 @@ export class StorageService implements IStorageService {
     @Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService,
   ) {}
 
-  async getStorages(options: StorageOptions): Promise<Storage[]> {
+  async getStorages(options: StorageOptions): Promise<StorageList> {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      let storages: Storage[] | null = [];
+      let storageList: StorageList | null = {
+        size: 0,
+        storages: [],
+      };
       const { id, roomName, storageName }: StorageFilterOptions = options.filter;
       const pagination: StoragePaginationOptions = options.pagination;
       const sort: StorageSortOptions = options.sort;
@@ -38,9 +41,10 @@ export class StorageService implements IStorageService {
 
       if (id) {
         const storage: Storage | null = await this.storageRepository.findById(id);
-        storages = storage ? [storage] : [];
+        storageList.size = storage ? 1 : 0;
+        storageList.storages = storage ? [storage] : [];
         this.logger.log(`[${this.getStorages.name}] - byIdOption Method finished `);
-        return storages;
+        return storageList;
       }
 
       if (roomName) {
@@ -48,9 +52,10 @@ export class StorageService implements IStorageService {
         filterBy.roomIds = roomIds;
       }
 
-      storages = await this.storageRepository.findAll(filterBy, pagination, sort);
+      storageList = await this.storageRepository.findAll(filterBy, pagination, sort);
+
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
-      return storages;
+      return storageList;
     } catch (error) {
       this.logger.error(`[${this.getStorages.name}] - Exception thrown: ${error}`);
       throw error;

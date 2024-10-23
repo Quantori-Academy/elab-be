@@ -1,6 +1,6 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { Storage } from '@prisma/client';
-import { StorageCreation, StorageWithReagents, FilterBy } from '../types/storage.types';
+import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from '../types/storage.types';
 import { StoragePaginationOptions, StorageSortOptions } from './storageOptions.interface';
 
 export interface IStorageRepository extends IRepository<Storage> {
@@ -9,7 +9,7 @@ export interface IStorageRepository extends IRepository<Storage> {
   findUniqueStorage(roomId: number, storageName: string): Promise<Storage | null>;
   create(storageDto: StorageCreation): Promise<Storage>;
   findAllByName(storageName: string, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
-  findAll(filterBy?: FilterBy, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
+  findAll(filterBy?: FilterBy, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<StorageList>;
   findAllByRoom(
     roomId: number,
     pagination?: StoragePaginationOptions,

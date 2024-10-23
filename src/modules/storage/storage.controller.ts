@@ -33,6 +33,7 @@ import {
   CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
+import { StorageList } from './types/storage.types';
 
 const ROUTE = 'storages';
 
@@ -55,7 +56,7 @@ export class StorageController {
   async getStorages(@Query(ValidateParseStorageOptionsPipe) options: StorageOptions) {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
     try {
-      const storages: Storage[] = await this.storageService.getStorages(options);
+      const storages: StorageList = await this.storageService.getStorages(options);
       this.logger.log(`[${this.getStorages.name}] - Method finished`);
       return storages;
     } catch (error) {

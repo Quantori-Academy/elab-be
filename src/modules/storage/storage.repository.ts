@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
-import { StorageCreation, StorageWithReagents, FilterBy } from './types/storage.types';
+import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from './types/storage.types';
 import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './interfaces/storageOptions.interface';
 
 @Injectable()
@@ -59,30 +59,37 @@ export class StorageRepository implements IStorageRepository {
     filterBy?: FilterBy,
     pagination?: StoragePaginationOptions,
     sortOptions?: StorageSortOptions,
-  ): Promise<Storage[]> {
+  ): Promise<StorageList> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
-      const storages: Storage[] = await this.prisma.storage.findMany({
-        where: {
-          roomId: {
-            in: filterBy?.roomIds,
-          },
-          name: {
-            contains: filterBy?.name,
-            mode: 'insensitive',
-          },
+
+      const where: any = {
+        roomId: {
+          in: filterBy?.roomIds,
         },
-        skip,
-        take,
-        orderBy: orderBy,
-        include: {
-          room: true,
+        name: {
+          contains: filterBy?.name,
+          mode: 'insensitive',
         },
-      });
+      };
+
+      const [storages, size] = await Promise.all([
+        this.prisma.storage.findMany({
+          where,
+          skip,
+          take,
+          orderBy: orderBy,
+          include: {
+            room: true,
+          },
+        }),
+        this.prisma.storage.count({ where }),
+      ]);
+
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
-      return storages;
+      return { storages, size };
     } catch (error) {
       this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
       throw error;
