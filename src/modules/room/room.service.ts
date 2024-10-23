@@ -86,10 +86,7 @@ export class RoomService implements IRoomService {
       let room: Room | null = await this.roomRepository.findById(id);
       if (!room) throw new NotFoundException('Room Not Found');
 
-      const { name, description = null } = roomDto;
-      room.name = name ? name : room.name;
-      room.description = description ? description : room.description;
-      room = await this.roomRepository.update(room);
+      room = await this.roomRepository.update({ id, ...roomDto });
 
       this.logger.log(`[${this.update.name}] - Method finished`);
       return room;
