@@ -75,7 +75,7 @@ export class StorageRepository implements IStorageRepository {
         },
       };
 
-      const [storages, size] = await Promise.all([
+      const [storages, size] = await this.prisma.$transaction([
         this.prisma.storage.findMany({
           where,
           skip,
