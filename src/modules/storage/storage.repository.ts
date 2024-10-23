@@ -1,9 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
 import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from './types/storage.types';
 import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './interfaces/storageOptions.interface';
+import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -154,7 +156,7 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async update(storage: Storage): Promise<Storage> {
+  async update(storage: PartialWithRequiredId<Storage>): Promise<Storage> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
       const updatedStorage: Storage = await this.prisma.storage.update({
@@ -164,6 +166,9 @@ export class StorageRepository implements IStorageRepository {
       this.logger.log(`[${this.update.name}] - Method finished`);
       return updatedStorage;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+        error = new ConflictException(`Storage with name ${storage.name} already exists, in this room `);
+      }
       this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }

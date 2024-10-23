@@ -100,16 +100,14 @@ export class StorageService implements IStorageService {
     }
   }
 
-  async update(id: number, roomDto: UpdateStroageDto): Promise<Storage> {
+  async update(id: number, storageDto: UpdateStroageDto): Promise<Storage> {
     this.logger.log(`[${this.delete.name}] - Method start`);
     try {
       let storage: Storage | null = await this.storageRepository.findById(id);
       if (!storage) throw new NotFoundException('Room Not Found');
 
-      const { name, description = null } = roomDto;
-      storage.name = name ? name : storage.name;
-      storage.description = description ? description : storage.description;
-      storage = await this.storageRepository.update(storage);
+      const { name = storage.name, description = null } = storageDto;
+      storage = await this.storageRepository.update({ id: storage.id, name, description });
 
       this.logger.log(`[${this.update.name}] - Method finished`);
       return storage;
