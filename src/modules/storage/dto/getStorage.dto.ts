@@ -82,6 +82,30 @@ class GetStorageSuccessDto {
   room: Room;
 }
 
+class GetStorageListResponseDto {
+  @ApiProperty({
+    type: [GetStorageSuccessDto],
+    example: [
+      {
+        id: 155,
+        roomId: 3,
+        name: 'test2',
+        description: null,
+        createdAt: '2024-10-22T11:27:55.708Z',
+        updatedAt: '2024-10-22T12:27:32.000Z',
+        room: {
+          id: 3,
+          name: 'Room3',
+          description: null,
+        },
+      },
+    ],
+  })
+  storages: GetStorageSuccessDto[];
+  @ApiProperty({ example: 2 })
+  size: number;
+}
+
 class GetStorageValidationErrorsDto {
   @ApiProperty({
     example: [
@@ -108,4 +132,4 @@ class GetStorageValidationErrorsDto {
   statusCode: number;
 }
 
-export { GetStorageSuccessDto, GetStoragesQueryDto, GetStorageValidationErrorsDto };
+export { GetStorageSuccessDto, GetStoragesQueryDto, GetStorageValidationErrorsDto, GetStorageListResponseDto };

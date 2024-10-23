@@ -6,17 +6,17 @@ import { Role, Room } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { DeleteRoomConflictErrorDto, DeleteRoomNotFoundErrorDto, DeleteRoomSuccessDto } from './dto/deleteRoom.dto';
+import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 import {
   CreateRoomConflictErrorDto,
   CreateRoomDto,
   CreateRoomSuccessDto,
   CreateRoomValidationErrorDto,
 } from './dto/createRoom.dto';
-import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
-import { TokenErrorResponseDto } from '../security/dto/token.dto';
-import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
-import { DeleteRoomConflictErrorDto, DeleteRoomNotFoundErrorDto, DeleteRoomSuccessDto } from './dto/deleteRoom.dto';
-import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'rooms';
 

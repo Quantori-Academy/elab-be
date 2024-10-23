@@ -4,6 +4,7 @@ import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
 import { Room } from '@prisma/client';
 import { RoomWithStorages } from './types/room.type';
+
 @Injectable()
 export class RoomService implements IRoomService {
   private readonly logger: Logger = new Logger(RoomService.name);
