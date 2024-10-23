@@ -8,6 +8,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { StorageModule } from './modules/storage/storage.module';
 import * as cookieParser from 'cookie-parser';
 import { ReagentModule } from './modules/reagent/reagent.module';
+import { ReagentRequestModule } from './modules/reagentRequest/reagentRequest.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ReagentModule } from './modules/reagent/reagent.module';
     PrismaModule,
     StorageModule,
     ReagentModule,
+    ReagentRequestModule,
   ],
 })
 export class AppModule implements NestModule {
