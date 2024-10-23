@@ -1,16 +1,15 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 class CreateStorageLocationsDto {
-  @ApiProperty({ example: 3 })
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  @Min(1)
-  roomId: number;
+  @ApiProperty({ example: 'Room1' })
+  @IsNotEmpty()
+  @IsString()
+  roomName: string;
 
-  @ApiProperty({ example: 'Unique name' })
+  @ApiProperty({ example: 'StorageName' })
+  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -35,7 +34,7 @@ class CreateStorageConflictErrorDto {
 
 class CreateStorageNotFoundErrorDto {
   @ApiProperty({
-    example: ['Room with id - N, is not found'],
+    example: "Room - Doesn't exists",
   })
   message: string;
 
@@ -48,7 +47,7 @@ class CreateStorageNotFoundErrorDto {
 
 class CreateStorageValidationErrorDto {
   @ApiProperty({
-    example: ['roomId must not be less than 1', 'roomId must be an integer number', 'name must be a string'],
+    example: ['roomName must be a string', 'name must be a string', 'name should not be empty', 'roomName should not be empty'],
   })
   message: string;
 

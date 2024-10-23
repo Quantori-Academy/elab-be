@@ -52,13 +52,13 @@ export class StorageService implements IStorageService {
   async createStorageLocation(storageDto: CreateStorageLocationsDto): Promise<Storage> {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
     try {
-      const { roomId, name, description = null } = storageDto;
+      const { roomName, name, description = null } = storageDto;
 
-      const roomExist: string | null = await this.roomService.getRoomNameById(roomId);
-      if (!roomExist) throw new NotFoundException(`Room with id - ${roomId} - Doesn't exists`);
+      const roomId: number | null = await this.roomService.getRoomIdByName(roomName);
+      if (!roomId) throw new NotFoundException(`Room ${roomName} - Doesn't exists`);
 
       const existingStorage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, name);
-      if (existingStorage) throw new ConflictException(`Storage with this - ${name} - in Room${roomId} already exists`);
+      if (existingStorage) throw new ConflictException(`Storage with this - ${name} - in Room${roomName} already exists`);
 
       const storage: Storage = await this.storageRepository.create({ roomId, name, description });
       this.logger.log(`[${this.createStorageLocation.name}] - Method finished`);
