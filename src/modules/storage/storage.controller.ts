@@ -6,7 +6,12 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
-import { GetStoragesQueryDto, GetStorageSuccessDto, GetStorageValidationErrorsDto } from './dto/getStorage.dto';
+import {
+  GetStorageListResponseDto,
+  GetStoragesQueryDto,
+  GetStorageSuccessDto,
+  GetStorageValidationErrorsDto,
+} from './dto/getStorage.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { StorageOptions } from './interfaces/storageOptions.interface';
 import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pipe';
@@ -46,7 +51,7 @@ export class StorageController {
 
   @ApiBearerAuth()
   @ApiQuery({ type: GetStoragesQueryDto })
-  @ApiResponse({ status: HttpStatus.OK, type: [GetStorageSuccessDto] })
+  @ApiResponse({ status: HttpStatus.OK, type: GetStorageListResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetStorageValidationErrorsDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
