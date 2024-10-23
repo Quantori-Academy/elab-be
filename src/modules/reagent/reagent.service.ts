@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
-import { ReagentOptions } from './interfaces/reagentOptions.interface';
+import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
 
@@ -28,7 +28,7 @@ class ReagentService implements IReagentService {
       const { filter, pagination, sort } = options || {};
       if (filter.category && filter.name) {
         this.logger.log('Fetching reagents by both name and category');
-        return await this.reagentRepository.getAllByBoth(filter.name, filter.category, pagination, sort);
+        return await this.reagentRepository.getAllByNameAndCategory(filter.name, filter.category, pagination, sort);
       } else if (filter.category) {
         this.logger.log('Fetching reagents by category');
         return await this.reagentRepository.getAllByCategory(filter.category, pagination, sort);
@@ -42,6 +42,17 @@ class ReagentService implements IReagentService {
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents!');
+    }
+  }
+
+  async searchByStructure(options: ReagentSearchOptions): Promise<IReagent | IReagent[]> {
+    try {
+      this.logger.log('searchByStructure method start');
+      const { pagination, sort, structure } = options || {};
+      return await this.reagentRepository.getAllByStructure(structure, pagination, sort);
+    } catch (error) {
+      this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
+      throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
     }
   }
 }

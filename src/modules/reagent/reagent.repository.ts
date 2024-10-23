@@ -76,7 +76,7 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async getAllByBoth(
+  async getAllByNameAndCategory(
     name: string,
     category: Category,
     pagination?: PaginationOptions,
@@ -92,6 +92,37 @@ class ReagentRepository implements IReagentRepository {
       take,
       orderBy,
     });
+  }
+
+  async getAllByStructure(
+    structure: string,
+    pagination?: PaginationOptions,
+    sorting?: SortOptions,
+  ): Promise<IReagent | IReagent[]> {
+    const { skip = 0, take = 10 } = pagination || {};
+    const orderBy = this.orderFactory(sorting);
+    let inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
+                   FROM "Reagent" 
+                   WHERE structure @>$1`;
+    if (orderBy) {
+      if (Array.isArray(orderBy)) {
+        const orderClause = orderBy.map((order) => {
+          const [key, value] = Object.entries(order)[0];
+          return `"${key}" ${value}`;
+        });
+        inputString += ` ORDER BY ${orderClause.join(' ,')}`;
+        console.log(` ORDER BY ${orderClause.join(' ,')}`);
+      } else {
+        const orderClause = Object.entries(orderBy).map(([key, value]) => {
+          return `"${key}" ${value}`;
+        });
+        inputString += ` ORDER BY ${orderClause[0]} `;
+      }
+    }
+
+    inputString += ` LIMIT ${take} OFFSET ${skip}`;
+    console.log(inputString);
+    return await this.prisma.$queryRawUnsafe(inputString, structure);
   }
 
   private orderFactory(
