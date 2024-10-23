@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, HttpStatus, Inject, Logger, Param, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpStatus,
+  Inject,
+  Logger,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ROOM_SERVICE_TOKEN } from './room.service';
 import { IRoomService } from './interfaces/roomService.interface';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -17,6 +29,13 @@ import {
   CreateRoomSuccessDto,
   CreateRoomValidationErrorDto,
 } from './dto/createRoom.dto';
+import {
+  UpdateRoomConflictErrorDto,
+  UpdateRoomDto,
+  UpdateRoomNotFoundErrorDto,
+  UpdateRoomSuccessDto,
+  UpdateRoomValidationErrorDto,
+} from './dto/updateRoom.dto';
 
 const ROUTE = 'rooms';
 
@@ -67,6 +86,28 @@ export class RoomController {
       };
     } catch (error) {
       this.logger.error(`[${this.deleteRoom.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: UpdateRoomSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateRoomValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateRoomNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateRoomConflictErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch(':id')
+  async updateRoom(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) roomDto: UpdateRoomDto) {
+    this.logger.log(`[${this.updateRoom.name}] - Method start`);
+    try {
+      const room: Room = await this.roomService.update(id, roomDto);
+      this.logger.log(`[${this.updateRoom.name}] - Method finished`);
+      return room;
+    } catch (error) {
+      this.logger.error(`[${this.updateRoom.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
