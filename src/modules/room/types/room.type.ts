@@ -1,5 +1,11 @@
 import { Room, Storage } from '@prisma/client';
 
-export type RoomWithStorages = Room & {
+type RoomWithStorages = Room & {
   storages: Storage[];
 };
+
+type IdOnly = {
+  id: number;
+};
+
+export { RoomWithStorages, IdOnly };

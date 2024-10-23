@@ -2,7 +2,12 @@ import { Injectable, PipeTransform, BadRequestException, HttpStatus } from '@nes
 import { validate, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { GetStoragesQueryDto } from '../dto/getStorage.dto';
-import { FilterOptions, PaginationOptions, SortOptions, StorageOptions } from '../interfaces/storageOptions.interface';
+import {
+  StorageFilterOptions,
+  StoragePaginationOptions,
+  StorageSortOptions,
+  StorageOptions,
+} from '../interfaces/storageOptions.interface';
 
 @Injectable()
 export class ValidateParseStorageOptionsPipe implements PipeTransform {
@@ -28,26 +33,31 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
         error: 'Bad Request',
       });
     }
-    if (queryDto.alphabeticalName && queryDto.chronologicalDate) {
+
+    if (
+      (queryDto.alphabeticalStorageName && (queryDto.chronologicalDate || queryDto.alphabeticalRoomName)) ||
+      (queryDto.chronologicalDate && queryDto.alphabeticalRoomName)
+    ) {
       throw new BadRequestException({
-        message: 'Only one of alphabeticalName or chronologicalDate must be provided',
+        message: 'Only one of alphabeticalStorageName, alphabeticalRoomName, or chronologicalDate must be provided',
         statusCode: HttpStatus.BAD_REQUEST,
         error: 'Bad Request',
       });
     }
 
-    const filters: FilterOptions = {
+    const filters: StorageFilterOptions = {
       id: queryDto.id,
-      roomId: queryDto.roomId,
+      roomName: queryDto.roomName,
       storageName: queryDto.storageName,
     };
 
-    const sorts: SortOptions = {
-      alphabeticalName: queryDto.alphabeticalName,
+    const sorts: StorageSortOptions = {
+      alphabeticalStorageName: queryDto.alphabeticalStorageName,
+      alphabeticalRoomName: queryDto.alphabeticalRoomName,
       chronologicalDate: queryDto.chronologicalDate,
     };
 
-    const paginations: PaginationOptions = {
+    const paginations: StoragePaginationOptions = {
       skip: queryDto.skip,
       take: queryDto.take,
     };

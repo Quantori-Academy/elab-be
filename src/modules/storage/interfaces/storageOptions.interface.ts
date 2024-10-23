@@ -6,30 +6,32 @@ enum Order {
 type OrderBy =
   | {
       name?: Order;
-      createdAt?: Order;
+      updatedAt?: Order;
+      room?: { name?: Order };
     }
   | undefined;
 
-type SortOptions = {
-  chronologicalDate: Order | undefined;
-  alphabeticalName: Order | undefined;
+type StorageSortOptions = {
+  chronologicalDate?: Order | undefined;
+  alphabeticalStorageName?: Order | undefined;
+  alphabeticalRoomName?: Order | undefined;
 };
 
-type FilterOptions = {
-  id: number | undefined;
-  roomId: number | undefined;
-  storageName: string | undefined;
+type StorageFilterOptions = {
+  id?: number | undefined;
+  roomName?: string | undefined;
+  storageName?: string | undefined;
 };
 
-type PaginationOptions = {
-  skip: number | undefined;
-  take: number | undefined;
+type StoragePaginationOptions = {
+  skip?: number | undefined;
+  take?: number | undefined;
 };
 
 type StorageOptions = {
-  filter: FilterOptions;
-  sort: SortOptions;
-  pagination: PaginationOptions;
+  filter: StorageFilterOptions;
+  sort: StorageSortOptions;
+  pagination: StoragePaginationOptions;
 };
 
-export { StorageOptions, FilterOptions, SortOptions, PaginationOptions, Order, OrderBy };
+export { StorageOptions, StorageFilterOptions, StorageSortOptions, StoragePaginationOptions, Order, OrderBy };

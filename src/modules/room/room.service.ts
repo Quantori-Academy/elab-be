@@ -17,12 +17,9 @@ export class RoomService implements IRoomService {
   async getRoomNameById(id: number): Promise<string | null> {
     this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
     try {
-      const room = await this.prisma.room.findUnique({
-        where: { id },
-        select: { name: true },
-      });
+      const roomName: string | null = await this.roomRepository.findRoomNameById(id);
       this.logger.log(`[${this.getRoomNameById.name}] - Method finished`);
-      return room ? room.name : null;
+      return roomName;
     } catch (error) {
       this.logger.error(`[${this.getRoomNameById.name}] - Exception thrown: ${error}`);
       throw error;
@@ -32,14 +29,23 @@ export class RoomService implements IRoomService {
   async getRoomIdByName(roomName: string): Promise<number | null> {
     this.logger.log(`[${this.getRoomIdByName.name}] - Method start`);
     try {
-      const room = await this.prisma.room.findUnique({
-        where: { name: roomName },
-        select: { id: true },
-      });
+      const roomId: number | null = await this.roomRepository.findRoomIdByName(roomName);
       this.logger.log(`[${this.getRoomIdByName.name}] - Method finished`);
-      return room ? room.id : null;
+      return roomId;
     } catch (error) {
       this.logger.error(`[${this.getRoomIdByName.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async getRoomIdsBySubName(roomName: string): Promise<number[]> {
+    this.logger.log(`[${this.getRoomIdsBySubName.name}] - Method start`);
+    try {
+      const roomIds: number[] = await this.roomRepository.findRoomIdsBySubName(roomName);
+      this.logger.log(`[${this.getRoomIdsBySubName.name}] - Method finished`);
+      return roomIds;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomIdsBySubName.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

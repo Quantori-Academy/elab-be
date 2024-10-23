@@ -2,8 +2,8 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
-import { OrderBy, PaginationOptions, SortOptions } from './interfaces/storageOptions.interface';
-import { StorageCreation, StorageWithReagents } from './types/storage.types';
+import { StorageCreation, StorageWithReagents, FilterBy } from './types/storage.types';
+import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './interfaces/storageOptions.interface';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -55,15 +55,28 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAll(pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+  async findAll(
+    filterBy?: FilterBy,
+    pagination?: StoragePaginationOptions,
+    sortOptions?: StorageSortOptions,
+  ): Promise<Storage[]> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
       const storages: Storage[] = await this.prisma.storage.findMany({
+        where: {
+          roomId: {
+            in: filterBy?.roomIds,
+          },
+          name: {
+            contains: filterBy?.name,
+            mode: 'insensitive',
+          },
+        },
         skip,
         take,
-        orderBy,
+        orderBy: orderBy,
         include: {
           room: true,
         },
@@ -76,7 +89,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByName(storageName: string, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[]> {
+  async findAllByName(
+    storageName: string,
+    pagination?: StoragePaginationOptions,
+    sortOptions?: StorageSortOptions,
+  ): Promise<Storage[]> {
     this.logger.log(`[${this.findAllByName.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
@@ -84,7 +101,10 @@ export class StorageRepository implements IStorageRepository {
 
       const storages: Storage[] = await this.prisma.storage.findMany({
         where: {
-          name: storageName,
+          name: {
+            contains: storageName,
+            mode: 'insensitive',
+          },
         },
         skip,
         take,
@@ -101,7 +121,11 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  async findAllByRoom(roomId: number, pagination?: PaginationOptions, sortOptions?: SortOptions): Promise<Storage[] | null> {
+  async findAllByRoom(
+    roomId: number,
+    pagination?: StoragePaginationOptions,
+    sortOptions?: StorageSortOptions,
+  ): Promise<Storage[] | null> {
     this.logger.log(`[${this.findAllByRoom.name}] - Method start`);
     try {
       const { skip = 0, take = 10 } = pagination || {};
@@ -191,16 +215,17 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
-  private orderFactory(sortOptions: SortOptions | undefined): OrderBy {
+  private orderFactory(sortOptions: StorageSortOptions | undefined): OrderBy {
     this.logger.log(`[${this.orderFactory.name}] - Method start`);
     try {
       if (!sortOptions) return undefined;
       const orderBy: OrderBy = {};
-      if (sortOptions.alphabeticalName) {
-        orderBy.name = sortOptions.alphabeticalName;
-      }
-      if (sortOptions.chronologicalDate) {
-        orderBy.createdAt = sortOptions.chronologicalDate;
+      if (sortOptions.alphabeticalStorageName) {
+        orderBy.name = sortOptions.alphabeticalStorageName;
+      } else if (sortOptions.chronologicalDate) {
+        orderBy.updatedAt = sortOptions.chronologicalDate;
+      } else {
+        orderBy.room = { name: sortOptions.alphabeticalRoomName };
       }
       this.logger.log(`[${this.orderFactory.name}] - Method finished`);
       return Object.keys(orderBy).length > 0 ? orderBy : undefined;

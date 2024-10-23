@@ -1,11 +1,17 @@
 import { Reagent, Storage } from '@prisma/client';
 
-export type StorageWithReagents = Storage & {
+type StorageWithReagents = Storage & {
   reagents: Reagent[];
 };
 
-export type StorageCreation = {
+type StorageCreation = {
   roomId: number;
   name: string;
   description?: string | null;
 };
+type FilterBy = {
+  roomIds?: number[] | undefined;
+  name?: string | undefined;
+};
+
+export { StorageWithReagents, StorageCreation, FilterBy };

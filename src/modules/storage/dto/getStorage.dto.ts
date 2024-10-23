@@ -13,12 +13,10 @@ class GetStoragesQueryDto {
   @Min(1)
   id?: number;
 
-  @ApiProperty({ required: false, type: Number, description: 'Id of the room' })
+  @ApiProperty({ required: false, type: String, description: 'name of the room' })
   @IsOptional()
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  @Min(1)
-  roomId?: number;
+  @IsString()
+  roomName?: string;
 
   @ApiProperty({ required: false, type: String, description: 'Name of the storage' })
   @IsOptional()
@@ -44,10 +42,15 @@ class GetStoragesQueryDto {
   @IsEnum(Order)
   chronologicalDate?: Order;
 
-  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical name (asc or desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical storage (asc or desc)' })
   @IsOptional()
   @IsEnum(Order)
-  alphabeticalName?: Order;
+  alphabeticalStorageName?: Order;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabetical room (asc or desc)' })
+  @IsOptional()
+  @IsEnum(Order)
+  alphabeticalRoomName?: Order;
 }
 
 class GetStorageSuccessDto {
@@ -91,8 +94,9 @@ class GetStorageValidationErrorsDto {
       'take must not be less than 1',
       'take must be an integer number',
       'chronologicalDate must be one of the following values: asc, desc',
-      'alphabeticalName must be one of the following values: asc, desc',
-      'Only one of alphabeticalName or chronologicalDate must be provided',
+      'alphabeticalStorageName must be one of the following values: asc, desc',
+      'alphabeticalRoomName must be one of the following values: asc, desc',
+      'Only one of alphabeticalStorageName, alphabeticalRoomName or chronologicalDate must be provided',
     ],
   })
   message: string;

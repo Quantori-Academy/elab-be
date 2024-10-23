@@ -8,5 +8,6 @@ export interface IRoomRepository extends IRepository<Room> {
   findById(id: number, includeStorages?: boolean): Promise<Room | RoomWithStorages | null>; // implementation signature
   findRoomIdByName(roomName: string): Promise<number | null>;
   findRoomNameById(id: number): Promise<string | null>;
+  findRoomIdsBySubName(roomName: string): Promise<number[]>;
   create(room: CreateRoomDto): Promise<Room>;
 }
