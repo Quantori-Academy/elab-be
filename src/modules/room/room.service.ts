@@ -2,17 +2,13 @@ import { ConflictException, Inject, Injectable, Logger, NotFoundException } from
 import { ROOM_REPOSITORY_TOKEN } from './room.repository';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
-import { PrismaService } from '../prisma/prisma.service';
 import { Room } from '@prisma/client';
 import { RoomWithStorages } from './types/room.type';
 @Injectable()
 export class RoomService implements IRoomService {
   private readonly logger: Logger = new Logger(RoomService.name);
 
-  constructor(
-    @Inject(ROOM_REPOSITORY_TOKEN) private roomRepository: IRoomRepository,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(@Inject(ROOM_REPOSITORY_TOKEN) private roomRepository: IRoomRepository) {}
 
   async getRoomNameById(id: number): Promise<string | null> {
     this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
