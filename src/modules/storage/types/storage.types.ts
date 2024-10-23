@@ -9,6 +9,7 @@ type StorageCreation = {
   name: string;
   description?: string | null;
 };
+
 type FilterBy = {
   roomIds?: number[] | undefined;
   name?: string | undefined;

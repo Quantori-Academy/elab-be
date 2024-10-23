@@ -8,14 +8,8 @@ export interface IStorageRepository extends IRepository<Storage> {
   findById(id: number, includeReagents?: boolean): Promise<Storage | StorageWithReagents | null>; // implementation
   findUniqueStorage(roomId: number, storageName: string): Promise<Storage | null>;
   create(storageDto: StorageCreation): Promise<Storage>;
-  findAllByRoom(
-    roomId: number,
-    pagination?: StoragePaginationOptions,
-    sortOptions?: StorageSortOptions,
-  ): Promise<Storage[] | null>;
   findAllByName(storageName: string, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
   findAll(filterBy?: FilterBy, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
-  findAllByName(storageName: string, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
   findAllByRoom(
     roomId: number,
     pagination?: StoragePaginationOptions,
