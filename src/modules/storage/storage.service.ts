@@ -101,12 +101,12 @@ export class StorageService implements IStorageService {
   }
 
   async update(id: number, storageDto: UpdateStroageDto): Promise<Storage> {
-    this.logger.log(`[${this.delete.name}] - Method start`);
+    this.logger.log(`[${this.update.name}] - Method start`);
     try {
       let storage: Storage | null = await this.storageRepository.findById(id);
       if (!storage) throw new NotFoundException('Room Not Found');
 
-      const { name = storage.name, description = null } = storageDto;
+      const { name = storage.name, description = storage.description } = storageDto;
       storage = await this.storageRepository.update({ id: storage.id, name, description });
 
       this.logger.log(`[${this.update.name}] - Method finished`);
