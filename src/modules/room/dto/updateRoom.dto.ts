@@ -10,7 +10,7 @@ class UpdateRoomDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: 'Description for storage' })
+  @ApiProperty({ example: 'Description for Room' })
   description?: string | undefined;
 }
 

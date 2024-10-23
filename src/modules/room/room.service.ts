@@ -81,7 +81,7 @@ export class RoomService implements IRoomService {
   }
 
   async update(id: number, roomDto: UpdateRoomDto): Promise<Room> {
-    this.logger.log(`[${this.delete.name}] - Method start`);
+    this.logger.log(`[${this.update.name}] - Method start`);
     try {
       let room: Room | null = await this.roomRepository.findById(id);
       if (!room) throw new NotFoundException('Room Not Found');
@@ -91,10 +91,10 @@ export class RoomService implements IRoomService {
       room.description = description ? description : room.description;
       room = await this.roomRepository.update(room);
 
-      this.logger.log(`[${this.delete.name}] - Method finished`);
+      this.logger.log(`[${this.update.name}] - Method finished`);
       return room;
     } catch (error) {
-      this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
+      this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
