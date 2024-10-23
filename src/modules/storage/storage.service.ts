@@ -3,16 +3,16 @@ import { STORAGE_REPOSITORY_TOKEN } from './storage.repository';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
+import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
+import { ROOM_SERVICE_TOKEN } from '../room/room.service';
+import { IRoomService } from '../room/interfaces/roomService.interface';
+import { FilterBy, StorageWithReagents } from './types/storage.types';
 import {
   StorageFilterOptions,
   StoragePaginationOptions,
   StorageSortOptions,
   StorageOptions,
 } from './interfaces/storageOptions.interface';
-import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
-import { ROOM_SERVICE_TOKEN } from '../room/room.service';
-import { IRoomService } from '../room/interfaces/roomService.interface';
-import { FilterBy, StorageWithReagents } from './types/storage.types';
 
 @Injectable()
 export class StorageService implements IStorageService {

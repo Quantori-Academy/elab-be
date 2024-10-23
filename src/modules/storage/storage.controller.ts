@@ -1,3 +1,18 @@
+import { STORAGE_SERVICE_TOKEN } from './storage.service';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { IStorageService } from './interfaces/storageService.interface';
+import { Role, Storage } from '@prisma/client';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { GetStoragesQueryDto, GetStorageSuccessDto, GetStorageValidationErrorsDto } from './dto/getStorage.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { StorageOptions } from './interfaces/storageOptions.interface';
+import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pipe';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
+import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 import {
   Body,
   Controller,
@@ -12,27 +27,12 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { STORAGE_SERVICE_TOKEN } from './storage.service';
-import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IStorageService } from './interfaces/storageService.interface';
-import { Role, Storage } from '@prisma/client';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
-import { GetStoragesQueryDto, GetStorageSuccessDto, GetStorageValidationErrorsDto } from './dto/getStorage.dto';
-import { TokenErrorResponseDto } from '../security/dto/token.dto';
-import { StorageOptions } from './interfaces/storageOptions.interface';
-import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pipe';
 import {
   CreateStorageConflictErrorDto,
   CreateStorageLocationsDto,
   CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
-import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
-import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
-import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'storages';
 
