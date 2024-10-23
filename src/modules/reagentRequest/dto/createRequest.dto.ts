@@ -9,7 +9,7 @@ export class CreateRequestDto {
   name: string;
 
   @ApiProperty({ example: 2 })
-  @Transform((value) => Number(value))
+  @Transform(({ value }) => Number(value))
   @IsInt()
   userId: number;
 
