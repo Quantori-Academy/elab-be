@@ -44,6 +44,8 @@ const ROUTE = 'rooms';
 export class RoomController {
   private readonly logger: Logger = new Logger(RoomController.name);
 
+  constructor(@Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService) {}
+
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateRoomSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateRoomValidationErrorDto })
@@ -111,6 +113,4 @@ export class RoomController {
       throw error;
     }
   }
-
-  constructor(@Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService) {}
 }
