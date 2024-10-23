@@ -27,6 +27,7 @@ import {
   Inject,
   Logger,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -39,6 +40,7 @@ import {
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
 import { StorageList } from './types/storage.types';
+import { UpdateStroageDto } from './dto/updateStorage.dto';
 
 const ROUTE = 'storages';
 
@@ -113,6 +115,28 @@ export class StorageController {
       };
     } catch (error) {
       this.logger.error(`[${this.deleteStorage.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  // @ApiBearerAuth()
+  // @ApiResponse({ status: HttpStatus.OK, type: UpdateRoomSuccessDto })
+  // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateRoomValidationErrorDto })
+  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  // @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateRoomNotFoundErrorDto })
+  // @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateRoomConflictErrorDto })
+  // @Roles(Role.Admin)
+  // @UseGuards(AuthGuard, RolesGuard)
+  @Patch(':id')
+  async updateStorage(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) storageDto: UpdateStroageDto) {
+    this.logger.log(`[${this.updateStorage.name}] - Method start`);
+    try {
+      const storage: Storage = await this.storageService.update(id, storageDto);
+      this.logger.log(`[${this.updateStorage.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.updateStorage.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
