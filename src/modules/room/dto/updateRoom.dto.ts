@@ -62,7 +62,7 @@ class UpdateRoomValidationErrorDto {
   })
   message: string;
 
-  @ApiProperty({ example: 'Conflict' })
+  @ApiProperty({ example: 'Bad Request' })
   error: string;
 
   @ApiProperty({ example: HttpStatus.BAD_REQUEST })
