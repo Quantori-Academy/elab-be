@@ -13,6 +13,7 @@ import {
   StorageSortOptions,
   StorageOptions,
 } from './interfaces/storageOptions.interface';
+import { UpdateStroageDto } from './dto/updateStorage.dto';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -95,6 +96,22 @@ export class StorageService implements IStorageService {
       this.logger.log(`[${this.delete.name}] - Method finished`);
     } catch (error) {
       this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async update(id: number, storageDto: UpdateStroageDto): Promise<Storage> {
+    this.logger.log(`[${this.update.name}] - Method start`);
+    try {
+      let storage: Storage | null = await this.storageRepository.findById(id);
+      if (!storage) throw new NotFoundException('Storage Not Found');
+
+      storage = await this.storageRepository.update({ id, ...storageDto });
+
+      this.logger.log(`[${this.update.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

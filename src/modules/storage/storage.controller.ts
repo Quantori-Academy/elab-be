@@ -18,6 +18,14 @@ import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pi
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
+import { StorageList } from './types/storage.types';
+import {
+  UpdateStorageConflictErrorDto,
+  UpdateStorageNotFoundErrorDto,
+  UpdateStorageValidationErrorDto,
+  UpdateStroageDto,
+  UpdateStroageSuccessDto,
+} from './dto/updateStorage.dto';
 import {
   Body,
   Controller,
@@ -27,6 +35,7 @@ import {
   Inject,
   Logger,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -38,7 +47,6 @@ import {
   CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
-import { StorageList } from './types/storage.types';
 
 const ROUTE = 'storages';
 
@@ -113,6 +121,28 @@ export class StorageController {
       };
     } catch (error) {
       this.logger.error(`[${this.deleteStorage.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: UpdateStroageSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateStorageValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateStorageConflictErrorDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch(':id')
+  async updateStorage(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) storageDto: UpdateStroageDto) {
+    this.logger.log(`[${this.updateStorage.name}] - Method start`);
+    try {
+      const storage: Storage = await this.storageService.update(id, storageDto);
+      this.logger.log(`[${this.updateStorage.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.updateStorage.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
