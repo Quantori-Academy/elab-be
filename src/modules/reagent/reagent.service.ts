@@ -37,7 +37,7 @@ class ReagentService implements IReagentService {
         return await this.reagentRepository.getAllByName(filter.name, pagination, sort);
       } else {
         this.logger.log('Fetching all Reagents');
-        return await this.reagentRepository.findAll();
+        return await this.reagentRepository.findAll(pagination, sort);
       }
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
