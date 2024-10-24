@@ -26,6 +26,12 @@ enum Category {
   Sample
 }
 
+enum Package {
+  Bottle
+  SolventsBox
+  PackageBox
+}
+
 model User {
   id                      Int     @id @default(autoincrement())
   firstName               String
@@ -65,6 +71,7 @@ model Reagent {
   storageId     Int
   category      Category
   structure     String?
+  package       Package?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   storage       Storage  @relation(fields: [storageId], references: [id])

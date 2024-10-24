@@ -1,14 +1,15 @@
 import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { REQUEST_REPOSITORY_TOKEN } from './reagentRequest.repository';
-import { IRepository } from 'src/common/interfaces/repository.interface';
 import { IReagentRequest } from './interfaces/reagentRequestEntity.interface';
 import { IReagentRequestService } from './interfaces/reagentRequestService.interface';
+import { ReagentRequestOptions } from './interfaces/reagentRequestOptions.interface';
+import { IReagentRequestRepository } from './interfaces/reagentRequestRepository.interface';
 
 @Injectable()
 class ReagentRequestService implements IReagentRequestService {
   private logger = new Logger(ReagentRequestService.name);
 
-  constructor(@Inject(REQUEST_REPOSITORY_TOKEN) private requestRepository: IRepository<IReagentRequest>) {}
+  constructor(@Inject(REQUEST_REPOSITORY_TOKEN) private requestRepository: IReagentRequestRepository) {}
 
   async create(request: IReagentRequest): Promise<IReagentRequest> {
     try {
@@ -19,6 +20,52 @@ class ReagentRequestService implements IReagentRequestService {
     } catch (error) {
       this.logger.error('Failed to create Reagent Request: ', error);
       throw new InternalServerErrorException('Failed to create a Reagent Request!');
+    }
+  }
+
+  async getReagentRequestsForProcurementOficcer(options: ReagentRequestOptions): Promise<IReagentRequest[]> {
+    try {
+      this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Start`);
+      const { filter, pagination, sort } = options || {};
+      if (filter.name && filter.status) {
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Filter By Name And Status`);
+        return await this.requestRepository.getAllByNameAndStatus(filter.name, filter.status, pagination, sort);
+      } else if (filter.name) {
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Filter By Name`);
+        return await this.requestRepository.getAllByName(filter.name, pagination, sort);
+      } else if (filter.status) {
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Filter By Status`);
+        return await this.requestRepository.getAllByStatus(filter.status, pagination, sort);
+      } else {
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Fetch All Reagent Requests`);
+        return await this.requestRepository.findAll(pagination, sort);
+      }
+    } catch (error) {
+      this.logger.error('Failed to fetch Reagent Requests: ', error);
+      throw new InternalServerErrorException('Failed to fetch a Reagent Requests!');
+    }
+  }
+
+  async getReagentRequestsForResearchers(options: ReagentRequestOptions, id: number): Promise<IReagentRequest[]> {
+    try {
+      this.logger.log(`${this.getReagentRequestsForResearchers.name} - Start`);
+      const { filter, pagination, sort } = options || {};
+      if (filter.name && filter.status) {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Filter By Name And Status`);
+        return await this.requestRepository.getAllByNameAndStatus(filter.name, filter.status, pagination, sort, id);
+      } else if (filter.name) {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Filter By Name`);
+        return await this.requestRepository.getAllByName(filter.name, pagination, sort, id);
+      } else if (filter.status) {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Filter By Status`);
+        return await this.requestRepository.getAllByStatus(filter.status, pagination, sort, id);
+      } else {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Fetch All Reagent Requests`);
+        return await this.requestRepository.findAll(pagination, sort, id);
+      }
+    } catch (error) {
+      this.logger.error('Failed to fetch Reagent Requests: ', error);
+      throw new InternalServerErrorException('Failed to fetch a Reagent Requests!');
     }
   }
 }

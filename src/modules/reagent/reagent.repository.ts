@@ -42,6 +42,18 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
+      include: {
+        storage: {
+          select: {
+            name: true,
+            room: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
       skip,
       take,
       orderBy,
@@ -59,6 +71,18 @@ class ReagentRepository implements IReagentRepository {
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: { name },
+      include: {
+        storage: {
+          select: {
+            name: true,
+            room: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
       skip,
       take,
       orderBy,
@@ -70,6 +94,18 @@ class ReagentRepository implements IReagentRepository {
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: { category },
+      include: {
+        storage: {
+          select: {
+            name: true,
+            room: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
       skip,
       take,
       orderBy,
@@ -87,6 +123,18 @@ class ReagentRepository implements IReagentRepository {
     return await this.prisma.reagent.findMany({
       where: {
         AND: [{ name }, { category }],
+      },
+      include: {
+        storage: {
+          select: {
+            name: true,
+            room: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
       skip,
       take,

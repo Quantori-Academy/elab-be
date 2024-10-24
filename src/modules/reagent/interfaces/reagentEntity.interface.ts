@@ -1,4 +1,4 @@
-import { Category } from '@prisma/client';
+import { Category, Package } from '@prisma/client';
 
 export interface IReagent {
   id?: number;
@@ -15,6 +15,7 @@ export interface IReagent {
   expirationDate: Date;
   storageId: number;
   category: Category;
+  package?: Package | null;
   structure?: string | null;
   createdAt?: Date;
   updatedAt?: Date;

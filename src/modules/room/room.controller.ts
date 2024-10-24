@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpStatus,
   Inject,
   Logger,
@@ -36,6 +37,7 @@ import {
   UpdateRoomSuccessDto,
   UpdateRoomValidationErrorDto,
 } from './dto/updateRoom.dto';
+import { GetRoomSuccessDto } from './dto/getRooms.dto';
 
 const ROUTE = 'rooms';
 
@@ -110,6 +112,25 @@ export class RoomController {
       return room;
     } catch (error) {
       this.logger.error(`[${this.updateRoom.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [GetRoomSuccessDto] })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getRooms() {
+    this.logger.log(`[${this.getRooms.name}] - Method start`);
+    try {
+      const rooms: Room[] = await this.roomService.getRooms();
+      this.logger.log(`[${this.getRooms.name}] - Method finished`);
+      return rooms;
+    } catch (error) {
+      this.logger.error(`[${this.getRooms.name}] - Exception thrown` + error);
       throw error;
     }
   }

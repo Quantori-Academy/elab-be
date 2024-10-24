@@ -12,6 +12,18 @@ export class RoomService implements IRoomService {
 
   constructor(@Inject(ROOM_REPOSITORY_TOKEN) private roomRepository: IRoomRepository) {}
 
+  async getRooms(): Promise<Room[]> {
+    this.logger.log(`[${this.getRooms.name}] - Method start`);
+    try {
+      const rooms: Room[] = await this.roomRepository.findAll();
+      this.logger.log(`[${this.getRooms.name}] - Method finished`);
+      return rooms;
+    } catch (error) {
+      this.logger.error(`[${this.getRooms.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
   async getRoomNameById(id: number): Promise<string | null> {
     this.logger.log(`[${this.getRoomNameById.name}] - Method start`);
     try {
