@@ -23,8 +23,12 @@ export class ReagentRequestController {
   @Roles(Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
-  async create(@Body() createRequestDto: CreateRequestDto) {
-    return await this.requestService.create(createRequestDto);
+  async create(@Body() createRequestDto: CreateRequestDto, @Req() req: any) {
+    const dtoWithUserId = {
+      ...createRequestDto,
+      userId: parseInt(req.user.id),
+    };
+    return await this.requestService.create(dtoWithUserId);
   }
 
   @ApiBearerAuth()

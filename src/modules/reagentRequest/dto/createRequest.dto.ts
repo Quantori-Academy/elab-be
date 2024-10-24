@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
-import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateRequestDto {
   @ApiProperty({ example: 'Reagent A' })
   @IsString()
   name: string;
-
-  @ApiProperty({ example: 2 })
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  userId: number;
 
   @ApiProperty({ example: '500 ml' })
   @IsString()
