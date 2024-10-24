@@ -49,10 +49,20 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     });
   }
 
-  async findAll(pagination?: PaginationOptions, sort?: SortOptions): Promise<IReagentRequest[]> {
+  async findAll(pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<IReagentRequest[]> {
     this.logger.log('findAll method start');
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.findAll.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
+    this.logger.log(`[${this.findAll.name}] - Finished`);
     return await this.prisma.reagentRequest.findMany({
       skip,
       take,
@@ -60,10 +70,24 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     });
   }
 
-  async getAllByStatus(status: Status, pagination?: PaginationOptions, sort?: SortOptions): Promise<IReagentRequest[]> {
+  async getAllByStatus(
+    status: Status,
+    pagination?: PaginationOptions,
+    sort?: SortOptions,
+    id?: number,
+  ): Promise<IReagentRequest[]> {
     this.logger.log(`[${this.getAllByStatus.name}] - Started`);
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.getAllByStatus.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
     this.logger.log(`[${this.getAllByStatus.name}] - Finished`);
     return await this.prisma.reagentRequest.findMany({
       where: { status },
@@ -73,10 +97,19 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     });
   }
 
-  async getAllByName(name: string, pagination?: PaginationOptions, sort?: SortOptions): Promise<IReagentRequest[]> {
+  async getAllByName(name: string, pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<IReagentRequest[]> {
     this.logger.log(`[${this.getAllByName.name}] - Started`);
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.getAllByName.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
     this.logger.log(`[${this.getAllByName.name}] - Finished`);
     return await this.prisma.reagentRequest.findMany({
       where: { name },
@@ -91,10 +124,20 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     status: Status,
     pagination?: PaginationOptions,
     sort?: SortOptions,
+    id?: number,
   ): Promise<IReagentRequest[]> {
     this.logger.log(`[${this.getAllByNameAndStatus.name}] - Started`);
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.getAllByNameAndStatus.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
     this.logger.log(`[${this.getAllByNameAndStatus.name}] - Finished`);
     return await this.prisma.reagentRequest.findMany({
       where: {

@@ -23,22 +23,45 @@ class ReagentRequestService implements IReagentRequestService {
     }
   }
 
-  async getReagentRequests(options: ReagentRequestOptions): Promise<IReagentRequest[]> {
+  async getReagentRequestsForProcurementOficcer(options: ReagentRequestOptions): Promise<IReagentRequest[]> {
     try {
-      this.logger.log(`${this.getReagentRequests.name} - Start`);
+      this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Start`);
       const { filter, pagination, sort } = options || {};
       if (filter.name && filter.status) {
-        this.logger.log(`${this.getReagentRequests.name} - Filter By Name And Status`);
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Filter By Name And Status`);
         return await this.requestRepository.getAllByNameAndStatus(filter.name, filter.status, pagination, sort);
       } else if (filter.name) {
-        this.logger.log(`${this.getReagentRequests.name} - Filter By Name`);
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Filter By Name`);
         return await this.requestRepository.getAllByName(filter.name, pagination, sort);
       } else if (filter.status) {
-        this.logger.log(`${this.getReagentRequests.name} - Filter By Status`);
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Filter By Status`);
         return await this.requestRepository.getAllByStatus(filter.status, pagination, sort);
       } else {
-        this.logger.log(`${this.getReagentRequests.name} - Fetch All Reagent Requests`);
+        this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Fetch All Reagent Requests`);
         return await this.requestRepository.findAll(pagination, sort);
+      }
+    } catch (error) {
+      this.logger.error('Failed to fetch Reagent Requests: ', error);
+      throw new InternalServerErrorException('Failed to fetch a Reagent Requests!');
+    }
+  }
+
+  async getReagentRequestsForResearchers(options: ReagentRequestOptions, id: number): Promise<IReagentRequest[]> {
+    try {
+      this.logger.log(`${this.getReagentRequestsForResearchers.name} - Start`);
+      const { filter, pagination, sort } = options || {};
+      if (filter.name && filter.status) {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Filter By Name And Status`);
+        return await this.requestRepository.getAllByNameAndStatus(filter.name, filter.status, pagination, sort, id);
+      } else if (filter.name) {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Filter By Name`);
+        return await this.requestRepository.getAllByName(filter.name, pagination, sort, id);
+      } else if (filter.status) {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Filter By Status`);
+        return await this.requestRepository.getAllByStatus(filter.status, pagination, sort, id);
+      } else {
+        this.logger.log(`${this.getReagentRequestsForResearchers.name} - Fetch All Reagent Requests`);
+        return await this.requestRepository.findAll(pagination, sort, id);
       }
     } catch (error) {
       this.logger.error('Failed to fetch Reagent Requests: ', error);
