@@ -104,7 +104,7 @@ export class StorageService implements IStorageService {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
       let storage: Storage | null = await this.storageRepository.findById(id);
-      if (!storage) throw new NotFoundException('Room Not Found');
+      if (!storage) throw new NotFoundException('Storage Not Found');
 
       storage = await this.storageRepository.update({ id, ...storageDto });
 
