@@ -4,6 +4,7 @@ import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
 import { Room } from '@prisma/client';
 import { RoomWithStorages } from './types/room.type';
+import { UpdateRoomDto } from './dto/updateRoom.dto';
 
 @Injectable()
 export class RoomService implements IRoomService {
@@ -75,6 +76,22 @@ export class RoomService implements IRoomService {
       this.logger.log(`[${this.delete.name}] - Method finished`);
     } catch (error) {
       this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async update(id: number, roomDto: UpdateRoomDto): Promise<Room> {
+    this.logger.log(`[${this.update.name}] - Method start`);
+    try {
+      let room: Room | null = await this.roomRepository.findById(id);
+      if (!room) throw new NotFoundException('Room Not Found');
+
+      room = await this.roomRepository.update({ id, ...roomDto });
+
+      this.logger.log(`[${this.update.name}] - Method finished`);
+      return room;
+    } catch (error) {
+      this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

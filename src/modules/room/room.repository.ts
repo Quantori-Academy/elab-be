@@ -1,9 +1,11 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { Prisma, Room } from '@prisma/client';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { IdOnly, RoomWithStorages } from './types/room.type';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 
 @Injectable()
 export class RoomRepository implements IRoomRepository {
@@ -97,7 +99,7 @@ export class RoomRepository implements IRoomRepository {
     }
   }
 
-  async update(room: Room): Promise<Room> {
+  async update(room: PartialWithRequiredId<Room>): Promise<Room> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
       const updatedRoom: Room = await this.prisma.room.update({
@@ -107,6 +109,9 @@ export class RoomRepository implements IRoomRepository {
       this.logger.log(`[${this.update.name}] - Method finished`);
       return updatedRoom;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+        error = new ConflictException(`Room with name ${room.name} already exists`);
+      }
       this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }
