@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { IRepository } from 'src/common/interfaces/repository.interface';
 import { IReagentRequest } from './interfaces/reagentRequestEntity.interface';
+import { IReagentRequestRepository } from './interfaces/reagentRequestRepository.interface';
+import { Prisma, Status } from '@prisma/client';
+import { OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentRequestOptions.interface';
 
 @Injectable()
-class ReagentRequestRepository implements IRepository<IReagentRequest> {
+class ReagentRequestRepository implements IReagentRequestRepository {
   private logger = new Logger(ReagentRequestRepository.name);
 
   constructor(private prisma: PrismaService) {}
@@ -47,9 +49,138 @@ class ReagentRequestRepository implements IRepository<IReagentRequest> {
     });
   }
 
-  async findAll(): Promise<IReagentRequest[]> {
+  async findAll(pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<IReagentRequest[]> {
     this.logger.log('findAll method start');
-    return await this.prisma.reagentRequest.findMany();
+    const { skip = 0, take = 10 } = pagination || {};
+    const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.findAll.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
+    this.logger.log(`[${this.findAll.name}] - Finished`);
+    return await this.prisma.reagentRequest.findMany({
+      skip,
+      take,
+      orderBy,
+    });
+  }
+
+  async getAllByStatus(
+    status: Status,
+    pagination?: PaginationOptions,
+    sort?: SortOptions,
+    id?: number,
+  ): Promise<IReagentRequest[]> {
+    this.logger.log(`[${this.getAllByStatus.name}] - Started`);
+    const { skip = 0, take = 10 } = pagination || {};
+    const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.getAllByStatus.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
+    this.logger.log(`[${this.getAllByStatus.name}] - Finished`);
+    return await this.prisma.reagentRequest.findMany({
+      where: { status },
+      skip,
+      take,
+      orderBy,
+    });
+  }
+
+  async getAllByName(name: string, pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<IReagentRequest[]> {
+    this.logger.log(`[${this.getAllByName.name}] - Started`);
+    const { skip = 0, take = 10 } = pagination || {};
+    const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.getAllByName.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
+    this.logger.log(`[${this.getAllByName.name}] - Finished`);
+    return await this.prisma.reagentRequest.findMany({
+      where: { name },
+      skip,
+      take,
+      orderBy,
+    });
+  }
+
+  async getAllByNameAndStatus(
+    name: string,
+    status: Status,
+    pagination?: PaginationOptions,
+    sort?: SortOptions,
+    id?: number,
+  ): Promise<IReagentRequest[]> {
+    this.logger.log(`[${this.getAllByNameAndStatus.name}] - Started`);
+    const { skip = 0, take = 10 } = pagination || {};
+    const orderBy = this.orderFactory(sort);
+    if (id) {
+      this.logger.log(`[${this.getAllByNameAndStatus.name}] - Finished with checking User ID`);
+      return await this.prisma.reagentRequest.findMany({
+        where: { userId: id },
+        skip,
+        take,
+        orderBy,
+      });
+    }
+    this.logger.log(`[${this.getAllByNameAndStatus.name}] - Finished`);
+    return await this.prisma.reagentRequest.findMany({
+      where: {
+        AND: [{ name }, { status }],
+      },
+      skip,
+      take,
+      orderBy,
+    });
+  }
+
+  private orderFactory(
+    sortOptions: SortOptions | undefined,
+  ): Prisma.ReagentOrderByWithRelationInput | Prisma.ReagentOrderByWithRelationInput[] | undefined {
+    try {
+      this.logger.log(`[${this.orderFactory.name}] - Started`);
+      if (!sortOptions) return undefined;
+      const orderBy: OrderBy = {};
+      if (sortOptions.sortByCreatedDate) {
+        orderBy.createdAt = sortOptions.sortByCreatedDate;
+      }
+      if (sortOptions.sortByUpdatedDate) {
+        orderBy.updatedAt = sortOptions.sortByUpdatedDate;
+      }
+      if (sortOptions.sortByQuantity) {
+        orderBy.desiredQuantity = sortOptions.sortByQuantity;
+      }
+
+      this.logger.log(`[${this.orderFactory.name}] - Finished`);
+      if (Object.keys(orderBy).length === 1) {
+        return orderBy;
+      } else if (Object.keys(orderBy).length > 1) {
+        const orderArr = Object.entries(orderBy).map(([key, value]) => {
+          return { [key]: value };
+        });
+        return orderArr;
+      } else {
+        return undefined;
+      }
+    } catch (error) {
+      this.logger.error('Error in orderFactory: ', error);
+      throw error;
+    }
   }
 }
 
