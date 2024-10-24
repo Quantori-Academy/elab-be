@@ -31,7 +31,7 @@ export class StorageService implements IStorageService {
         size: 0,
         storages: [],
       };
-      const { id, roomName, storageName }: StorageFilterOptions = options.filter;
+      const { roomName, storageName }: StorageFilterOptions = options.filter;
       const pagination: StoragePaginationOptions = options.pagination;
       const sort: StorageSortOptions = options.sort;
 
@@ -40,19 +40,11 @@ export class StorageService implements IStorageService {
         roomIds: undefined,
       };
 
-      if (id) {
-        const storage: Storage | null = await this.storageRepository.findById(id);
-        storageList.size = storage ? 1 : 0;
-        storageList.storages = storage ? [storage] : [];
-        this.logger.log(`[${this.getStorages.name}] - byIdOption Method finished `);
-        return storageList;
-      }
-
       if (roomName) {
         const roomIds: number[] = await this.roomService.getRoomIdsBySubName(roomName);
         filterBy.roomIds = roomIds;
       }
-
+      console.log(filterBy);
       storageList = await this.storageRepository.findAll(filterBy, pagination, sort);
 
       this.logger.log(`[${this.getStorages.name}] - Method finished`);

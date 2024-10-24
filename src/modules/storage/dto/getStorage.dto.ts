@@ -6,13 +6,6 @@ import { HttpStatus } from '@nestjs/common';
 import { Room } from '@prisma/client';
 
 class GetStoragesQueryDto {
-  @ApiProperty({ required: false, type: Number, description: 'Id of the storage' })
-  @IsOptional()
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  @Min(1)
-  id?: number;
-
   @ApiProperty({ required: false, type: String, description: 'name of the room' })
   @IsOptional()
   @IsString()
