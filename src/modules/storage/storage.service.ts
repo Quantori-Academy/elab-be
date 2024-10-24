@@ -44,7 +44,7 @@ export class StorageService implements IStorageService {
         const roomIds: number[] = await this.roomService.getRoomIdsBySubName(roomName);
         filterBy.roomIds = roomIds;
       }
-      console.log(filterBy);
+
       storageList = await this.storageRepository.findAll(filterBy, pagination, sort);
 
       this.logger.log(`[${this.getStorages.name}] - Method finished`);

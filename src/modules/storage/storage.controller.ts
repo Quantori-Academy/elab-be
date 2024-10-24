@@ -58,6 +58,27 @@ export class StorageController {
   constructor(@Inject(STORAGE_SERVICE_TOKEN) private storageService: IStorageService) {}
 
   @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetStorageSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get(':id')
+  async getStorageById(@Param('id', ParseIdPipe) id: number) {
+    this.logger.log(`[${this.getStorageById.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.storageService.getStorage(id);
+      this.logger.log(`[${this.getStorageById.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.getStorageById.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
   @ApiQuery({ type: GetStoragesQueryDto })
   @ApiResponse({ status: HttpStatus.OK, type: GetStorageListResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetStorageValidationErrorsDto })
@@ -74,27 +95,6 @@ export class StorageController {
       return storages;
     } catch (error) {
       this.logger.error(`[${this.getStorages.name}] - Exception thrown` + error);
-      throw error;
-    }
-  }
-
-  @ApiBearerAuth()
-  @ApiQuery({ type: GetStoragesQueryDto })
-  @ApiResponse({ status: HttpStatus.OK, type: GetStorageListResponseDto })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetStorageValidationErrorsDto })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
-  @Get(':id')
-  async getStorageById(@Param('id', ParseIdPipe) id: number) {
-    this.logger.log(`[${this.getStorageById.name}] - Method start`);
-    try {
-      const storage: Storage | null = await this.storageService.getStorage(id);
-      this.logger.log(`[${this.getStorageById.name}] - Method finished`);
-      return storage;
-    } catch (error) {
-      this.logger.error(`[${this.getStorageById.name}] - Exception thrown` + error);
       throw error;
     }
   }
