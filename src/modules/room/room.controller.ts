@@ -37,6 +37,7 @@ import {
   UpdateRoomSuccessDto,
   UpdateRoomValidationErrorDto,
 } from './dto/updateRoom.dto';
+import { GetRoomSuccessDto } from './dto/getRooms.dto';
 
 const ROUTE = 'rooms';
 
@@ -116,13 +117,11 @@ export class RoomController {
   }
 
   @ApiBearerAuth()
-  //@ApiQuery({ type: GetStoragesQueryDto })
-  //@ApiResponse({ status: HttpStatus.OK, type: GetStorageListResponseDto })
-  //@ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetStorageValidationErrorsDto })
-  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  //@ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  // @Roles(Role.Admin)
-  // @UseGuards(AuthGuard, RolesGuard)
+  @ApiResponse({ status: HttpStatus.OK, type: [GetRoomSuccessDto] })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Get('')
   async getRooms() {
     this.logger.log(`[${this.getRooms.name}] - Method start`);
