@@ -55,6 +55,20 @@ export class StorageService implements IStorageService {
     }
   }
 
+  async getStorage(id: number): Promise<Storage | null> {
+    this.logger.log(`[${this.getStorage.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.storageRepository.findById(id);
+      if (!storage) throw new NotFoundException('Storage Not Found');
+
+      this.logger.log(`[${this.getStorage.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.getStorage.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
   async createStorageLocation(storageDto: CreateStorageLocationsDto): Promise<Storage> {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
     try {
