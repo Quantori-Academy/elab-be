@@ -34,6 +34,7 @@ import {
   HttpStatus,
   Inject,
   Logger,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -70,6 +71,7 @@ export class StorageController {
     this.logger.log(`[${this.getStorageById.name}] - Method start`);
     try {
       const storage: Storage | null = await this.storageService.getStorage(id);
+      if (!storage) throw new NotFoundException('Storage Not Found');
       this.logger.log(`[${this.getStorageById.name}] - Method finished`);
       return storage;
     } catch (error) {

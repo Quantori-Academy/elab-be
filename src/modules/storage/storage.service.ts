@@ -54,8 +54,6 @@ export class StorageService implements IStorageService {
     this.logger.log(`[${this.getStorage.name}] - Method start`);
     try {
       const storage: Storage | null = await this.storageRepository.findById(id);
-      if (!storage) throw new NotFoundException('Storage Not Found');
-
       this.logger.log(`[${this.getStorage.name}] - Method finished`);
       return storage;
     } catch (error) {
