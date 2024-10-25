@@ -13,7 +13,7 @@ import {
   GetStorageValidationErrorsDto,
 } from './dto/getStorage.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
-import { StorageOptions } from './interfaces/storageOptions.interface';
+import { StorageOptions } from './types/storageOptions.type';
 import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pipe';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
@@ -34,6 +34,7 @@ import {
   HttpStatus,
   Inject,
   Logger,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -56,6 +57,28 @@ export class StorageController {
   private readonly logger: Logger = new Logger(StorageController.name);
 
   constructor(@Inject(STORAGE_SERVICE_TOKEN) private storageService: IStorageService) {}
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetStorageSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get(':id')
+  async getStorageById(@Param('id', ParseIdPipe) id: number) {
+    this.logger.log(`[${this.getStorageById.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.storageService.getStorage(id);
+      if (!storage) throw new NotFoundException('Storage Not Found');
+      this.logger.log(`[${this.getStorageById.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.getStorageById.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
 
   @ApiBearerAuth()
   @ApiQuery({ type: GetStoragesQueryDto })
