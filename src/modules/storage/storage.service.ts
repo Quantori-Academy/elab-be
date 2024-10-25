@@ -7,12 +7,7 @@ import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
 import { FilterBy, StorageList, StorageWithReagents } from './types/storage.types';
-import {
-  StorageFilterOptions,
-  StoragePaginationOptions,
-  StorageSortOptions,
-  StorageOptions,
-} from './interfaces/storageOptions.interface';
+import { StorageFilterOptions, StoragePaginationOptions, StorageSortOptions, StorageOptions } from './types/storageOptions.type';
 import { UpdateStroageDto } from './dto/updateStorage.dto';
 
 @Injectable()

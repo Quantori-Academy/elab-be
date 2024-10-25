@@ -1,5 +1,5 @@
 import { Storage } from '@prisma/client';
-import { StorageOptions } from './storageOptions.interface';
+import { StorageOptions } from '../types/storageOptions.type';
 import { CreateStorageLocationsDto } from '../dto/createStorageLocation.dto';
 import { StorageList } from '../types/storage.types';
 import { UpdateStroageDto } from '../dto/updateStorage.dto';

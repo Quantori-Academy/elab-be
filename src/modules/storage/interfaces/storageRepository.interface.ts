@@ -1,7 +1,7 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { Storage } from '@prisma/client';
 import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from '../types/storage.types';
-import { StoragePaginationOptions, StorageSortOptions } from './storageOptions.interface';
+import { StoragePaginationOptions, StorageSortOptions } from '../types/storageOptions.type';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 
 export interface IStorageRepository extends IRepository<Storage> {

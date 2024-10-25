@@ -2,12 +2,7 @@ import { Injectable, PipeTransform, BadRequestException, HttpStatus } from '@nes
 import { validate, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { GetStoragesQueryDto } from '../dto/getStorage.dto';
-import {
-  StorageFilterOptions,
-  StoragePaginationOptions,
-  StorageSortOptions,
-  StorageOptions,
-} from '../interfaces/storageOptions.interface';
+import { StorageFilterOptions, StoragePaginationOptions, StorageSortOptions, StorageOptions } from '../types/storageOptions.type';
 
 @Injectable()
 export class ValidateParseStorageOptionsPipe implements PipeTransform {

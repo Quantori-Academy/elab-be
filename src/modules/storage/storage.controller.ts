@@ -13,7 +13,7 @@ import {
   GetStorageValidationErrorsDto,
 } from './dto/getStorage.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
-import { StorageOptions } from './interfaces/storageOptions.interface';
+import { StorageOptions } from './types/storageOptions.type';
 import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pipe';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Order } from 'src/modules/storage/interfaces/storageOptions.interface';
+import { Order } from 'src/modules/storage/types/storageOptions.type';
 
 export class GetReagentRequestDto {
   @ApiProperty({ required: false, description: 'Starting index of pagination', minimum: 0 })
