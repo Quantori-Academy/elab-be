@@ -48,8 +48,8 @@ class ReagentService implements IReagentService {
   async searchByStructure(options: ReagentSearchOptions): Promise<IReagent | IReagent[]> {
     try {
       this.logger.log('searchByStructure method start');
-      const { pagination, sort, structure } = options || {};
-      return await this.reagentRepository.getAllByStructure(structure, pagination, sort);
+      const { pagination, sort, structure, flag } = options || {};
+      return await this.reagentRepository.getAllByStructure(structure, pagination, sort, flag);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
