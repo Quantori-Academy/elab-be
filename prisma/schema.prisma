@@ -72,6 +72,7 @@ model Reagent {
   category      Category
   structure     String?
   package       Package?
+  isDeleted     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   storage       Storage  @relation(fields: [storageId], references: [id])
@@ -110,7 +111,6 @@ model ReagentRequest {
   user                  User     @relation(fields: [userId], references: [id])
   name                  String
   structureSmiles       String?
-  structureImage        String?
   casNumber             String?
   desiredQuantity       String
   userComments          String?

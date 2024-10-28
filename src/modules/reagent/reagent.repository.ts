@@ -42,6 +42,7 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
+      where: { isDeleted: false },
       include: {
         storage: {
           select: {
@@ -70,7 +71,7 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
-      where: { name },
+      where: { name, isDeleted: false },
       include: {
         storage: {
           select: {
@@ -93,7 +94,7 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
-      where: { category },
+      where: { category, isDeleted: false },
       include: {
         storage: {
           select: {
@@ -122,7 +123,7 @@ class ReagentRepository implements IReagentRepository {
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: {
-        AND: [{ name }, { category }],
+        AND: [{ name }, { category }, { isDeleted: false }],
       },
       include: {
         storage: {
@@ -156,15 +157,16 @@ class ReagentRepository implements IReagentRepository {
     if (isFullStructure === undefined) {
       inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
                    FROM "Reagent" 
-                   WHERE structure @>$1`;
+                   WHERE isDeleted = FALSE AND structure @>$1`;
     } else {
       console.log(isFullStructure);
       inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
                    FROM "Reagent" 
                    WHERE 
-                      (${isFullStructure} = TRUE AND structure =$1) OR
-                      (${isFullStructure} = FALSE AND structure @>$1 AND structure !=$1)`;
+                      (${isFullStructure} = TRUE AND isDeleted = FALSE AND structure =$1) OR
+                      (${isFullStructure} = FALSE AND isDeleted = FALSE AND structure @>$1 AND structure !=$1)`;
     }
+      
     if (orderBy) {
       if (Array.isArray(orderBy)) {
         const orderClause = orderBy.map((order) => {
