@@ -2,13 +2,23 @@ import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { Order } from 'src/modules/storage/types/storageOptions.type';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Order } from 'src/modules/storage/interfaces/storageOptions.interface';
 
 export class SearchByStructureDto {
   @ApiProperty({ example: 'c1cccnc1' })
   @IsString()
   structure: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+    description: 'The flag to retrieve either the full structures or substructures',
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  isFullStructure?: boolean;
 
   @ApiProperty({ required: false, type: String, description: 'Name of the reagent or sample' })
   @IsOptional()

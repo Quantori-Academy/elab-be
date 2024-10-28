@@ -1,5 +1,5 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
-import { PaginationOptions, SortOptions } from './reagentOptions.interface';
+import { FlagOptions, PaginationOptions, SortOptions } from './reagentOptions.interface';
 import { IReagent } from './reagentEntity.interface';
 
 export interface IReagentRepository extends IRepository<IReagent> {
@@ -12,5 +12,10 @@ export interface IReagentRepository extends IRepository<IReagent> {
     sorting?: SortOptions,
   ): Promise<IReagent[]>;
   findAll(pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
-  getAllByStructure(structure: string, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent | IReagent[]>;
+  getAllByStructure(
+    structure: string,
+    pagination?: PaginationOptions,
+    sorting?: SortOptions,
+    flag?: FlagOptions,
+  ): Promise<IReagent | IReagent[]>;
 }

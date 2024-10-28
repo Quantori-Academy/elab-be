@@ -21,6 +21,10 @@ export type PaginationOptions = {
   take: number | undefined;
 };
 
+export type FlagOptions = {
+  isFullStructure?: boolean;
+};
+
 export type ReagentOptions = {
   filter: FilterOptions;
   sort: SortOptions;
@@ -31,4 +35,5 @@ export type ReagentSearchOptions = {
   sort: SortOptions;
   pagination: PaginationOptions;
   structure: string;
+  flag: FlagOptions;
 };

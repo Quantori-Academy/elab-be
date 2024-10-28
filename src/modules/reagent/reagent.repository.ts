@@ -1,6 +1,6 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
+import { FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
 import { Category, Prisma } from '@prisma/client';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
@@ -147,12 +147,26 @@ class ReagentRepository implements IReagentRepository {
     structure: string,
     pagination?: PaginationOptions,
     sorting?: SortOptions,
+    flag?: FlagOptions,
   ): Promise<IReagent | IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
-    let inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
+    const { isFullStructure } = flag || {};
+    let inputString;
+    console.log(isFullStructure);
+    if (isFullStructure === undefined) {
+      inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
                    FROM "Reagent" 
                    WHERE isDeleted = FALSE AND structure @>$1`;
+    } else {
+      console.log(isFullStructure);
+      inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
+                   FROM "Reagent" 
+                   WHERE 
+                      (${isFullStructure} = TRUE AND isDeleted = FALSE AND structure =$1) OR
+                      (${isFullStructure} = FALSE AND isDeleted = FALSE AND structure @>$1 AND structure !=$1)`;
+    }
+      
     if (orderBy) {
       if (Array.isArray(orderBy)) {
         const orderClause = orderBy.map((order) => {
