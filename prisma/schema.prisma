@@ -110,7 +110,6 @@ model ReagentRequest {
   user                  User     @relation(fields: [userId], references: [id])
   name                  String
   structureSmiles       String?
-  structureImage        String?
   casNumber             String?
   desiredQuantity       String
   userComments          String?
