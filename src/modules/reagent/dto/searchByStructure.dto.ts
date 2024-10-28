@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { Order } from 'src/modules/storage/interfaces/storageOptions.interface';
+import { Order } from '../interfaces/reagentOptions.interface';
 
 export class SearchByStructureDto {
   @ApiProperty({ example: 'c1cccnc1' })
