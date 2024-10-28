@@ -7,12 +7,7 @@ import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
 import { FilterBy, StorageList, StorageWithReagents } from './types/storage.types';
-import {
-  StorageFilterOptions,
-  StoragePaginationOptions,
-  StorageSortOptions,
-  StorageOptions,
-} from './interfaces/storageOptions.interface';
+import { StorageFilterOptions, StoragePaginationOptions, StorageSortOptions, StorageOptions } from './types/storageOptions.type';
 import { UpdateStroageDto } from './dto/updateStorage.dto';
 
 @Injectable()
@@ -31,7 +26,7 @@ export class StorageService implements IStorageService {
         size: 0,
         storages: [],
       };
-      const { id, roomName, storageName }: StorageFilterOptions = options.filter;
+      const { roomName, storageName }: StorageFilterOptions = options.filter;
       const pagination: StoragePaginationOptions = options.pagination;
       const sort: StorageSortOptions = options.sort;
 
@@ -39,14 +34,6 @@ export class StorageService implements IStorageService {
         name: storageName,
         roomIds: undefined,
       };
-
-      if (id) {
-        const storage: Storage | null = await this.storageRepository.findById(id);
-        storageList.size = storage ? 1 : 0;
-        storageList.storages = storage ? [storage] : [];
-        this.logger.log(`[${this.getStorages.name}] - byIdOption Method finished `);
-        return storageList;
-      }
 
       if (roomName) {
         const roomIds: number[] = await this.roomService.getRoomIdsBySubName(roomName);
@@ -59,6 +46,18 @@ export class StorageService implements IStorageService {
       return storageList;
     } catch (error) {
       this.logger.error(`[${this.getStorages.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async getStorage(id: number): Promise<Storage | null> {
+    this.logger.log(`[${this.getStorage.name}] - Method start`);
+    try {
+      const storage: Storage | null = await this.storageRepository.findById(id);
+      this.logger.log(`[${this.getStorage.name}] - Method finished`);
+      return storage;
+    } catch (error) {
+      this.logger.error(`[${this.getStorage.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

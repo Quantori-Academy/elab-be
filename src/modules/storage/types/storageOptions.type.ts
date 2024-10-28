@@ -18,7 +18,6 @@ type StorageSortOptions = {
 };
 
 type StorageFilterOptions = {
-  id?: number | undefined;
   roomName?: string | undefined;
   storageName?: string | undefined;
 };

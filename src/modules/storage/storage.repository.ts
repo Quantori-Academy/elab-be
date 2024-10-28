@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
 import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from './types/storage.types';
-import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './interfaces/storageOptions.interface';
+import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './types/storageOptions.type';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
