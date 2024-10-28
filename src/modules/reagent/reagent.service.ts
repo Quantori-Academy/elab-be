@@ -55,6 +55,16 @@ class ReagentService implements IReagentService {
       throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
     }
   }
+
+  private markDeleted(quantityLeft: number): boolean {
+    try {
+      this.logger.log('markDeleted method start');
+      return quantityLeft === 0;
+    } catch (error) {
+      this.logger.error('markDeleted emthod failed: ', error);
+      throw new InternalServerErrorException('Something went wrong on the server!');
+    }
+  }
 }
 
 const REAGENT_SERVICE_TOKEN = Symbol('REAGENT_SERVICE_TOKEN');
