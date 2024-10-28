@@ -42,6 +42,7 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
+      where: { isDeleted: false },
       include: {
         storage: {
           select: {
@@ -70,7 +71,7 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
-      where: { name },
+      where: { name, isDeleted: false },
       include: {
         storage: {
           select: {
@@ -93,7 +94,7 @@ class ReagentRepository implements IReagentRepository {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
-      where: { category },
+      where: { category, isDeleted: false },
       include: {
         storage: {
           select: {
@@ -122,7 +123,7 @@ class ReagentRepository implements IReagentRepository {
     const orderBy = this.orderFactory(sorting);
     return await this.prisma.reagent.findMany({
       where: {
-        AND: [{ name }, { category }],
+        AND: [{ name }, { category }, { isDeleted: false }],
       },
       include: {
         storage: {
@@ -151,7 +152,7 @@ class ReagentRepository implements IReagentRepository {
     const orderBy = this.orderFactory(sorting);
     let inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
                    FROM "Reagent" 
-                   WHERE structure @>$1`;
+                   WHERE isDeleted = FALSE AND structure @>$1`;
     if (orderBy) {
       if (Array.isArray(orderBy)) {
         const orderClause = orderBy.map((order) => {

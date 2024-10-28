@@ -17,6 +17,7 @@ export interface IReagent {
   category: Category;
   package?: Package | null;
   structure?: string | null;
+  isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
