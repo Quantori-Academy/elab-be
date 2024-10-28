@@ -16,11 +16,6 @@ export class CreateRequestDto {
   @IsString()
   structureSmiles?: string;
 
-  @ApiProperty({ example: 'image path/url' })
-  @IsOptional()
-  @IsString()
-  structureImage?: string;
-
   @ApiProperty({ example: '123-45-67' })
   @IsOptional()
   @IsString()
@@ -52,10 +47,6 @@ export class CreateRequestSuccessDto {
   @ApiProperty({ examples: ['CO'] })
   @IsString()
   structureSmiles: string | null;
-
-  @ApiProperty({ examples: ['image path/url'] })
-  @IsString()
-  structureImage: string | null;
 
   @ApiProperty({ examples: ['123-45-67'] })
   @IsString()

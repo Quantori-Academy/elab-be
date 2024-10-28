@@ -62,10 +62,6 @@ export class GetReagentRequestSuccessDto {
   @IsString()
   structureSmiles?: string | null;
 
-  @ApiProperty({ description: 'path/url to Image of the structure of the Requested Reagent' })
-  @IsString()
-  structureImage?: string | null;
-
   @ApiProperty({ description: 'CAS Number of the Requested Reagent' })
   @IsString()
   casNumber?: string | null;

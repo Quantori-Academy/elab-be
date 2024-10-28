@@ -6,7 +6,6 @@ export interface IReagentRequest {
   userId: number;
   desiredQuantity: string;
   structureSmiles?: string | null;
-  structureImage?: string | null;
   casNumber?: string | null;
   userComments?: string | null;
   procurementComments?: string | null;
