@@ -112,7 +112,8 @@ model ReagentRequest {
   name                  String
   structureSmiles       String?
   casNumber             String?
-  desiredQuantity       String
+  desiredQuantity       Float
+  quantityUnit          String
   userComments          String?
   procurementComments   String?
   status                Status   @default(Pending)
