@@ -4,6 +4,7 @@ import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { UpdateReagentDto } from './dto/updateReagent.dto';
 
 @Injectable()
 class ReagentService implements IReagentService {
@@ -53,6 +54,28 @@ class ReagentService implements IReagentService {
     } catch (error) {
       this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
+    }
+  }
+
+  async getReagentById(id: number): Promise<IReagent | null> {
+    try {
+      this.logger.log('searchByStructure method start');
+      const reagent = await this.reagentRepository.findById(id);
+      return reagent;
+    } catch (error) {
+      this.logger.error('Failed to fetch a reagent by ID: ', error);
+      throw new InternalServerErrorException('Failed to fetch a reagent by ID!');
+    }
+  }
+
+  async editReagent(data: UpdateReagentDto, id: number): Promise<IReagent> {
+    try {
+      this.logger.log('editReagent method start');
+      const newReagent = await this.reagentRepository.updateById(data, id);
+      return newReagent;
+    } catch (error) {
+      this.logger.error('Failed to edit a reagent: ', error);
+      throw new InternalServerErrorException('Failed to edit a reagent!');
     }
   }
 

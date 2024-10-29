@@ -4,6 +4,7 @@ import { FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfac
 import { Category, Prisma } from '@prisma/client';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { UpdateReagentDto } from './dto/updateReagent.dto';
 
 @Injectable()
 class ReagentRepository implements IReagentRepository {
@@ -21,6 +22,13 @@ class ReagentRepository implements IReagentRepository {
     return await this.prisma.reagent.update({
       where: { id: reagent.id },
       data: reagent,
+    });
+  }
+
+  async updateById(data: UpdateReagentDto, id: number): Promise<IReagent> {
+    return await this.prisma.reagent.update({
+      where: { id },
+      data,
     });
   }
 
@@ -166,7 +174,7 @@ class ReagentRepository implements IReagentRepository {
                       (${isFullStructure} = TRUE AND isDeleted = FALSE AND structure =$1) OR
                       (${isFullStructure} = FALSE AND isDeleted = FALSE AND structure @>$1 AND structure !=$1)`;
     }
-      
+
     if (orderBy) {
       if (Array.isArray(orderBy)) {
         const orderClause = orderBy.map((order) => {
