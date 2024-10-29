@@ -166,7 +166,7 @@ class ReagentRepository implements IReagentRepository {
                       (${isFullStructure} = TRUE AND isDeleted = FALSE AND structure =$1) OR
                       (${isFullStructure} = FALSE AND isDeleted = FALSE AND structure @>$1 AND structure !=$1)`;
     }
-      
+
     if (orderBy) {
       if (Array.isArray(orderBy)) {
         const orderClause = orderBy.map((order) => {
