@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from 'src/modules/storage/types/storageOptions.type';
 
 export class GetReagentRequestDto {
@@ -54,9 +54,13 @@ export class GetReagentRequestSuccessDto {
   @IsInt()
   userId: number;
 
-  @ApiProperty({ example: '500 ml', description: 'desired Quantity of the Requested Reagent, e.g. 500 ml' })
+  @ApiProperty({ example: 500, description: 'desired Quantity of the Requested Reagent in number, e.g. 500' })
+  @IsNumber()
+  desiredQuantity: number;
+
+  @ApiProperty({ example: 'ml', description: 'Quantity Unit of the Requested Reagent in string, e.g. 500 ml' })
   @IsString()
-  desiredQuantity: string;
+  quantityUnit: string;
 
   @ApiProperty({ description: 'Structure of the Requested Reagent' })
   @IsString()

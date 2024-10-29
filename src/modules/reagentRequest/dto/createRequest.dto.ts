@@ -1,15 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateRequestDto {
   @ApiProperty({ example: 'Reagent A' })
   @IsString()
   name: string;
 
-  @ApiProperty({ example: '500 ml' })
+  @ApiProperty({ example: 500 })
+  @IsNumber()
+  desiredQuantity: number;
+
+  @ApiProperty({ example: 'ml' })
   @IsString()
-  desiredQuantity: string;
+  quantityUnit: string;
 
   @ApiProperty({ example: 'CO' })
   @IsOptional()
@@ -40,9 +44,13 @@ export class CreateRequestSuccessDto {
   @IsInt()
   userId: number;
 
-  @ApiProperty({ example: '500 ml' })
+  @ApiProperty({ example: 500 })
+  @IsNumber()
+  desiredQuantity: number;
+
+  @ApiProperty({ example: 'ml' })
   @IsString()
-  desiredQuantity: string;
+  quantityUnit: string;
 
   @ApiProperty({ examples: ['CO'] })
   @IsString()

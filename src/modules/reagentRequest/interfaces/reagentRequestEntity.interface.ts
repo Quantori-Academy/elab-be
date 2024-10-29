@@ -4,7 +4,8 @@ export interface IReagentRequest {
   id?: number;
   name: string;
   userId: number;
-  desiredQuantity: string;
+  desiredQuantity: number;
+  quantityUnit: string;
   structureSmiles?: string | null;
   casNumber?: string | null;
   userComments?: string | null;
