@@ -119,4 +119,17 @@ model ReagentRequest {
   status                Status   @default(Pending)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt 
+  order                 Order?   @relation(fields: [orderId], references: [id])
+  orderId               Int?
+}
+
+model Order {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  title     String
+  seller    String
+  status    Status
+  reagents  ReagentRequest[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }
