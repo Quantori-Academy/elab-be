@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
 import { CompleteOrderData, OrderList, OrderWithReagents } from './types/order.type';
@@ -64,7 +64,7 @@ export class OrderRepository implements IOrderRepository {
       const missingIds = requestedReagentIds.filter((id) => !existingReagentIds.includes(id));
       if (missingIds.length > 0) {
         this.logger.error(`[${this.create.name}] - Exception thrown: invalid regent ids`);
-        throw new BadRequestException(`The following reagent IDs not found: ${missingIds}`);
+        throw new NotFoundException(`The following reagent IDs not found: ${missingIds}`);
       }
 
       const order: OrderWithReagents = await this.prisma.order.create({
