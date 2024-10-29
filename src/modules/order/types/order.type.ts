@@ -4,6 +4,7 @@ import { CreateOrderDto } from '../dto/createOrder.dto';
 type OnlyReagentId = {
   id: number;
 };
+
 type OrderWithReagents = Order & {
   reagents: ReagentRequest[];
 };
