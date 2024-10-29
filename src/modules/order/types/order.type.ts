@@ -1,4 +1,4 @@
-import { Order, ReagentRequest, Status } from '@prisma/client';
+import { Order, ReagentRequest } from '@prisma/client';
 import { CreateOrderDto } from '../dto/createOrder.dto';
 
 type OrderWithReagents = Order & {
@@ -12,7 +12,6 @@ type OrderList = {
 
 type CompleteOrderData = CreateOrderDto & {
   userId: number;
-  status: Status;
 };
 
 export { OrderWithReagents, OrderList, CompleteOrderData };

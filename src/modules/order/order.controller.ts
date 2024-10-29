@@ -6,7 +6,6 @@ import { CompleteOrderData, OrderWithReagents } from './types/order.type';
 import { CreateOrderDto } from './dto/createOrder.dto';
 import { Request } from 'express';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
-import { Status } from '@prisma/client';
 
 const ROUTE = 'orders';
 
@@ -18,13 +17,15 @@ export class OrderController {
   constructor(@Inject(ORDER_SERVICE_TOKEN) private orderService: IOrderService) {}
 
   @Post('')
-  async createOrder(@Req() req: Request, @Body(ValidationPipe) orderDto: CreateOrderDto): Promise<OrderWithReagents> {
+  async createOrder(
+    @Req() req: Request,
+    @Body(new ValidationPipe({ transform: true })) orderDto: CreateOrderDto,
+  ): Promise<OrderWithReagents> {
     this.logger.log(`[${this.createOrder.name}] - Method start`);
     try {
       const user: UserPayload = (req as any).user as UserPayload;
       const complteOrderData: CompleteOrderData = {
         userId: user.id!,
-        status: Status.Pending,
         ...orderDto,
       };
       const order: OrderWithReagents = await this.orderService.createOrder(complteOrderData);

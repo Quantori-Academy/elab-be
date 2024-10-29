@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { Status } from '@prisma/client';
+import { Exclude, Type } from 'class-transformer';
 import { IsArray, IsInt, MaxLength, ValidateNested } from 'class-validator';
 
 class ReagentIdsDto {
@@ -22,6 +23,10 @@ class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => ReagentIdsDto)
   reagents: ReagentIdsDto[];
+
+  @ApiHideProperty()
+  @Exclude()
+  status: Status = Status.Pending;
 }
 
 export { CreateOrderDto };
