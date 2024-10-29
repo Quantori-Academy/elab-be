@@ -71,21 +71,13 @@ class ReagentService implements IReagentService {
   async editReagent(data: UpdateReagentDto, id: number): Promise<IReagent> {
     try {
       this.logger.log('editReagent method start');
-      const newReagent = await this.reagentRepository.updateById(data, id);
+      const quantityLeft = data.quantityLeft;
+      const isDeleted = quantityLeft === 0;
+      const newReagent = await this.reagentRepository.updateById(data, id, isDeleted);
       return newReagent;
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
       throw new InternalServerErrorException('Failed to edit a reagent!');
-    }
-  }
-
-  private markDeleted(quantityLeft: number): boolean {
-    try {
-      this.logger.log('markDeleted method start');
-      return quantityLeft === 0;
-    } catch (error) {
-      this.logger.error('markDeleted emthod failed: ', error);
-      throw new InternalServerErrorException('Something went wrong on the server!');
     }
   }
 }

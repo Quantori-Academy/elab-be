@@ -25,10 +25,13 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async updateById(data: UpdateReagentDto, id: number): Promise<IReagent> {
+  async updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent> {
     return await this.prisma.reagent.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        isDeleted,
+      },
     });
   }
 

@@ -19,5 +19,5 @@ export interface IReagentRepository extends IRepository<IReagent> {
     sorting?: SortOptions,
     flag?: FlagOptions,
   ): Promise<IReagent | IReagent[]>;
-  updateById(data: UpdateReagentDto, id: number): Promise<IReagent>;
+  updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent>;
 }
