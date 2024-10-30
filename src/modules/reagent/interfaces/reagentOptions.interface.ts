@@ -14,6 +14,7 @@ export type SortOptions = {
 export type FilterOptions = {
   name?: string;
   category?: string;
+  storageId?: number;
 };
 
 export type PaginationOptions = {
