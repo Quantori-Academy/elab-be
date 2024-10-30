@@ -23,6 +23,7 @@ import { SearchByStructureDto, SearchByStructureErrorDto, SearchByStructureSucce
 import { ValidateParseForSearchPipe } from './pipes/validateParseForSearch.pipe';
 import { UpdateReagentDto, UpdateReagentSuccessDto } from './dto/updateReagent.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { IReagent } from './interfaces/reagentEntity.interface';
 
 const ROUTE = 'reagents';
 
@@ -72,6 +73,23 @@ export class ReagentController {
       const reagent = await this.reagentService.getReagentById(id);
       if (!reagent) throw new NotFoundException('Reagent Not Found!');
       return await this.reagentService.editReagent(updateReagentDto, id);
+    } catch (error) {
+      this.logger.error('Error in controller in POST editReagent: ', error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [GetReagentSuccessDto] })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND })
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async getReagentById(@Param('id', ParseIdPipe) id: number): Promise<IReagent> {
+    try {
+      this.logger.log('getReagentById route start');
+      const reagent: IReagent | null = await this.reagentService.getReagentById(id);
+      if (!reagent) throw new NotFoundException('Reagent Not Found!');
+      return reagent;
     } catch (error) {
       this.logger.error('Error in controller in POST editReagent: ', error);
       throw error;
