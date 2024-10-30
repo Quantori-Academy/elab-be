@@ -30,6 +30,7 @@ export class ValidateParseReagentOptionsPipe implements PipeTransform {
     const filter: FilterOptions = {
       name: queryDto.name,
       category: queryDto.category,
+      storageId: queryDto.storageId,
     };
 
     const sort: SortOptions = {
