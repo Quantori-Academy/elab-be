@@ -1,6 +1,7 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { FlagOptions, PaginationOptions, SortOptions } from './reagentOptions.interface';
 import { IReagent } from './reagentEntity.interface';
+import { UpdateReagentDto } from '../dto/updateReagent.dto';
 
 export interface IReagentRepository extends IRepository<IReagent> {
   getAllByName(name: string, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
@@ -18,4 +19,5 @@ export interface IReagentRepository extends IRepository<IReagent> {
     sorting?: SortOptions,
     flag?: FlagOptions,
   ): Promise<IReagent | IReagent[]>;
+  updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent>;
 }

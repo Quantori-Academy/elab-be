@@ -4,6 +4,7 @@ import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { UpdateReagentDto } from './dto/updateReagent.dto';
 
 @Injectable()
 class ReagentService implements IReagentService {
@@ -13,7 +14,7 @@ class ReagentService implements IReagentService {
   async create(data: IReagent): Promise<IReagent> {
     try {
       this.logger.log('Create reagent method start');
-      const reagent = await this.reagentRepository.create(data);
+      const reagent: IReagent = await this.reagentRepository.create(data);
       this.logger.log('Created a reagent');
       return reagent;
     } catch (error) {
@@ -56,13 +57,27 @@ class ReagentService implements IReagentService {
     }
   }
 
-  private markDeleted(quantityLeft: number): boolean {
+  async getReagentById(id: number): Promise<IReagent | null> {
     try {
-      this.logger.log('markDeleted method start');
-      return quantityLeft === 0;
+      this.logger.log('searchByStructure method start');
+      const reagent: IReagent | null = await this.reagentRepository.findById(id);
+      return reagent;
     } catch (error) {
-      this.logger.error('markDeleted emthod failed: ', error);
-      throw new InternalServerErrorException('Something went wrong on the server!');
+      this.logger.error('Failed to fetch a reagent by ID: ', error);
+      throw new InternalServerErrorException('Failed to fetch a reagent by ID!');
+    }
+  }
+
+  async editReagent(data: UpdateReagentDto, id: number): Promise<IReagent> {
+    try {
+      this.logger.log('editReagent method start');
+      const quantityLeft = data.quantityLeft;
+      const isDeleted = quantityLeft === 0;
+      const newReagent: IReagent = await this.reagentRepository.updateById(data, id, isDeleted);
+      return newReagent;
+    } catch (error) {
+      this.logger.error('Failed to edit a reagent: ', error);
+      throw new InternalServerErrorException('Failed to edit a reagent!');
     }
   }
 }

@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpStatus, Inject, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Logger,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -9,12 +21,16 @@ import { ValidateParseReagentOptionsPipe } from './pipes/validateParseQueries.pi
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { SearchByStructureDto, SearchByStructureErrorDto, SearchByStructureSuccessDto } from './dto/searchByStructure.dto';
 import { ValidateParseForSearchPipe } from './pipes/validateParseForSearch.pipe';
+import { UpdateReagentDto, UpdateReagentSuccessDto } from './dto/updateReagent.dto';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 
 const ROUTE = 'reagents';
 
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class ReagentController {
+  private logger = new Logger(ReagentController.name);
+
   constructor(@Inject(REAGENT_SERVICE_TOKEN) private reagentService: IReagentService) {}
 
   @ApiBearerAuth()
@@ -43,5 +59,22 @@ export class ReagentController {
   @Get('/search')
   async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
     return await this.reagentService.searchByStructure(searchByStructureDto);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND })
+  @UseGuards(AuthGuard)
+  @Post(':id')
+  async editReagent(@Body() updateReagentDto: UpdateReagentDto, @Param('id', ParseIdPipe) id: number) {
+    try {
+      this.logger.log('editReagent route start');
+      const reagent = await this.reagentService.getReagentById(id);
+      if (!reagent) throw new NotFoundException('Reagent Not Found!');
+      return await this.reagentService.editReagent(updateReagentDto, id);
+    } catch (error) {
+      this.logger.error('Error in controller in POST editReagent: ', error);
+      throw error;
+    }
   }
 }
