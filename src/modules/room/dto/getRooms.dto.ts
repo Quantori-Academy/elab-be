@@ -9,6 +9,9 @@ class GetRoomSuccessDto {
 
   @ApiProperty({ example: 'Description for storage' })
   description: string;
+
+  @ApiProperty({ example: 10 })
+  storageCount: number;
 }
 
 export { GetRoomSuccessDto };
