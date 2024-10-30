@@ -26,19 +26,7 @@ class ReagentService implements IReagentService {
     try {
       this.logger.log('getReagents method start');
       const { filter, pagination, sort } = options || {};
-      if (filter.category && filter.name) {
-        this.logger.log('Fetching reagents by both name and category');
-        return await this.reagentRepository.getAllByNameAndCategory(filter.name, filter.category, pagination, sort);
-      } else if (filter.category) {
-        this.logger.log('Fetching reagents by category');
-        return await this.reagentRepository.getAllByCategory(filter.category, pagination, sort);
-      } else if (filter.name) {
-        this.logger.log('Fetching reagents by name');
-        return await this.reagentRepository.getAllByName(filter.name, pagination, sort);
-      } else {
-        this.logger.log('Fetching all Reagents');
-        return await this.reagentRepository.findAll(pagination, sort);
-      }
+      return await this.reagentRepository.findAll(filter, pagination, sort);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents!');
@@ -53,16 +41,6 @@ class ReagentService implements IReagentService {
     } catch (error) {
       this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
-    }
-  }
-
-  private markDeleted(quantityLeft: number): boolean {
-    try {
-      this.logger.log('markDeleted method start');
-      return quantityLeft === 0;
-    } catch (error) {
-      this.logger.error('markDeleted emthod failed: ', error);
-      throw new InternalServerErrorException('Something went wrong on the server!');
     }
   }
 }
