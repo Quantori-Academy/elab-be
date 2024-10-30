@@ -2,7 +2,7 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import { PrismaService } from '../prisma/prisma.service';
 import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { Prisma, Storage } from '@prisma/client';
-import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from './types/storage.types';
+import { StorageCreation, StorageWithReagents, FilterBy, StorageList, StorageWithReagentCount } from './types/storage.types';
 import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './types/storageOptions.type';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
@@ -85,13 +85,23 @@ export class StorageRepository implements IStorageRepository {
           orderBy: orderBy,
           include: {
             room: true,
+            _count: {
+              select: {
+                reagents: true,
+              },
+            },
           },
         }),
         this.prisma.storage.count({ where }),
       ]);
 
+      const storageWithReagentCount: StorageWithReagentCount[] = storages.map(({ _count, ...storages }) => ({
+        ...storages,
+        reagentCount: _count.reagents,
+      }));
+
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
-      return { storages, size };
+      return { storages: storageWithReagentCount, size };
     } catch (error) {
       this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
       throw error;

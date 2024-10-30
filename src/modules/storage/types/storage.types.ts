@@ -4,6 +4,16 @@ type StorageWithReagents = Storage & {
   reagents: Reagent[];
 };
 
+type StorageWithReagentCountObject = Storage & {
+  _count: {
+    reagents: number;
+  };
+};
+
+type StorageWithReagentCount = Storage & {
+  reagentCount: number;
+};
+
 type StorageCreation = {
   roomId: number;
   name: string;
@@ -20,4 +30,4 @@ type StorageList = {
   storages: Storage[];
 };
 
-export { StorageWithReagents, StorageCreation, FilterBy, StorageList };
+export { StorageWithReagents, StorageCreation, FilterBy, StorageList, StorageWithReagentCount, StorageWithReagentCountObject };
