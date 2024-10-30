@@ -48,7 +48,13 @@ import {
   CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
-import { MoveItemsDto } from './dto/moveItems.dto';
+import {
+  MoveItemsConflictErrorDto,
+  MoveItemsDto,
+  MoveItemsNotFoundErrorDto,
+  MoveItemsSuccessDto,
+  MoveItemsValidationErrorsDto,
+} from './dto/moveItems.dto';
 
 const ROUTE = 'storages';
 
@@ -149,15 +155,13 @@ export class StorageController {
     }
   }
 
-  // @ApiBearerAuth()
-  // @ApiResponse({ status: HttpStatus.OK, type: UpdateStroageSuccessDto })
-  // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateStorageValidationErrorDto })
-  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  // @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
-  // @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateStorageConflictErrorDto })
-  // @Roles(Role.Admin)
-  // @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: MoveItemsSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: MoveItemsValidationErrorsDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: MoveItemsNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: MoveItemsConflictErrorDto })
   @Patch('move-items')
   async moveItems(@Body(ValidationPipe) moveItemsDto: MoveItemsDto) {
     this.logger.log(`[${this.moveItems.name}] - Method start`);

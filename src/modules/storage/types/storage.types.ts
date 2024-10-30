@@ -25,7 +25,7 @@ type StorageCreation = {
 };
 
 type UpdatedStorages = {
-  updatedDestionationStorage: StorageWithReagents;
+  updatedDestinationStorage: StorageWithReagents;
   updatedSourceStorage: StorageWithReagents;
 };
 
