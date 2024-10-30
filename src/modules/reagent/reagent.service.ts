@@ -14,7 +14,7 @@ class ReagentService implements IReagentService {
   async create(data: IReagent): Promise<IReagent> {
     try {
       this.logger.log('Create reagent method start');
-      const reagent = await this.reagentRepository.create(data);
+      const reagent: IReagent = await this.reagentRepository.create(data);
       this.logger.log('Created a reagent');
       return reagent;
     } catch (error) {
@@ -60,7 +60,7 @@ class ReagentService implements IReagentService {
   async getReagentById(id: number): Promise<IReagent | null> {
     try {
       this.logger.log('searchByStructure method start');
-      const reagent = await this.reagentRepository.findById(id);
+      const reagent: IReagent | null = await this.reagentRepository.findById(id);
       return reagent;
     } catch (error) {
       this.logger.error('Failed to fetch a reagent by ID: ', error);
@@ -73,7 +73,7 @@ class ReagentService implements IReagentService {
       this.logger.log('editReagent method start');
       const quantityLeft = data.quantityLeft;
       const isDeleted = quantityLeft === 0;
-      const newReagent = await this.reagentRepository.updateById(data, id, isDeleted);
+      const newReagent: IReagent = await this.reagentRepository.updateById(data, id, isDeleted);
       return newReagent;
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
