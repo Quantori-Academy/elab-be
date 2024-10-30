@@ -1,7 +1,21 @@
-import { Reagent, Storage } from '@prisma/client';
+import { Prisma, Reagent, Storage } from '@prisma/client';
 
 type StorageWithReagents = Storage & {
   reagents: Reagent[];
+};
+
+type StorageWithReagentCountObject = Prisma.StorageGetPayload<{
+  include: {
+    _count: {
+      select: {
+        reagents: true;
+      };
+    };
+  };
+}>;
+
+type StorageWithReagentCount = Storage & {
+  reagentCount: number;
 };
 
 type StorageCreation = {
@@ -20,4 +34,4 @@ type StorageList = {
   storages: Storage[];
 };
 
-export { StorageWithReagents, StorageCreation, FilterBy, StorageList };
+export { StorageWithReagents, StorageCreation, FilterBy, StorageList, StorageWithReagentCount, StorageWithReagentCountObject };

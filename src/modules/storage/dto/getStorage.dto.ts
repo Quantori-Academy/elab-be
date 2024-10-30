@@ -65,6 +65,9 @@ class GetStorageSuccessDto {
   @ApiProperty({ example: '2024-10-11T09:04:23.426Z' })
   updatedAt: Date;
 
+  @ApiProperty({ example: 10 })
+  reagentCount: number;
+
   @ApiProperty({
     example: {
       id: 6,
@@ -86,6 +89,7 @@ class GetStorageListResponseDto {
         description: null,
         createdAt: '2024-10-22T11:27:55.708Z',
         updatedAt: '2024-10-22T12:27:32.000Z',
+        reagentCount: 99,
         room: {
           id: 3,
           name: 'Room3',
