@@ -100,13 +100,13 @@ export class RoomRepository implements IRoomRepository {
         },
       });
 
-      const roomsWithStorageSize: RoomWithStorageCount[] = rooms.map(({ _count, ...room }) => ({
+      const roomsWithStorageCount: RoomWithStorageCount[] = rooms.map(({ _count, ...room }) => ({
         ...room,
         storageCount: _count.storages,
       }));
 
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
-      return roomsWithStorageSize;
+      return roomsWithStorageCount;
     } catch (error) {
       this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
       throw error;
