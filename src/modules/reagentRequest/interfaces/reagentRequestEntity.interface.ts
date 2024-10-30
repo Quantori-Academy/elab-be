@@ -13,5 +13,5 @@ export interface IReagentRequest {
   status?: Status;
   createdAt?: Date;
   updatedAt?: Date;
-  orderId?: number;
+  orderId?: number | null;
 }
