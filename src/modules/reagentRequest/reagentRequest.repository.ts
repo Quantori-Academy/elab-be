@@ -4,6 +4,7 @@ import { IReagentRequest } from './interfaces/reagentRequestEntity.interface';
 import { IReagentRequestRepository } from './interfaces/reagentRequestRepository.interface';
 import { Prisma, Status } from '@prisma/client';
 import { OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentRequestOptions.interface';
+import { UpdateReagentRequestDto } from './dto/updateReagentRequest.dto';
 
 @Injectable()
 class ReagentRequestRepository implements IReagentRequestRepository {
@@ -23,6 +24,14 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     return await this.prisma.reagentRequest.update({
       where: { id: request.id },
       data: request,
+    });
+  }
+
+  async updateById(data: UpdateReagentRequestDto, id: number): Promise<IReagentRequest> {
+    this.logger.log('UpdateById method start');
+    return await this.prisma.reagentRequest.update({
+      where: { id },
+      data,
     });
   }
 
