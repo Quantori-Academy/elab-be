@@ -22,10 +22,8 @@ export class StorageRepository implements IStorageRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  findById(id: number): Promise<Storage | null>; // base
-  findById(id: number, includeReagents: true): Promise<StorageWithReagents | null>; // overload
-
-  // implementation signature
+  async findById(id: number): Promise<Storage | null>;
+  async findById(id: number, includeReagents: true): Promise<StorageWithReagents | null>;
   async findById(id: number, includeReagents: boolean = false): Promise<Storage | StorageWithReagents | null> {
     this.logger.log(`[${this.findById.name}] - Method start`);
     try {
@@ -270,6 +268,7 @@ export class StorageRepository implements IStorageRepository {
             },
           },
         }),
+
         this.prisma.storage.findUnique({
           where: {
             id: destinationStorageId,
@@ -290,10 +289,6 @@ export class StorageRepository implements IStorageRepository {
         errorMessages.push(`Destination storage with ID ${destinationStorageId} not found.`);
       }
 
-      if (errorMessages.length > 0) {
-        throw new NotFoundException();
-      }
-
       if (!sourceStorage || !destinationStorage) throw new NotFoundException(errorMessages.join(' '));
 
       const existingReagentIds = new Set(sourceStorage.reagents.map((reagent) => reagent.id));
@@ -305,9 +300,9 @@ export class StorageRepository implements IStorageRepository {
         );
       }
 
-      const updatedDestionationStorage: StorageWithReagents = await this.prisma.storage.update({
+      const updatedDestinationStorage: StorageWithReagents = await this.prisma.storage.update({
         where: {
-          id: moveItemsDto.destinationStorageId,
+          id: destinationStorageId,
         },
         data: {
           reagents: {
@@ -321,7 +316,7 @@ export class StorageRepository implements IStorageRepository {
 
       const updatedSourceStorage: StorageWithReagents = (await this.prisma.storage.findUnique({
         where: {
-          id: moveItemsDto.sourceStorageId,
+          id: sourceStorageId,
         },
         include: {
           reagents: true,
@@ -329,7 +324,7 @@ export class StorageRepository implements IStorageRepository {
       }))!;
 
       this.logger.log(`[${this.moveItems.name}] - Method finished`);
-      return { updatedDestionationStorage, updatedSourceStorage };
+      return { updatedDestinationStorage, updatedSourceStorage };
     } catch (error) {
       this.logger.error(`[${this.moveItems.name}] - Exception thrown: ` + error);
       throw error;

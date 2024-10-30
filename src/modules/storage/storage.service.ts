@@ -119,6 +119,10 @@ export class StorageService implements IStorageService {
   async moveItems(moveItemsDto: MoveItemsDto): Promise<UpdatedStorages> {
     this.logger.log(`[${this.moveItems.name}] - Method start`);
     try {
+      const { sourceStorageId, destinationStorageId } = moveItemsDto;
+      if (sourceStorageId === destinationStorageId) {
+        throw new ConflictException("Source and destination storages can't be the same");
+      }
       const updatedStorages: UpdatedStorages = await this.storageRepository.moveItems(moveItemsDto);
       this.logger.log(`[${this.moveItems.name}] - Method finished`);
       return updatedStorages;
