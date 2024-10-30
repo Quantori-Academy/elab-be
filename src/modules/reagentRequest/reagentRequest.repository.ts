@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IReagentRequest } from './interfaces/reagentRequestEntity.interface';
 import { IReagentRequestRepository } from './interfaces/reagentRequestRepository.interface';
-import { Prisma, Status } from '@prisma/client';
-import { OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentRequestOptions.interface';
+import { Prisma } from '@prisma/client';
+import { FilterOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentRequestOptions.interface';
 import { UpdateReagentRequestDto } from './dto/updateReagentRequest.dto';
 
 @Injectable()
@@ -58,100 +58,30 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     });
   }
 
-  async findAll(pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<IReagentRequest[]> {
+  async findAll(
+    filter?: FilterOptions,
+    pagination?: PaginationOptions,
+    sort?: SortOptions,
+    id?: number,
+  ): Promise<IReagentRequest[]> {
     this.logger.log('findAll method start');
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sort);
+    const whereClause: any = {};
+
+    if (filter?.name) {
+      whereClause.name = filter.name;
+    }
+    if (filter?.status) {
+      whereClause.status = filter.status;
+    }
     if (id) {
       this.logger.log(`[${this.findAll.name}] - Finished with checking User ID`);
-      return await this.prisma.reagentRequest.findMany({
-        where: { userId: id },
-        skip,
-        take,
-        orderBy,
-      });
+      whereClause.userId = id;
     }
     this.logger.log(`[${this.findAll.name}] - Finished`);
     return await this.prisma.reagentRequest.findMany({
-      skip,
-      take,
-      orderBy,
-    });
-  }
-
-  async getAllByStatus(
-    status: Status,
-    pagination?: PaginationOptions,
-    sort?: SortOptions,
-    id?: number,
-  ): Promise<IReagentRequest[]> {
-    this.logger.log(`[${this.getAllByStatus.name}] - Started`);
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sort);
-    if (id) {
-      this.logger.log(`[${this.getAllByStatus.name}] - Finished with checking User ID`);
-      return await this.prisma.reagentRequest.findMany({
-        where: { userId: id },
-        skip,
-        take,
-        orderBy,
-      });
-    }
-    this.logger.log(`[${this.getAllByStatus.name}] - Finished`);
-    return await this.prisma.reagentRequest.findMany({
-      where: { status },
-      skip,
-      take,
-      orderBy,
-    });
-  }
-
-  async getAllByName(name: string, pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<IReagentRequest[]> {
-    this.logger.log(`[${this.getAllByName.name}] - Started`);
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sort);
-    if (id) {
-      this.logger.log(`[${this.getAllByName.name}] - Finished with checking User ID`);
-      return await this.prisma.reagentRequest.findMany({
-        where: { userId: id },
-        skip,
-        take,
-        orderBy,
-      });
-    }
-    this.logger.log(`[${this.getAllByName.name}] - Finished`);
-    return await this.prisma.reagentRequest.findMany({
-      where: { name },
-      skip,
-      take,
-      orderBy,
-    });
-  }
-
-  async getAllByNameAndStatus(
-    name: string,
-    status: Status,
-    pagination?: PaginationOptions,
-    sort?: SortOptions,
-    id?: number,
-  ): Promise<IReagentRequest[]> {
-    this.logger.log(`[${this.getAllByNameAndStatus.name}] - Started`);
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sort);
-    if (id) {
-      this.logger.log(`[${this.getAllByNameAndStatus.name}] - Finished with checking User ID`);
-      return await this.prisma.reagentRequest.findMany({
-        where: { userId: id },
-        skip,
-        take,
-        orderBy,
-      });
-    }
-    this.logger.log(`[${this.getAllByNameAndStatus.name}] - Finished`);
-    return await this.prisma.reagentRequest.findMany({
-      where: {
-        AND: [{ name }, { status }],
-      },
+      where: whereClause,
       skip,
       take,
       orderBy,
