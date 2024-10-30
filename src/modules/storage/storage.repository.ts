@@ -9,10 +9,12 @@ import {
   StorageList,
   StorageWithReagentCount,
   StorageWithReagentCountObject,
+  UpdatedStorages,
 } from './types/storage.types';
 import { OrderBy, StoragePaginationOptions, StorageSortOptions } from './types/storageOptions.type';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { MoveItemsDto } from './dto/moveItems.dto';
 
 @Injectable()
 export class StorageRepository implements IStorageRepository {
@@ -240,6 +242,96 @@ export class StorageRepository implements IStorageRepository {
       this.logger.log(`[${this.upsert.name}] - Method finished`);
     } catch (error) {
       this.logger.error(`[${this.upsert.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async moveItems(moveItemsDto: MoveItemsDto): Promise<UpdatedStorages> {
+    this.logger.log(`[${this.moveItems.name}] - Method start`);
+    try {
+      const { sourceStorageId, destinationStorageId } = moveItemsDto;
+      const requestedReagentIds: number[] = moveItemsDto.reagents.map((reagent) => reagent.id);
+
+      const [sourceStorage, destinationStorage] = await this.prisma.$transaction([
+        this.prisma.storage.findUnique({
+          where: {
+            id: sourceStorageId,
+          },
+          include: {
+            reagents: {
+              where: {
+                id: {
+                  in: requestedReagentIds,
+                },
+              },
+              select: {
+                id: true,
+              },
+            },
+          },
+        }),
+        this.prisma.storage.findUnique({
+          where: {
+            id: destinationStorageId,
+          },
+          select: {
+            id: true,
+          },
+        }),
+      ]);
+
+      const errorMessages: string[] = [];
+
+      if (!sourceStorage) {
+        errorMessages.push(`Source storage with ID ${sourceStorageId} not found.`);
+      }
+
+      if (!destinationStorage) {
+        errorMessages.push(`Destination storage with ID ${destinationStorageId} not found.`);
+      }
+
+      if (errorMessages.length > 0) {
+        throw new NotFoundException();
+      }
+
+      if (!sourceStorage || !destinationStorage) throw new NotFoundException(errorMessages.join(' '));
+
+      const existingReagentIds = new Set(sourceStorage.reagents.map((reagent) => reagent.id));
+      const missingIds: number[] = requestedReagentIds.filter((id) => !existingReagentIds.has(id));
+      if (missingIds.length > 0) {
+        this.logger.error(`[${this.moveItems.name}] - Exception thrown: invalid regent ids`);
+        throw new NotFoundException(
+          `The following reagent IDs: ${missingIds} not found in source storage id: ${sourceStorage.id}`,
+        );
+      }
+
+      const updatedDestionationStorage: StorageWithReagents = await this.prisma.storage.update({
+        where: {
+          id: moveItemsDto.destinationStorageId,
+        },
+        data: {
+          reagents: {
+            connect: requestedReagentIds.map((id) => ({ id })),
+          },
+        },
+        include: {
+          reagents: true,
+        },
+      });
+
+      const updatedSourceStorage: StorageWithReagents = (await this.prisma.storage.findUnique({
+        where: {
+          id: moveItemsDto.sourceStorageId,
+        },
+        include: {
+          reagents: true,
+        },
+      }))!;
+
+      this.logger.log(`[${this.moveItems.name}] - Method finished`);
+      return { updatedDestionationStorage, updatedSourceStorage };
+    } catch (error) {
+      this.logger.error(`[${this.moveItems.name}] - Exception thrown: ` + error);
       throw error;
     }
   }

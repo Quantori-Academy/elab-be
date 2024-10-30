@@ -110,4 +110,4 @@ class CreateOrderNotFoundDto {
   statusCode: number;
 }
 
-export { CreateOrderDto, CreateOrderSuccessDto, CreateOrderBadRequestDto, CreateOrderNotFoundDto };
+export { CreateOrderDto, CreateOrderSuccessDto, CreateOrderBadRequestDto, CreateOrderNotFoundDto, ReagentIdsDto };

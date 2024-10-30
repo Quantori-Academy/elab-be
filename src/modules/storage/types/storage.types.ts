@@ -24,6 +24,11 @@ type StorageCreation = {
   description?: string | null;
 };
 
+type UpdatedStorages = {
+  updatedDestionationStorage: StorageWithReagents;
+  updatedSourceStorage: StorageWithReagents;
+};
+
 type FilterBy = {
   roomIds?: number[] | undefined;
   name?: string | undefined;
@@ -34,4 +39,12 @@ type StorageList = {
   storages: Storage[];
 };
 
-export { StorageWithReagents, StorageCreation, FilterBy, StorageList, StorageWithReagentCount, StorageWithReagentCountObject };
+export {
+  StorageWithReagents,
+  StorageCreation,
+  FilterBy,
+  StorageList,
+  StorageWithReagentCount,
+  StorageWithReagentCountObject,
+  UpdatedStorages,
+};

@@ -18,7 +18,7 @@ import { ValidateParseStorageOptionsPipe } from './pipes/validateParseQueries.pi
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { DeleteStorageConflictErrorDto, DeleteStorageNotFoundErrorDto, DeleteStorageSuccessDto } from './dto/deleteStorage.dto';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
-import { StorageList } from './types/storage.types';
+import { StorageList, UpdatedStorages } from './types/storage.types';
 import {
   UpdateStorageConflictErrorDto,
   UpdateStorageNotFoundErrorDto,
@@ -48,6 +48,7 @@ import {
   CreateStorageNotFoundErrorDto,
   CreateStorageValidationErrorDto,
 } from './dto/createStorageLocation.dto';
+import { MoveItemsDto } from './dto/moveItems.dto';
 
 const ROUTE = 'storages';
 
@@ -144,6 +145,28 @@ export class StorageController {
       };
     } catch (error) {
       this.logger.error(`[${this.deleteStorage.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  // @ApiBearerAuth()
+  // @ApiResponse({ status: HttpStatus.OK, type: UpdateStroageSuccessDto })
+  // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateStorageValidationErrorDto })
+  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  // @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
+  // @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateStorageConflictErrorDto })
+  // @Roles(Role.Admin)
+  // @UseGuards(AuthGuard, RolesGuard)
+  @Patch('move-items')
+  async moveItems(@Body(ValidationPipe) moveItemsDto: MoveItemsDto) {
+    this.logger.log(`[${this.moveItems.name}] - Method start`);
+    try {
+      const updatedStorages: UpdatedStorages = await this.storageService.moveItems(moveItemsDto);
+      this.logger.log(`[${this.moveItems.name}] - Method finished`);
+      return updatedStorages;
+    } catch (error) {
+      this.logger.error(`[${this.moveItems.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
