@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { Prisma, Room } from '@prisma/client';
 import { CreateRoomDto } from './dto/createRoom.dto';
-import { IdOnly, RoomWithStorages } from './types/room.type';
+import { IdOnly, RoomWithStorageCount, RoomWithStorageCountObject, RoomWithStorages } from './types/room.type';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 
@@ -87,12 +87,26 @@ export class RoomRepository implements IRoomRepository {
     }
   }
 
-  async findAll(): Promise<Room[]> {
+  async findAll(): Promise<RoomWithStorageCount[]> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
-      const rooms: Room[] = await this.prisma.room.findMany({});
+      const rooms: RoomWithStorageCountObject[] = await this.prisma.room.findMany({
+        include: {
+          _count: {
+            select: {
+              storages: true,
+            },
+          },
+        },
+      });
+
+      const roomsWithStorageSize: RoomWithStorageCount[] = rooms.map(({ _count, ...room }) => ({
+        ...room,
+        storageCount: _count.storages,
+      }));
+
       this.logger.log(`[${this.findAll.name}] - Method finished,`);
-      return rooms;
+      return roomsWithStorageSize;
     } catch (error) {
       this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
       throw error;
