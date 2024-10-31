@@ -60,7 +60,7 @@ export class OrderController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetOrderValidationErrorsDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.Admin)
+  @Roles(Role.ProcurementOfficer)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
   async orderList(@Query(ValidateParseOrderOptionsPipe) options: OrdereOptions): Promise<any> {
