@@ -1,9 +1,17 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
-import { CompleteOrderData, OnlyReagentId, OrderList, OrderWithReagents } from './types/order.type';
-import { Order } from '@prisma/client';
+import {
+  CompleteOrderData,
+  OnlyReagentId,
+  OrderList,
+  OrderWithReagents,
+  OrderWithReagentCount,
+  OrderWithReagentCountObject,
+} from './types/order.type';
+import { Order, Prisma } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
+import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
 
 @Injectable()
 export class OrderRepository implements IOrderRepository {
@@ -30,19 +38,52 @@ export class OrderRepository implements IOrderRepository {
     }
   }
 
-  async findAll(): Promise<OrderList> {
+  async findAll(
+    filterBy?: OrderFilterOptions,
+    pagination?: OrderPaginationOptions,
+    sortOptions?: OrderSortOptions,
+  ): Promise<OrderList> {
     this.logger.log(`[${this.findAll.name}] - Method start`);
     try {
-      const where = {
-        include: {
-          reagents: true,
+      const { skip = 0, take = 10 } = pagination || {};
+      const orderBy: OrderBy = this.orderFactory(sortOptions);
+      const where: Prisma.OrderWhereInput = {
+        title: {
+          contains: filterBy?.title,
+          mode: 'insensitive',
+        },
+        seller: {
+          contains: filterBy?.seller,
+          mode: 'insensitive',
         },
       };
 
-      const [orders, size] = await this.prisma.$transaction([this.prisma.order.findMany(where), this.prisma.order.count()]);
+      const [orders, size]: [OrderWithReagentCountObject[], number] = await this.prisma.$transaction([
+        this.prisma.order.findMany({
+          where,
+          skip,
+          take,
+          orderBy: orderBy,
+          include: {
+            reagents: true,
+            _count: {
+              select: {
+                reagents: true,
+              },
+            },
+          },
+        }),
+
+        this.prisma.order.count({ where }),
+      ]);
+
+      const orderWithReagentCount: OrderWithReagentCount[] = orders.map(({ _count, ...orders }) => ({
+        ...orders,
+        reagentCount: _count.reagents,
+      }));
 
       this.logger.log(`[${this.findAll.name}] - Method finished`);
-      return { orders, size };
+      return { orders: orderWithReagentCount, size };
     } catch (error) {
       this.logger.error(`[${this.findAll.name}] - Exception thrown: ${error}`);
       throw error;
@@ -136,6 +177,22 @@ export class OrderRepository implements IOrderRepository {
       return deletedOrder;
     } catch (error) {
       this.logger.error(`[${this.delete.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  private orderFactory(sortOptions: OrderSortOptions | undefined): OrderBy {
+    this.logger.log(`[${this.orderFactory.name}] - Method start`);
+    try {
+      if (!sortOptions) return undefined;
+      const orderBy: OrderBy = {};
+      if (sortOptions.chronologicalDate) {
+        orderBy.updatedAt = sortOptions.chronologicalDate;
+      }
+      this.logger.log(`[${this.orderFactory.name}] - Method finished`);
+      return Object.keys(orderBy).length > 0 ? orderBy : undefined;
+    } catch (error) {
+      this.logger.error(`[${this.orderFactory.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

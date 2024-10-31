@@ -2,7 +2,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ORDER_REPOSITORY_TOKEN } from './order.repository';
 import { IOrderService } from './interfaces/orderService.interface';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
-import { CompleteOrderData, OrderWithReagents } from './types/order.type';
+import { CompleteOrderData, OrderList, OrderWithReagents } from './types/order.type';
+import { OrdereOptions } from './types/orderOptions.type';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -18,6 +19,19 @@ export class OrderService implements IOrderService {
       return order;
     } catch (error) {
       this.logger.error(`[${this.createOrder.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  async orderList(options: OrdereOptions): Promise<OrderList> {
+    try {
+      this.logger.log(`[${this.orderList.name}] - Method start`);
+      const { filter, pagination, sort } = options;
+      const order: OrderList = await this.orderRepository.findAll(filter, pagination, sort);
+      this.logger.log(`[${this.orderList.name}] - Method finished`);
+      return order;
+    } catch (error) {
+      this.logger.error(`[${this.orderList.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
