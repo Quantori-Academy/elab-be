@@ -8,8 +8,8 @@ export async function StorageSeed() {
   const numberOfRooms: number = 3;
   const numberOfCabinets: number = 5;
   const numberOfShelves: number = 10;
-
   const roomNames: string[] = [];
+  
   for (let i = 1; i <= numberOfRooms; i++) {
     const roomName: string = `Room${i}`;
     roomNames.push(roomName);
@@ -33,7 +33,6 @@ export async function StorageSeed() {
     if (room) {
       for (let j = 1; j <= numberOfCabinets; j++) {
         const cabinetName: string = `Cabinet${j}`;
-
         for (let k = 1; k <= numberOfShelves; k++) {
           const shelfName: string = `Shelf${k}`;
           const storageName: string = `${cabinetName}-${shelfName}`;
