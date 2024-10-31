@@ -14,7 +14,7 @@ import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries..pipe';
 import { OrdereOptions } from './types/orderOptions.type';
-import { GetOrdersQueryDto } from './dto/getOrder.dto';
+import { GetOrderListResponseDto, GetOrdersQueryDto, GetOrderValidationErrorsDto } from './dto/getOrder.dto';
 
 const ROUTE = 'orders';
 
@@ -56,12 +56,12 @@ export class OrderController {
 
   @ApiBearerAuth()
   @ApiQuery({ type: GetOrdersQueryDto })
-  // @ApiResponse({ status: HttpStatus.OK, type: GetStorageListResponseDto })
-  // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetStorageValidationErrorsDto })
-  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  // @Roles(Role.Admin)
-  // @UseGuards(AuthGuard, RolesGuard)
+  @ApiResponse({ status: HttpStatus.OK, type: GetOrderListResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetOrderValidationErrorsDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Get('')
   async orderList(@Query(ValidateParseOrderOptionsPipe) options: OrdereOptions): Promise<any> {
     this.logger.log(`[${this.orderList.name}] - Method start`);
