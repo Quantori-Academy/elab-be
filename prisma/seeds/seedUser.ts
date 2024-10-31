@@ -42,7 +42,7 @@ export async function UserSeed() {
 
     await prisma.user.upsert({
       where: { email: user.email },
-      update: userData,
+      update: {},
       create: userData
     });
   }

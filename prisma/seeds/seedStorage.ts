@@ -15,9 +15,7 @@ export async function StorageSeed() {
     roomNames.push(roomName);
     await prisma.room.upsert({
       where: { name: roomName },
-      update: {
-        description: `description for ${roomName}`
-      },
+      update: {},
       create: {
         name: roomName,
         description: `description for ${roomName}`
@@ -43,9 +41,7 @@ export async function StorageSeed() {
                 name: storageName,
               },
             },
-            update: {
-              description: `Updated description for ${storageName}`, 
-            },
+            update: {},
             create: {
               roomId: room.id,
               name: storageName,
