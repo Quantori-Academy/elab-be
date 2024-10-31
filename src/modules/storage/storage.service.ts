@@ -6,9 +6,10 @@ import { Storage } from '@prisma/client';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
 import { ROOM_SERVICE_TOKEN } from '../room/room.service';
 import { IRoomService } from '../room/interfaces/roomService.interface';
-import { FilterBy, StorageList, StorageWithReagents } from './types/storage.types';
+import { FilterBy, StorageList, StorageWithReagents, UpdatedStorages } from './types/storage.types';
 import { StorageFilterOptions, StoragePaginationOptions, StorageSortOptions, StorageOptions } from './types/storageOptions.type';
 import { UpdateStroageDto } from './dto/updateStorage.dto';
+import { MoveItemsDto } from './dto/moveItems.dto';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -111,6 +112,22 @@ export class StorageService implements IStorageService {
       return storage;
     } catch (error) {
       this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  async moveItems(moveItemsDto: MoveItemsDto): Promise<UpdatedStorages> {
+    this.logger.log(`[${this.moveItems.name}] - Method start`);
+    try {
+      const { sourceStorageId, destinationStorageId } = moveItemsDto;
+      if (sourceStorageId === destinationStorageId) {
+        throw new ConflictException("Source and destination storages can't be the same");
+      }
+      const updatedStorages: UpdatedStorages = await this.storageRepository.moveItems(moveItemsDto);
+      this.logger.log(`[${this.moveItems.name}] - Method finished`);
+      return updatedStorages;
+    } catch (error) {
+      this.logger.error(`[${this.moveItems.name}] - Exception thrown: ` + error);
       throw error;
     }
   }

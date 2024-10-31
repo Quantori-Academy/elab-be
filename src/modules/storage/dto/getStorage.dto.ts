@@ -99,6 +99,7 @@ class GetStorageListResponseDto {
     ],
   })
   storages: GetStorageSuccessDto[];
+
   @ApiProperty({ example: 2 })
   size: number;
 }

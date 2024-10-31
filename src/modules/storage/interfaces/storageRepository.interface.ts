@@ -1,8 +1,9 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { Storage } from '@prisma/client';
-import { StorageCreation, StorageWithReagents, FilterBy, StorageList } from '../types/storage.types';
+import { StorageCreation, StorageWithReagents, FilterBy, StorageList, UpdatedStorages } from '../types/storage.types';
 import { StoragePaginationOptions, StorageSortOptions } from '../types/storageOptions.type';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
+import { MoveItemsDto } from '../dto/moveItems.dto';
 
 export interface IStorageRepository extends IRepository<Storage> {
   findById(id: number, includeReagents: true): Promise<StorageWithReagents | null>; // overload
@@ -17,4 +18,5 @@ export interface IStorageRepository extends IRepository<Storage> {
     pagination?: StoragePaginationOptions,
     sortOptions?: StorageSortOptions,
   ): Promise<Storage[] | null>;
+  moveItems(moveItemsDto: MoveItemsDto): Promise<UpdatedStorages>;
 }
