@@ -3,18 +3,18 @@ import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
-import { IReagent } from './interfaces/reagentEntity.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
+import { Reagent } from '@prisma/client';
 
 @Injectable()
 class ReagentService implements IReagentService {
   private readonly logger = new Logger(ReagentService.name);
   constructor(@Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository) {}
 
-  async create(data: IReagent): Promise<IReagent> {
+  async create(data: Reagent): Promise<Reagent> {
     try {
       this.logger.log('Create reagent method start');
-      const reagent: IReagent = await this.reagentRepository.create(data);
+      const reagent: Reagent = await this.reagentRepository.create(data);
       this.logger.log('Created a reagent');
       return reagent;
     } catch (error) {
@@ -23,7 +23,7 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async getReagents(options: ReagentOptions): Promise<IReagent[]> {
+  async getReagents(options: ReagentOptions): Promise<Reagent[]> {
     try {
       this.logger.log('getReagents method start');
       const { filter, pagination, sort } = options || {};
@@ -34,7 +34,7 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async searchByStructure(options: ReagentSearchOptions): Promise<IReagent | IReagent[]> {
+  async searchByStructure(options: ReagentSearchOptions): Promise<Reagent | Reagent[]> {
     try {
       this.logger.log('searchByStructure method start');
       const { pagination, sort, structure, flag } = options || {};
@@ -45,10 +45,10 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async getReagentById(id: number): Promise<IReagent | null> {
+  async getReagentById(id: number): Promise<Reagent | null> {
     try {
       this.logger.log('searchByStructure method start');
-      const reagent: IReagent | null = await this.reagentRepository.findById(id);
+      const reagent: Reagent | null = await this.reagentRepository.findById(id);
       return reagent;
     } catch (error) {
       this.logger.error('Failed to fetch a reagent by ID: ', error);
@@ -56,12 +56,12 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async editReagent(data: UpdateReagentDto, id: number): Promise<IReagent> {
+  async editReagent(data: UpdateReagentDto, id: number): Promise<Reagent> {
     try {
       this.logger.log('editReagent method start');
       const quantityLeft = data.quantityLeft;
       const isDeleted = quantityLeft === 0;
-      const newReagent: IReagent = await this.reagentRepository.updateById(data, id, isDeleted);
+      const newReagent: Reagent = await this.reagentRepository.updateById(data, id, isDeleted);
       return newReagent;
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
