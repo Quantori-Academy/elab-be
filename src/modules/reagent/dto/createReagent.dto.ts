@@ -9,8 +9,9 @@ export class CreateReagentDto {
   name: string;
 
   @ApiProperty({ example: '58-08-2' })
+  @IsOptional()
   @IsString()
-  casNumber: string;
+  casNumber?: string;
 
   @ApiProperty({ example: 'Producer Name' })
   @IsString()
@@ -35,7 +36,7 @@ export class CreateReagentDto {
 
   @ApiProperty({ example: 5.5 })
   @Transform(({ value }) => Number(value))
-  @IsString()
+  @IsNumber()
   totalQuantity: number;
 
   @ApiProperty({ example: 'A sample reagent' })
@@ -57,9 +58,9 @@ export class CreateReagentDto {
   @IsString()
   storageId: number;
 
-  //@ApiProperty({ enum: Category, description: 'Category is either Reagent or Sample' })
-  //@IsEnum(Category)
-  //category: Category;
+  @ApiProperty({ enum: Category, description: 'Category is either Reagent or Sample' })
+  @IsEnum(Category)
+  category: Category;
 
   @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1' })
   @IsOptional()
@@ -83,7 +84,7 @@ export class CreateReagentSuccessDto {
 
   @ApiProperty({ example: '58-08-2' })
   @IsString()
-  casNumber: string;
+  casNumber?: string | null;
 
   @ApiProperty({ example: 'Producer Name' })
   @IsString()

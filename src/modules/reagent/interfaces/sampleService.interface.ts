@@ -1,5 +1,5 @@
-import { IReagent } from './reagentEntity.interface';
+import { Reagent } from '@prisma/client';
 
 export interface ISampleService {
-  create(data: IReagent): Promise<IReagent>;
+  create(data: Reagent): Promise<Reagent>;
 }
