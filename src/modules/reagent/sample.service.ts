@@ -9,7 +9,7 @@ class SampleService implements ISampleService {
   private logger = new Logger(SampleService.name);
   constructor(@Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository) {}
 
-  async create(data: Reagent): Promise<Reagent> {
+  async create(data: Omit<Reagent, 'category'>): Promise<Reagent> {
     try {
       this.logger.log(`${this.create.name} - START`);
       return await this.reagentRepository.create({ ...data, category: 'Sample' });

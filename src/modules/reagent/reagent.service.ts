@@ -11,10 +11,10 @@ class ReagentService implements IReagentService {
   private readonly logger = new Logger(ReagentService.name);
   constructor(@Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository) {}
 
-  async create(data: Reagent): Promise<Reagent> {
+  async create(data: Omit<Reagent, 'category'>): Promise<Reagent> {
     try {
       this.logger.log('Create reagent method start');
-      const reagent: Reagent = await this.reagentRepository.create(data);
+      const reagent: Reagent = await this.reagentRepository.create({ ...data, category: 'Reagent' });
       this.logger.log('Created a reagent');
       return reagent;
     } catch (error) {

@@ -58,10 +58,6 @@ export class CreateReagentDto {
   @IsString()
   storageId: number;
 
-  @ApiProperty({ enum: Category, description: 'Category is either Reagent or Sample' })
-  @IsEnum(Category)
-  category: Category;
-
   @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1' })
   @IsOptional()
   @IsString()
