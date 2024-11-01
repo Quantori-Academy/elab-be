@@ -36,10 +36,25 @@ class GetOrdersQueryDto {
   @Min(1)
   take?: number;
 
-  @ApiProperty({ required: false, enum: Order, description: 'Order by chronological date (asc or desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Order by chronological date updatedAt (asc or desc)' })
   @IsOptional()
   @IsEnum(Order)
-  chronologicalDate?: Order;
+  updatedAt?: Order;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by chronological date createddAt (asc or desc)' })
+  @IsOptional()
+  @IsEnum(Order)
+  createdAt?: Order;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabedical date createddAt (asc or desc)' })
+  @IsOptional()
+  @IsEnum(Order)
+  titleOrder?: Order;
+
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabedical date createddAt (asc or desc)' })
+  @IsOptional()
+  @IsEnum(Order)
+  sellerOrder?: Order;
 }
 
 class GetOrderListResponseDto {
@@ -87,7 +102,7 @@ class GetOrderValidationErrorsDto {
       'skip must be an integer number',
       'take must not be less than 1',
       'take must be an integer number',
-      'chronologicalDate must be one of the following values: asc, desc',
+      'Only one of "updatedAt", "createdAt", "titleOrder", or "sellerOrder" can be provided, or none.',
     ],
   })
   message: string;

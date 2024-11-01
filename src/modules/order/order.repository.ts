@@ -189,8 +189,25 @@ export class OrderRepository implements IOrderRepository {
     try {
       if (!sortOptions) return undefined;
       const orderBy: OrderBy = {};
-      if (sortOptions.chronologicalDate) {
-        orderBy.updatedAt = sortOptions.chronologicalDate;
+
+      const chronologicalOptions = sortOptions.chronologicalDate;
+      const alphabeticalOptions = sortOptions.alphabetical;
+
+      switch (true) {
+        case !!chronologicalOptions?.updatedAt:
+          orderBy.updatedAt = chronologicalOptions.updatedAt;
+          break;
+        case !!chronologicalOptions?.createdAt:
+          orderBy.createdAt = chronologicalOptions.createdAt;
+          break;
+        case !!alphabeticalOptions?.seller:
+          orderBy.seller = alphabeticalOptions.seller;
+          break;
+        case !!alphabeticalOptions?.title:
+          orderBy.title = alphabeticalOptions.title;
+          break;
+        default:
+          break;
       }
       this.logger.log(`[${this.orderFactory.name}] - Method finished`);
       return Object.keys(orderBy).length > 0 ? orderBy : undefined;

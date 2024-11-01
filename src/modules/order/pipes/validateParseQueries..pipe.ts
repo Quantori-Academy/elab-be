@@ -29,6 +29,21 @@ export class ValidateParseOrderOptionsPipe implements PipeTransform {
       });
     }
 
+    const providedSortOptions: (string | undefined)[] = [
+      queryDto.updatedAt,
+      queryDto.createdAt,
+      queryDto.titleOrder,
+      queryDto.sellerOrder,
+    ].filter(Boolean);
+
+    if (providedSortOptions.length > 1) {
+      throw new BadRequestException({
+        message: 'Only one of "updatedAt", "createdAt", "titleOrder", or "sellerOrder" can be provided, or none.',
+        statusCode: HttpStatus.BAD_REQUEST,
+        error: 'Bad Request',
+      });
+    }
+
     const filters: OrderFilterOptions = {
       title: queryDto.title,
       seller: queryDto.seller,
@@ -36,7 +51,14 @@ export class ValidateParseOrderOptionsPipe implements PipeTransform {
     };
 
     const sorts: OrderSortOptions = {
-      chronologicalDate: queryDto.chronologicalDate,
+      chronologicalDate: {
+        updatedAt: queryDto.updatedAt,
+        createdAt: queryDto.createdAt,
+      },
+      alphabetical: {
+        title: queryDto.titleOrder,
+        seller: queryDto.sellerOrder,
+      },
     };
 
     const paginations: OrderPaginationOptions = {

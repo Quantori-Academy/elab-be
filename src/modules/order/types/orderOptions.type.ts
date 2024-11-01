@@ -8,11 +8,21 @@ enum Order {
 type OrderBy =
   | {
       updatedAt?: Order;
+      createdAt?: Order;
+      title?: Order;
+      seller?: Order;
     }
   | undefined;
 
 type OrderSortOptions = {
-  chronologicalDate?: Order | undefined;
+  chronologicalDate?: {
+    updatedAt?: Order | undefined;
+    createdAt?: Order | undefined;
+  };
+  alphabetical?: {
+    title?: Order | undefined;
+    seller?: Order | undefined;
+  };
 };
 
 type OrderFilterOptions = {
