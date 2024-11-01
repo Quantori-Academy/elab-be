@@ -1,4 +1,17 @@
-import { Body, Controller, Get, HttpStatus, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Logger,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { REQUEST_SERVICE_TOKEN } from './reagentRequest.service';
 import { IReagentRequestService } from './interfaces/reagentRequestService.interface';
@@ -10,12 +23,15 @@ import { Role } from '@prisma/client';
 import { GetReagentRequestDto, GetReagentRequestSuccessDto } from './dto/getReagentRequest.dto';
 import { ValidateParseQueries } from './pipes/validateParseQueries.pipe';
 import { ReagentRequestOptions } from './interfaces/reagentRequestOptions.interface';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { UpdateReagentRequestDto, UpdateReagentRequestSuccessDto } from './dto/updateReagentRequest.dto';
 
 const ROUTE = 'reagent_requests';
 
 @ApiTags(ROUTE)
 @Controller(ROUTE)
 export class ReagentRequestController {
+  private logger = new Logger(ReagentRequestController.name);
   constructor(@Inject(REQUEST_SERVICE_TOKEN) private requestService: IReagentRequestService) {}
 
   @ApiBearerAuth()
@@ -44,6 +60,22 @@ export class ReagentRequestController {
       return await this.requestService.getReagentRequestsForProcurementOficcer(queryDto);
     } else {
       return await this.requestService.getReagentRequestsForResearchers(queryDto, user.id);
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.CREATED, type: UpdateReagentRequestSuccessDto })
+  @Roles(Role.ProcurementOfficer)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post(':id')
+  async editReagentRequest(@Param('id', ParseIdPipe) id: number, @Body() updateReagentRequestDto: UpdateReagentRequestDto) {
+    try {
+      const request = await this.requestService.getRequestById(id);
+      if (!request) throw new NotFoundException('Reagent Request with this ID - NOT FOUND');
+      return await this.requestService.editReagentRequest(updateReagentRequestDto, id);
+    } catch (error) {
+      this.logger.error('Error in controller path POST /:id ', error);
+      throw error;
     }
   }
 }
