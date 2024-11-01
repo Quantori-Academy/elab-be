@@ -16,6 +16,12 @@ export class GetReagentDto {
   @IsEnum(Category)
   category?: Category;
 
+  @ApiProperty({ required: false, description: 'Id of the storage location' })
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => Number(value))
+  storageId?: number;
+
   @ApiProperty({ required: false, enum: Order, description: 'Sorting by the name of Reagent (asc | desc)' })
   @IsOptional()
   @IsEnum(Order)

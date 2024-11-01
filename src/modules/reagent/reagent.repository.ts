@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
-import { Category, Prisma } from '@prisma/client';
+import { FilterOptions, FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
+import { Prisma } from '@prisma/client';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
@@ -49,11 +49,25 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async findAll(pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
+  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
+    const whereClause: any = { isDeleted: false };
+
+    if (filter?.category) {
+      whereClause.category = filter.category;
+    }
+
+    if (filter?.name) {
+      whereClause.name = filter.name;
+    }
+
+    if (filter?.storageId) {
+      whereClause.storageId = filter.storageId;
+    }
+
     return await this.prisma.reagent.findMany({
-      where: { isDeleted: false },
+      where: whereClause,
       include: {
         storage: {
           select: {
@@ -75,82 +89,6 @@ class ReagentRepository implements IReagentRepository {
   async delete(id: number): Promise<IReagent> {
     return await this.prisma.reagent.delete({
       where: { id },
-    });
-  }
-
-  async getAllByName(name: string, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sorting);
-    return await this.prisma.reagent.findMany({
-      where: { name, isDeleted: false },
-      include: {
-        storage: {
-          select: {
-            name: true,
-            room: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-      skip,
-      take,
-      orderBy,
-    });
-  }
-
-  async getAllByCategory(category: Category, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sorting);
-    return await this.prisma.reagent.findMany({
-      where: { category, isDeleted: false },
-      include: {
-        storage: {
-          select: {
-            name: true,
-            room: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-      skip,
-      take,
-      orderBy,
-    });
-  }
-
-  async getAllByNameAndCategory(
-    name: string,
-    category: Category,
-    pagination?: PaginationOptions,
-    sorting?: SortOptions,
-  ): Promise<IReagent[]> {
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sorting);
-    return await this.prisma.reagent.findMany({
-      where: {
-        AND: [{ name }, { category }, { isDeleted: false }],
-      },
-      include: {
-        storage: {
-          select: {
-            name: true,
-            room: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-      skip,
-      take,
-      orderBy,
     });
   }
 

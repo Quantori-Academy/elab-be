@@ -27,19 +27,7 @@ class ReagentService implements IReagentService {
     try {
       this.logger.log('getReagents method start');
       const { filter, pagination, sort } = options || {};
-      if (filter.category && filter.name) {
-        this.logger.log('Fetching reagents by both name and category');
-        return await this.reagentRepository.getAllByNameAndCategory(filter.name, filter.category, pagination, sort);
-      } else if (filter.category) {
-        this.logger.log('Fetching reagents by category');
-        return await this.reagentRepository.getAllByCategory(filter.category, pagination, sort);
-      } else if (filter.name) {
-        this.logger.log('Fetching reagents by name');
-        return await this.reagentRepository.getAllByName(filter.name, pagination, sort);
-      } else {
-        this.logger.log('Fetching all Reagents');
-        return await this.reagentRepository.findAll(pagination, sort);
-      }
+      return await this.reagentRepository.findAll(filter, pagination, sort);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
       throw new InternalServerErrorException('Failed to fetch a reagents!');
