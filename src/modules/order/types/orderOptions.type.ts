@@ -1,3 +1,5 @@
+import { Status } from '@prisma/client';
+
 enum Order {
   ASC = 'asc',
   DESC = 'desc',
@@ -16,6 +18,7 @@ type OrderSortOptions = {
 type OrderFilterOptions = {
   title?: string | undefined;
   seller?: string | undefined;
+  status?: Status | undefined;
 };
 
 type OrderPaginationOptions = {

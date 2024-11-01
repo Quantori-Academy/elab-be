@@ -32,6 +32,7 @@ export class ValidateParseOrderOptionsPipe implements PipeTransform {
     const filters: OrderFilterOptions = {
       title: queryDto.title,
       seller: queryDto.seller,
+      status: queryDto.status,
     };
 
     const sorts: OrderSortOptions = {

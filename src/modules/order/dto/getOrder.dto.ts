@@ -4,6 +4,7 @@ import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from '../types/orderOptions.type';
 import { OrderWithReagentCount } from '../types/order.type';
 import { HttpStatus } from '@nestjs/common';
+import { Status } from '@prisma/client';
 
 class GetOrdersQueryDto {
   @ApiProperty({ required: false, type: String, description: 'title of the order' })
@@ -15,6 +16,11 @@ class GetOrdersQueryDto {
   @IsOptional()
   @IsString()
   seller?: string;
+
+  @ApiProperty({ required: false, description: 'Status of order' })
+  @IsOptional()
+  @IsEnum(Status)
+  status?: Status;
 
   @ApiProperty({ required: false, type: Number, description: 'Starting index for pagination', minimum: 0 })
   @IsOptional()

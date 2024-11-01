@@ -56,6 +56,9 @@ export class OrderRepository implements IOrderRepository {
           contains: filterBy?.seller,
           mode: 'insensitive',
         },
+        status: {
+          equals: filterBy?.status,
+        },
       };
 
       const [orders, size]: [OrderWithReagentCountObject[], number] = await this.prisma.$transaction([
