@@ -58,14 +58,14 @@ model Session {
 model Reagent {
   id            Int      @id @default(autoincrement())
   name          String
-  casNumber     String
-  producer      String
-  catalogId     String
-  catalogLink   String
-  pricePerUnit  Float
+  casNumber     String?
+  producer      String?
+  catalogId     String?
+  catalogLink   String?
+  pricePerUnit  Float?
   quantityUnit  String
   totalQuantity Float
-  description   String
+  description   String?
   quantityLeft  Float
   expirationDate  DateTime
   storageId     Int
@@ -76,6 +76,9 @@ model Reagent {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   storage       Storage  @relation(fields: [storageId], references: [id])
+
+  usedReagentSample    Reagent[]   @relation("Prepared")
+  usedBy               Reagent[]    @relation("Prepared")
 }
 
 model Storage {
