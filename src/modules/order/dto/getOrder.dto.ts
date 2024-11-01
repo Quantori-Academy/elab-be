@@ -17,7 +17,7 @@ class GetOrdersQueryDto {
   @IsString()
   seller?: string;
 
-  @ApiProperty({ required: false, description: 'Status of order' })
+  @ApiProperty({ required: false, enum: Status, description: 'Status of order' })
   @IsOptional()
   @IsEnum(Status)
   status?: Status;
@@ -103,6 +103,8 @@ class GetOrderValidationErrorsDto {
       'take must not be less than 1',
       'take must be an integer number',
       'Only one of "updatedAt", "createdAt", "titleOrder", or "sellerOrder" can be provided, or none.',
+      'seller must be shorter than or equal to 200 characters',
+      'title must be shorter than or equal to 200 characters',
     ],
   })
   message: string;

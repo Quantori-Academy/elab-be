@@ -12,6 +12,7 @@ import {
 import { Order, Prisma } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class OrderRepository implements IOrderRepository {
@@ -130,19 +131,19 @@ export class OrderRepository implements IOrderRepository {
     }
   }
 
-  async update(order: PartialWithRequiredId<Order>): Promise<OrderWithReagents> {
+  async update(order: PartialWithRequiredId<Order>): Promise<Order> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
-      const updatedOrder: OrderWithReagents = await this.prisma.order.update({
+      const updatedOrder: Order = await this.prisma.order.update({
         where: { id: order.id },
-        include: {
-          reagents: true,
-        },
         data: order,
       });
       this.logger.log(`[${this.update.name}] - Method finished`);
       return updatedOrder;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+        error = new NotFoundException(`Order not found`);
+      }
       this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }

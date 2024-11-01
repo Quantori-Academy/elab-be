@@ -1,4 +1,18 @@
-import { Body, Controller, Get, HttpStatus, Inject, Logger, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Logger,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ORDER_SERVICE_TOKEN } from './order.service';
 import { IOrderService } from './interfaces/orderService.interface';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -7,7 +21,7 @@ import { CreateOrderBadRequestDto, CreateOrderDto, CreateOrderNotFoundDto, Creat
 import { Request } from 'express';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Order, Role } from '@prisma/client';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
@@ -15,6 +29,8 @@ import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries..pipe';
 import { OrdereOptions } from './types/orderOptions.type';
 import { GetOrderListResponseDto, GetOrdersQueryDto, GetOrderValidationErrorsDto } from './dto/getOrder.dto';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import { UpdateOrderDto } from './dto/updateOrder.dto';
 
 const ROUTE = 'orders';
 
@@ -71,6 +87,31 @@ export class OrderController {
       return order;
     } catch (error) {
       this.logger.error(`[${this.orderList.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  // @ApiBearerAuth()
+  // @ApiResponse({ status: HttpStatus.OK, type: UpdateStroageSuccessDto })
+  // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateStorageValidationErrorDto })
+  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  // @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
+  // @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateStorageConflictErrorDto })
+  // @Roles(Role.Admin)
+  // @UseGuards(AuthGuard, RolesGuard)
+  @Patch(':id')
+  async updateOrder(
+    @Param('id', ParseIdPipe) id: number,
+    @Body(new ValidationPipe({ transform: true })) updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
+    this.logger.log(`[${this.updateOrder.name}] - Method start`);
+    try {
+      const updatedOrder: Order = await this.orderService.updateOrder(id, updateOrderDto);
+      this.logger.log(`[${this.updateOrder.name}] - Method finished`);
+      return updatedOrder;
+    } catch (error) {
+      this.logger.error(`[${this.updateOrder.name}] - Exception thrown: ` + error);
       throw error;
     }
   }

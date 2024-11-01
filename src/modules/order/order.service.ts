@@ -4,6 +4,8 @@ import { IOrderService } from './interfaces/orderService.interface';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
 import { CompleteOrderData, OrderList, OrderWithReagents } from './types/order.type';
 import { OrdereOptions } from './types/orderOptions.type';
+import { Order } from '@prisma/client';
+import { UpdateOrderDto } from './dto/updateOrder.dto';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -32,6 +34,18 @@ export class OrderService implements IOrderService {
       return order;
     } catch (error) {
       this.logger.error(`[${this.orderList.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  async updateOrder(id: number, data: UpdateOrderDto): Promise<Order> {
+    this.logger.log(`[${this.updateOrder.name}] - Method start`);
+    try {
+      const order: Order = await this.orderRepository.update({ id, ...data });
+      this.logger.log(`[${this.updateOrder.name}] - Method finished`);
+      return order;
+    } catch (error) {
+      this.logger.error(`[${this.updateOrder.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
