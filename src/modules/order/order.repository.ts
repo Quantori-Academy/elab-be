@@ -122,6 +122,8 @@ export class OrderRepository implements IOrderRepository {
           reagents: true,
         },
       });
+
+      await this.deleteEmptyOrders();
       this.logger.log(`[${this.create.name}] - Method finished`);
       return order;
     } catch (error) {
@@ -213,6 +215,23 @@ export class OrderRepository implements IOrderRepository {
       return Object.keys(orderBy).length > 0 ? orderBy : undefined;
     } catch (error) {
       this.logger.error(`[${this.orderFactory.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
+  private async deleteEmptyOrders(): Promise<void> {
+    this.logger.log(`[${this.deleteEmptyOrders.name}] - Method start`);
+    try {
+      const { count } = await this.prisma.order.deleteMany({
+        where: {
+          reagents: {
+            none: {},
+          },
+        },
+      });
+      this.logger.log(`[${this.deleteEmptyOrders.name}] - Method finished, deleted - ${count} order`);
+    } catch (error) {
+      this.logger.error(`[${this.deleteEmptyOrders.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }
