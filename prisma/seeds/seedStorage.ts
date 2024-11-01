@@ -1,46 +1,56 @@
+import { Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const logger = new Logger(StorageSeed.name);
 
 export async function StorageSeed() {
-  const numberOfRooms = 3;
-  const numberOfCabinets = 5;
-  const numberOfShelves = 10;
-
-  const roomNames = [];
+  const numberOfRooms: number = 3;
+  const numberOfCabinets: number = 5;
+  const numberOfShelves: number = 10;
+  const roomNames: string[] = [];
+  
   for (let i = 1; i <= numberOfRooms; i++) {
-    const roomName = `Room${i}`;
+    const roomName: string = `Room${i}`;
     roomNames.push(roomName);
-
-    await prisma.room.create({
-      data: {
+    await prisma.room.upsert({
+      where: { name: roomName },
+      update: {},
+      create: {
         name: roomName,
+        description: `description for ${roomName}`
       },
     });
   }
 
   for (let i = 0; i < roomNames.length; i++) {
-    const roomId = i + 1;
-    const roomName = roomNames[i]; 
+    const room = await prisma.room.findUnique({
+      where: { name: roomNames[i] },
+    });
 
-    for (let j = 1; j <= numberOfCabinets; j++) {
-      const cabinetName = `Cabinet${j}`;
-
-      for (let k = 1; k <= numberOfShelves; k++) {
-        const shelfName = `Shelf${k}`;
-        
-        const storageName = `${cabinetName}-${shelfName}`;
-        
-        await prisma.storage.create({
-          data: {
-            roomId: roomId,
-            name: storageName,
-            description: `Description for ${storageName}`, 
-          },
-        });
+    if (room) {
+      for (let j = 1; j <= numberOfCabinets; j++) {
+        const cabinetName: string = `Cabinet${j}`;
+        for (let k = 1; k <= numberOfShelves; k++) {
+          const shelfName: string = `Shelf${k}`;
+          const storageName: string = `${cabinetName}-${shelfName}`;
+          await prisma.storage.upsert({
+            where: {
+              roomId_name: {
+                roomId: room.id,
+                name: storageName,
+              },
+            },
+            update: {},
+            create: {
+              roomId: room.id,
+              name: storageName,
+              description: `Description for ${storageName}`, 
+            },
+          });
+        }
       }
     }
   }
-
-  console.log('Seeding completed.');
+  logger.log('Storage seed completed');
 }
