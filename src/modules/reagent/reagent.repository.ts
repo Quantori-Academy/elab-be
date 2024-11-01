@@ -2,7 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { FilterOptions, FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
 import { Prisma, Reagent } from '@prisma/client';
-import { IReagentRepository } from './interfaces/reagentRepository.interface';
+import { IReagentRepository, IWhereClause } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 
 @Injectable()
@@ -51,7 +51,7 @@ class ReagentRepository implements IReagentRepository {
   async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<Reagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
-    const whereClause: any = { isDeleted: false };
+    const whereClause: IWhereClause = { isDeleted: false };
 
     if (filter?.category) {
       whereClause.category = filter.category;
