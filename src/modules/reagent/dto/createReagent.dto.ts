@@ -39,6 +39,7 @@ export class CreateReagentDto {
   totalQuantity: number;
 
   @ApiProperty({ example: 'A sample reagent' })
+  @IsOptional()
   @IsString()
   description: string;
 
@@ -110,7 +111,7 @@ export class CreateReagentSuccessDto {
 
   @ApiProperty({ example: 'A sample reagent' })
   @IsString()
-  description: string;
+  description: string | null;
 
   @ApiProperty({ example: 0 })
   @IsNumber()
