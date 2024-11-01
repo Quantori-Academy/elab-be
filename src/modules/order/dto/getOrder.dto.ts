@@ -46,12 +46,12 @@ class GetOrdersQueryDto {
   @IsEnum(Order)
   createdAt?: Order;
 
-  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabedical date createddAt (asc or desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabedical date title (asc or desc)' })
   @IsOptional()
   @IsEnum(Order)
   titleOrder?: Order;
 
-  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabedical date createddAt (asc or desc)' })
+  @ApiProperty({ required: false, enum: Order, description: 'Order by alphabedical date seller (asc or desc)' })
   @IsOptional()
   @IsEnum(Order)
   sellerOrder?: Order;
