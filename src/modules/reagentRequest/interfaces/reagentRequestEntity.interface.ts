@@ -1,4 +1,4 @@
-import { Status } from '@prisma/client';
+import { Package, Status } from '@prisma/client';
 
 export interface IReagentRequest {
   id?: number;
@@ -11,6 +11,7 @@ export interface IReagentRequest {
   userComments?: string | null;
   procurementComments?: string | null;
   status?: Status;
+  package?: Package | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

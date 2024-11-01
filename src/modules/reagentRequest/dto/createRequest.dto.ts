@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Status } from '@prisma/client';
-import { IsDate, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Package, Status } from '@prisma/client';
+import { IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateRequestDto {
   @ApiProperty({ example: 'Reagent A' })
@@ -29,6 +29,11 @@ export class CreateRequestDto {
   @IsOptional()
   @IsString()
   userComments?: string;
+
+  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox' })
+  @IsOptional()
+  @IsEnum(Package)
+  package: Package;
 }
 
 export class CreateRequestSuccessDto {
@@ -76,4 +81,8 @@ export class CreateRequestSuccessDto {
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()
   updatedAt: Date;
+
+  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox' })
+  @IsEnum(Package)
+  package: Package | null;
 }
