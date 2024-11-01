@@ -30,7 +30,12 @@ import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries..pip
 import { OrdereOptions } from './types/orderOptions.type';
 import { GetOrderListResponseDto, GetOrdersQueryDto, GetOrderValidationErrorsDto } from './dto/getOrder.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
-import { UpdateOrderDto } from './dto/updateOrder.dto';
+import {
+  UpdateOrderDto,
+  UpdateOrderNotFoundErrorDto,
+  UpdateOrderSuccessDto,
+  UpdateOrderValidationErrorDto,
+} from './dto/updateOrder.dto';
 
 const ROUTE = 'orders';
 
@@ -76,7 +81,7 @@ export class OrderController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetOrderValidationErrorsDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.ProcurementOfficer)
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
   async orderList(@Query(ValidateParseOrderOptionsPipe) options: OrdereOptions): Promise<OrderList> {
@@ -91,15 +96,14 @@ export class OrderController {
     }
   }
 
-  // @ApiBearerAuth()
-  // @ApiResponse({ status: HttpStatus.OK, type: UpdateStroageSuccessDto })
-  // @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateStorageValidationErrorDto })
-  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  // @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
-  // @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
-  // @ApiResponse({ status: HttpStatus.CONFLICT, type: UpdateStorageConflictErrorDto })
-  // @Roles(Role.Admin)
-  // @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: UpdateOrderSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateOrderValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateOrderNotFoundErrorDto })
+  @Roles(Role.ProcurementOfficer)
+  @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id')
   async updateOrder(
     @Param('id', ParseIdPipe) id: number,
