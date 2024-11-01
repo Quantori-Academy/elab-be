@@ -3,7 +3,7 @@ import { ROOM_REPOSITORY_TOKEN } from './room.repository';
 import { IRoomRepository } from './interfaces/roomRepository.interface';
 import { IRoomService } from './interfaces/roomService.interface';
 import { Room } from '@prisma/client';
-import { RoomWithStorages } from './types/room.type';
+import { RoomWithStorageCount, RoomWithStorages } from './types/room.type';
 import { UpdateRoomDto } from './dto/updateRoom.dto';
 
 @Injectable()
@@ -12,10 +12,10 @@ export class RoomService implements IRoomService {
 
   constructor(@Inject(ROOM_REPOSITORY_TOKEN) private roomRepository: IRoomRepository) {}
 
-  async getRooms(): Promise<Room[]> {
+  async getRooms(): Promise<RoomWithStorageCount[]> {
     this.logger.log(`[${this.getRooms.name}] - Method start`);
     try {
-      const rooms: Room[] = await this.roomRepository.findAll();
+      const rooms: RoomWithStorageCount[] = await this.roomRepository.findAll();
       this.logger.log(`[${this.getRooms.name}] - Method finished`);
       return rooms;
     } catch (error) {
