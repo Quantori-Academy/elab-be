@@ -121,6 +121,7 @@ model ReagentRequest {
   updatedAt             DateTime @updatedAt 
   order                 Order?   @relation(fields: [orderId], references: [id])
   orderId               Int?
+  package               Package?
 }
 
 model Order {
