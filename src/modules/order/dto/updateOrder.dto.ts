@@ -23,7 +23,7 @@ class UpdateOrderDto {
   @IsOptional()
   @Transform(({ value }) => (value === null ? undefined : value))
   @IsEnum(Status)
-  status?: Status;
+  status?: Status | undefined;
 }
 
 class UpdateOrderSuccessDto {
