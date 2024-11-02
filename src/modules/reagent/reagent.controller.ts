@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
 import { IReagentService } from './interfaces/reagentService.interface';
-import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CreateReagentDto, CreateReagentSuccessDto } from './dto/createReagent.dto';
 import { GetReagentDto, GetReagentErrorDto, GetReagentSuccessDto } from './dto/getReagent.dto';
@@ -24,6 +24,9 @@ import { ValidateParseForSearchPipe } from './pipes/validateParseForSearch.pipe'
 import { UpdateReagentDto, UpdateReagentSuccessDto } from './dto/updateReagent.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { SAMPLE_SERVICE_TOKEN } from './sample.service';
+import { ISampleService } from './interfaces/sampleService.interface';
+import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
 
 const ROUTE = 'reagents';
 
@@ -32,14 +35,18 @@ const ROUTE = 'reagents';
 export class ReagentController {
   private logger = new Logger(ReagentController.name);
 
-  constructor(@Inject(REAGENT_SERVICE_TOKEN) private reagentService: IReagentService) {}
+  constructor(
+    @Inject(REAGENT_SERVICE_TOKEN) private reagentService: IReagentService,
+    @Inject(SAMPLE_SERVICE_TOKEN) private sampleService: ISampleService,
+  ) {}
 
   @ApiBearerAuth()
+  @ApiBody({ type: () => CreateReagentDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
   @UseGuards(AuthGuard)
   @Post('')
   async createReagent(@Body() createReagentDto: CreateReagentDto) {
-    return await this.reagentService.create(createReagentDto);
+    return await this.reagentService.create({ ...createReagentDto, category: 'Reagent' });
   }
 
   @ApiBearerAuth()
@@ -63,6 +70,7 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
+  @ApiBody({ type: () => UpdateReagentDto })
   @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
@@ -94,5 +102,14 @@ export class ReagentController {
       this.logger.error('Error in controller in POST editReagent: ', error);
       throw error;
     }
+  }
+
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateSampleDto })
+  @ApiResponse({ status: HttpStatus.CREATED, type: CreateSampleSuccessDto })
+  @UseGuards(AuthGuard)
+  @Post('sample')
+  async createSample(@Body() createSampleDto: CreateSampleDto) {
+    return await this.sampleService.create({ ...createSampleDto, category: 'Sample' });
   }
 }

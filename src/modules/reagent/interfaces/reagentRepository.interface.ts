@@ -1,17 +1,18 @@
 import { IRepository } from 'src/common/interfaces/repository.interface';
 import { FilterOptions, FlagOptions, PaginationOptions, SortOptions } from './reagentOptions.interface';
 import { UpdateReagentDto } from '../dto/updateReagent.dto';
-import { Category, Reagent } from '@prisma/client';
+import { Category } from '@prisma/client';
+import { IReagent } from './reagentEntity.interface';
 
-export interface IReagentRepository extends IRepository<Reagent> {
-  findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<Reagent[]>;
+export interface IReagentRepository extends IRepository<IReagent> {
+  findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
   getAllByStructure(
     structure: string,
     pagination?: PaginationOptions,
     sorting?: SortOptions,
     flag?: FlagOptions,
-  ): Promise<Reagent | Reagent[]>;
-  updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<Reagent>;
+  ): Promise<IReagent | IReagent[]>;
+  updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent>;
 }
 
 export interface IWhereClause {

@@ -8,24 +8,28 @@ export class CreateReagentDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: '58-08-2' })
+  @ApiProperty({ example: '58-08-2', required: false })
   @IsOptional()
   @IsString()
   casNumber?: string;
 
-  @ApiProperty({ example: 'Producer Name' })
+  @ApiProperty({ example: 'Producer Name', required: false })
+  @IsOptional()
   @IsString()
   producer: string;
 
-  @ApiProperty({ example: 'CATALOG001' })
+  @ApiProperty({ example: 'CATALOG001', required: false })
+  @IsOptional()
   @IsString()
   catalogId: string;
 
-  @ApiProperty({ example: 'https://e-shop.com/catalog' })
+  @ApiProperty({ example: 'https://e-shop.com/catalog', required: false })
+  @IsOptional()
   @IsString()
   catalogLink: string;
 
-  @ApiProperty({ example: 234 })
+  @ApiProperty({ example: 234, required: false })
+  @IsOptional()
   @Transform(({ value }) => Number(value))
   @IsNumber()
   pricePerUnit: number;
@@ -39,7 +43,7 @@ export class CreateReagentDto {
   @IsNumber()
   totalQuantity: number;
 
-  @ApiProperty({ example: 'A sample reagent' })
+  @ApiProperty({ example: 'A sample reagent', required: false })
   @IsOptional()
   @IsString()
   description: string;
@@ -58,12 +62,12 @@ export class CreateReagentDto {
   @IsString()
   storageId: number;
 
-  @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1' })
+  @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1', required: false })
   @IsOptional()
   @IsString()
   structure?: string;
 
-  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox' })
+  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox', required: false })
   @IsOptional()
   @IsEnum(Package)
   package: Package;

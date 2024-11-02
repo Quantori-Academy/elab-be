@@ -1,9 +1,10 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { FilterOptions, FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
-import { Prisma, Reagent } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { IReagentRepository, IWhereClause } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
+import { IReagent } from './interfaces/reagentEntity.interface';
 
 @Injectable()
 class ReagentRepository implements IReagentRepository {
@@ -11,20 +12,20 @@ class ReagentRepository implements IReagentRepository {
 
   constructor(private prisma: PrismaService) {}
 
-  async create(reagent: Reagent): Promise<Reagent> {
+  async create(reagent: IReagent): Promise<IReagent> {
     return await this.prisma.reagent.create({
       data: reagent,
     });
   }
 
-  async update(reagent: Reagent): Promise<Reagent> {
+  async update(reagent: IReagent): Promise<IReagent> {
     return await this.prisma.reagent.update({
       where: { id: reagent.id },
       data: reagent,
     });
   }
 
-  async updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<Reagent> {
+  async updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent> {
     return await this.prisma.reagent.update({
       where: { id },
       data: {
@@ -34,7 +35,7 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async upsert(reagent: Reagent): Promise<void> {
+  async upsert(reagent: IReagent): Promise<void> {
     await this.prisma.reagent.upsert({
       where: { id: reagent.id },
       update: { ...reagent },
@@ -42,13 +43,13 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async findById(id: number): Promise<Reagent | null> {
+  async findById(id: number): Promise<IReagent | null> {
     return await this.prisma.reagent.findUnique({
       where: { id },
     });
   }
 
-  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<Reagent[]> {
+  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     const whereClause: IWhereClause = { isDeleted: false };
@@ -85,7 +86,7 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async delete(id: number): Promise<Reagent> {
+  async delete(id: number): Promise<IReagent> {
     return await this.prisma.reagent.delete({
       where: { id },
     });
@@ -96,7 +97,7 @@ class ReagentRepository implements IReagentRepository {
     pagination?: PaginationOptions,
     sorting?: SortOptions,
     flag?: FlagOptions,
-  ): Promise<Reagent | Reagent[]> {
+  ): Promise<IReagent | IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     const { isFullStructure } = flag || {};

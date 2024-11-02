@@ -1,5 +1,5 @@
-import { Reagent } from '@prisma/client';
+import { IReagent } from './reagentEntity.interface';
 
 export interface ISampleService {
-  create(data: Omit<Reagent, 'category'>): Promise<Reagent>;
+  create(data: IReagent): Promise<IReagent>;
 }
