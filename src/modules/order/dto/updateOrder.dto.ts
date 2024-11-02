@@ -5,14 +5,14 @@ import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 
 class UpdateOrderDto {
-  @ApiProperty({ example: 'title' })
+  @ApiProperty({ example: 'Title' })
   @IsOptional()
   @MaxLength(200)
   @IsString()
   @Transform(({ value }) => (value === null ? undefined : value))
   title?: string | undefined;
 
-  @ApiProperty({ example: 'Seler name' })
+  @ApiProperty({ example: 'Seller name' })
   @IsOptional()
   @MaxLength(200)
   @IsString()
