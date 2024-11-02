@@ -19,7 +19,7 @@ class UpdateOrderDto {
   @Transform(({ value }) => (value === null ? undefined : value))
   seller?: string | undefined;
 
-  @ApiProperty({ required: false, example: 'Fulfilled' })
+  @ApiProperty({ example: 'Fulfilled' })
   @IsOptional()
   @Transform(({ value }) => (value === null ? undefined : value))
   @IsEnum(Status)
