@@ -74,7 +74,7 @@ export class StorageRepository implements IStorageRepository {
       const { skip = 0, take = 10 } = pagination || {};
       const orderBy: OrderBy = this.orderFactory(sortOptions);
 
-      const where: any = {
+      const where: Prisma.StorageWhereInput = {
         roomId: {
           in: filterBy?.roomIds,
         },
