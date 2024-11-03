@@ -111,7 +111,6 @@ export class OrderController {
   ): Promise<Order> {
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {
-      console.log(updateOrderDto);
       const updatedOrder: Order = await this.orderService.updateOrder(id, updateOrderDto);
       this.logger.log(`[${this.updateOrder.name}] - Method finished`);
       return updatedOrder;
