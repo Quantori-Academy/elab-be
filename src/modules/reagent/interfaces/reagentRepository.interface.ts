@@ -3,6 +3,7 @@ import { FilterOptions, FlagOptions, PaginationOptions, SortOptions } from './re
 import { UpdateReagentDto } from '../dto/updateReagent.dto';
 import { Category } from '@prisma/client';
 import { IReagent } from './reagentEntity.interface';
+import { CreateSampleDto } from '../dto/createSample.dto';
 
 export interface IReagentRepository extends IRepository<IReagent> {
   findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
@@ -13,11 +14,15 @@ export interface IReagentRepository extends IRepository<IReagent> {
     flag?: FlagOptions,
   ): Promise<IReagent | IReagent[]>;
   updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent>;
+  createSample(sample: CreateSampleDto): Promise<IReagent>;
 }
 
 export interface IWhereClause {
   isDeleted: boolean;
   category?: Category;
-  name?: string;
+  name?: {
+    contains: string;
+    mode?: 'insensitive';
+  };
   storageId?: number;
 }

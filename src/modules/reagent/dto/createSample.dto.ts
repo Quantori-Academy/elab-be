@@ -44,7 +44,7 @@ export class CreateSampleDto {
   @IsOptional()
   @Transform(({ value }) => value.map((v: string | number) => Number(v)))
   @IsNumber({}, { each: true })
-  usedReagentSamples?: number[];
+  usedReagentSample?: number[];
 }
 
 export class CreateSampleSuccessDto {
@@ -109,7 +109,7 @@ export class CreateSampleSuccessDto {
   package: Package | null;
 
   @ApiProperty({ isArray: true, type: Number, required: false })
-  usedReagentSamples?: number[] | null;
+  usedReagentSample?: number[] | null;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
   @IsDate()

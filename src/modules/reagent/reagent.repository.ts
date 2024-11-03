@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { IReagentRepository, IWhereClause } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { CreateSampleDto } from './dto/createSample.dto';
 
 @Injectable()
 class ReagentRepository implements IReagentRepository {
@@ -15,6 +16,20 @@ class ReagentRepository implements IReagentRepository {
   async create(reagent: IReagent): Promise<IReagent> {
     return await this.prisma.reagent.create({
       data: reagent,
+    });
+  }
+
+  async createSample(sample: CreateSampleDto): Promise<IReagent> {
+    return await this.prisma.reagent.create({
+      data: {
+        ...sample,
+        category: 'Sample',
+        usedReagentSample: sample.usedReagentSample
+          ? {
+              connect: sample.usedReagentSample.map((id) => ({ id })),
+            }
+          : undefined,
+      },
     });
   }
 
@@ -59,7 +74,10 @@ class ReagentRepository implements IReagentRepository {
     }
 
     if (filter?.name) {
-      whereClause.name = filter.name;
+      whereClause.name = {
+        contains: filter.name,
+        mode: 'insensitive',
+      };
     }
 
     if (filter?.storageId) {
