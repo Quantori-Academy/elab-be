@@ -42,7 +42,7 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiBody({ type: () => CreateReagentDto })
-  @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.CREATED, type: () => CreateReagentSuccessDto })
   @UseGuards(AuthGuard)
   @Post('')
   async createReagent(@Body() createReagentDto: CreateReagentDto) {
@@ -51,8 +51,8 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiQuery({ type: () => GetReagentDto })
-  @ApiResponse({ status: HttpStatus.OK, type: [GetReagentSuccessDto] })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetReagentErrorDto })
+  @ApiResponse({ status: HttpStatus.OK, type: () => GetReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: () => GetReagentErrorDto })
   @UseGuards(AuthGuard)
   @Get('')
   async getReagents(@Query(ValidateParseReagentOptionsPipe) getReagentDto: ReagentOptions) {
@@ -61,8 +61,8 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiQuery({ type: () => SearchByStructureDto })
-  @ApiResponse({ status: HttpStatus.OK, type: [SearchByStructureSuccessDto] })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: SearchByStructureErrorDto })
+  @ApiResponse({ status: HttpStatus.OK, type: () => SearchByStructureSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: () => SearchByStructureErrorDto })
   @UseGuards(AuthGuard)
   @Get('/search')
   async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
@@ -71,7 +71,7 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiBody({ type: () => UpdateReagentDto })
-  @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
+  @ApiResponse({ status: HttpStatus.OK, type: () => UpdateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Post(':id')
@@ -88,7 +88,7 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.OK, type: [GetReagentSuccessDto] })
+  @ApiResponse({ status: HttpStatus.OK, type: () => GetReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Get(':id')
@@ -105,11 +105,11 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
-  @ApiBody({ type: CreateSampleDto })
-  @ApiResponse({ status: HttpStatus.CREATED, type: CreateSampleSuccessDto })
+  @ApiBody({ type: () => CreateSampleDto })
+  @ApiResponse({ status: HttpStatus.CREATED, type: () => CreateSampleSuccessDto })
   @UseGuards(AuthGuard)
-  @Post('sample')
+  @Post('/create/sample')
   async createSample(@Body() createSampleDto: CreateSampleDto) {
-    return await this.sampleService.create({ ...createSampleDto, category: 'Sample' });
+    return await this.sampleService.create(createSampleDto);
   }
 }

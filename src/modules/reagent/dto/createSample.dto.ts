@@ -23,7 +23,7 @@ export class CreateSampleDto {
   quantityUnit: string;
 
   @ApiProperty({ example: 5.5 })
-  @IsString()
+  @IsNumber()
   totalQuantity: number;
 
   @ApiProperty({ example: 0 })
@@ -36,10 +36,10 @@ export class CreateSampleDto {
 
   @ApiProperty({ example: 2 })
   @Transform(({ value }) => Number(value))
-  @IsString()
+  @IsNumber()
   storageId: number;
 
-  @ApiProperty({ isArray: true, type: Number, required: false })
+  @ApiProperty({ isArray: true, type: () => Number, required: false })
   @IsArray()
   @IsOptional()
   @Transform(({ value }) => value.map((v: string | number) => Number(v)))
@@ -57,19 +57,20 @@ export class CreateSampleSuccessDto {
   name: string;
 
   @ApiProperty({ required: false })
-  casNumber?: null;
+  @IsString()
+  casNumber?: string | null;
 
   @ApiProperty({ required: false })
-  producer?: null;
+  producer?: string | null;
 
   @ApiProperty({ required: false })
-  catalogId?: null;
+  catalogId?: string | null;
 
   @ApiProperty({ required: false })
-  catalogLink?: null;
+  catalogLink?: string | null;
 
   @ApiProperty({ required: false })
-  pricePerUnit?: null;
+  pricePerUnit?: number | null;
 
   @ApiProperty({ required: false })
   @IsString()
@@ -108,7 +109,7 @@ export class CreateSampleSuccessDto {
   @IsEnum(Package)
   package: Package | null;
 
-  @ApiProperty({ isArray: true, type: Number, required: false })
+  @ApiProperty({ isArray: true, type: () => Number, required: false })
   usedReagentSample?: number[] | null;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })

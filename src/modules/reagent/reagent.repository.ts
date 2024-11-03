@@ -30,6 +30,9 @@ class ReagentRepository implements IReagentRepository {
             }
           : undefined,
       },
+      include: {
+        usedReagentSample: true,
+      },
     });
   }
 
@@ -37,6 +40,9 @@ class ReagentRepository implements IReagentRepository {
     return await this.prisma.reagent.update({
       where: { id: reagent.id },
       data: reagent,
+      include: {
+        usedReagentSample: true,
+      },
     });
   }
 
@@ -46,6 +52,9 @@ class ReagentRepository implements IReagentRepository {
       data: {
         ...data,
         isDeleted,
+      },
+      include: {
+        usedReagentSample: true,
       },
     });
   }
@@ -61,6 +70,9 @@ class ReagentRepository implements IReagentRepository {
   async findById(id: number): Promise<IReagent | null> {
     return await this.prisma.reagent.findUnique({
       where: { id },
+      include: {
+        usedReagentSample: true,
+      },
     });
   }
 
@@ -97,6 +109,7 @@ class ReagentRepository implements IReagentRepository {
             },
           },
         },
+        usedReagentSample: true,
       },
       skip,
       take,
