@@ -32,7 +32,7 @@ class CreateOrderDto {
 
   @ApiHideProperty()
   @Exclude()
-  status: Status = Status.Ordered;
+  status: Status = Status.Pending;
 }
 
 class CreateOrderSuccessDto {
