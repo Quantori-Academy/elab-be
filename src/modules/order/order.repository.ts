@@ -108,7 +108,7 @@ export class OrderRepository implements IOrderRepository {
 
       const existingReagentIds: number[] = existingReagents.map((reagent) => reagent.id);
 
-      const orderWithExistingReqeust = await this.prisma.order.findMany({
+      const orderWithExistingRequest = await this.prisma.order.findMany({
         where: {
           reagents: {
             some: {
@@ -126,7 +126,7 @@ export class OrderRepository implements IOrderRepository {
           },
         },
       });
-      const orderIdMappedWithReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingReqeust.map((order) => ({
+      const orderIdMappedWithReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingRequest.map((order) => ({
         orderId: order.id,
         matchedReagentRequestIds: order.reagents.map((reagent) => reagent.id).filter((id) => existingReagentIds.includes(id)),
       }));
