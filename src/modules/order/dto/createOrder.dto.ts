@@ -102,9 +102,9 @@ class CreateOrderBadRequestDto {
 class CreateOrderConflictErrorDto {
   @ApiProperty({
     example: [
-      '1: Order with id 48 includes reagentRequests with ids - 2',
-      '2: Order with id 51 includes reagentRequests with ids - 1',
-      '3: Order with id 52 includes reagentRequests with ids - 3',
+      '1: Order with id 48 includes reagentRequests with ids - 2 which has status Ordered',
+      '2: Order with id 51 includes reagentRequests with ids - 1 which has status Ordered ',
+      '3: Order with id 52 includes reagentRequests with ids - 3 which has status Ordered',
     ],
   })
   message: string;
