@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Status } from '@prisma/client';
+import { ReagentRequest, Status } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 
@@ -47,6 +47,27 @@ class UpdateOrderSuccessDto {
 
   @ApiProperty({ example: '2024-10-23T17:09:00.204Z' })
   updatedAt: string;
+
+  @ApiProperty({
+    example: [
+      {
+        id: 13,
+        userId: 5,
+        name: 'Reagent A',
+        structureSmiles: 'CO',
+        casNumber: '123-45-67',
+        desiredQuantity: 500,
+        quantityUnit: 'ml',
+        userComments: 'Commenting here...',
+        procurementComments: null,
+        status: 'Fulfilled',
+        createdAt: '2024-11-01T13:48:27.215Z',
+        updatedAt: '2024-11-04T14:52:31.912Z',
+        orderId: 31,
+      },
+    ],
+  })
+  reagents: ReagentRequest;
 }
 
 class UpdateOrderValidationErrorDto {
@@ -58,6 +79,9 @@ class UpdateOrderValidationErrorDto {
       'seller must be a string',
       'seller must be shorter than or equal to 200 characters',
       'status must be one of the following values: Pending, Ordered, Fulfilled, Declined',
+      "Fulfilled/Declined orders can't be edited",
+      'Pending orders can be changed only to Submitted status',
+      'Order with status Submitted cannot be modified. You can only change its status to Fulfilled or Declined.',
     ],
   })
   message: string;

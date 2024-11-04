@@ -9,7 +9,7 @@ import {
   OrderWithReagentCount,
   OrderWithReagentCountObject,
 } from './types/order.type';
-import { Order, Prisma } from '@prisma/client';
+import { Order, Prisma, Status } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
 
@@ -130,22 +130,37 @@ export class OrderRepository implements IOrderRepository {
     }
   }
 
-  async update(order: PartialWithRequiredId<Order>): Promise<Order> {
+  async update(order: PartialWithRequiredId<Order>): Promise<OrderWithReagents> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
-      // const existingOrder = await this.prisma.order.findUnique({
-      //   where: { id: order.id },
-      // })
-      // if (!existingOrder) {
-      //   throw new NotFoundException(`Order not found`);
-      // }
-      // if (existingOrder.status === Status.Submitted) {
-      //   throw new NotFoundException(`Order with status ${Status.Submitted} can't be changed`);
-      // }
+      const { status } = order;
 
-      const updatedOrder: Order = await this.prisma.order.update({
+      if (status === Status.Declined) {
+        await this.prisma.reagentRequest.updateMany({
+          where: {
+            orderId: order.id,
+          },
+          data: {
+            status: Status.Pending,
+          },
+        });
+      } else if (status === Status.Fulfilled) {
+        await this.prisma.reagentRequest.updateMany({
+          where: {
+            orderId: order.id,
+          },
+          data: {
+            status: Status.Fulfilled,
+          },
+        });
+      }
+
+      const updatedOrder: OrderWithReagents = await this.prisma.order.update({
         where: { id: order.id },
         data: order,
+        include: {
+          reagents: true,
+        },
       });
       this.logger.log(`[${this.update.name}] - Method finished`);
       return updatedOrder;

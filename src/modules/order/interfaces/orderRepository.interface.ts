@@ -9,7 +9,7 @@ export interface IOrderRepository {
   findById(id: number, includeReagents?: false): Promise<Order | null>;
   findAll(filterBy?: OrderFilterOptions, pagination?: OrderPaginationOptions, sortOptions?: OrderSortOptions): Promise<OrderList>;
   create(data: CompleteOrderData): Promise<OrderWithReagents>;
-  update(order: PartialWithRequiredId<Order>): Promise<Order>;
+  update(order: PartialWithRequiredId<Order>): Promise<OrderWithReagents>;
   upsert(order: Order): Promise<void>;
   delete(id: number): Promise<OrderWithReagents>;
 }
