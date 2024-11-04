@@ -3,7 +3,13 @@ import { ORDER_SERVICE_TOKEN } from './order.service';
 import { IOrderService } from './interfaces/orderService.interface';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CompleteOrderData, OrderList, OrderWithReagents } from './types/order.type';
-import { CreateOrderBadRequestDto, CreateOrderDto, CreateOrderNotFoundDto, CreateOrderSuccessDto } from './dto/createOrder.dto';
+import {
+  CreateOrderBadRequestDto,
+  CreateOrderConflictErrorDto,
+  CreateOrderDto,
+  CreateOrderNotFoundDto,
+  CreateOrderSuccessDto,
+} from './dto/createOrder.dto';
 import { Request } from 'express';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -31,6 +37,7 @@ export class OrderController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: CreateOrderNotFoundDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.CONFLICT, type: CreateOrderConflictErrorDto })
   @Roles(Role.ProcurementOfficer)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')

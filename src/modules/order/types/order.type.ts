@@ -20,6 +20,11 @@ type OrderWithReagentCountObject = Prisma.OrderGetPayload<{
   };
 }>;
 
+type OrderIdMappedWithReagentIds = {
+  orderId: number;
+  matchedReagentRequestIds: number[];
+};
+
 type OrderWithReagentCount = OrderWithReagents & {
   reagentCount: number;
 };
@@ -33,4 +38,12 @@ type CompleteOrderData = CreateOrderDto & {
   userId: number;
 };
 
-export { OrderWithReagents, OrderList, CompleteOrderData, OnlyReagentId, OrderWithReagentCountObject, OrderWithReagentCount };
+export {
+  OrderWithReagents,
+  OrderList,
+  CompleteOrderData,
+  OnlyReagentId,
+  OrderWithReagentCountObject,
+  OrderWithReagentCount,
+  OrderIdMappedWithReagentIds,
+};
