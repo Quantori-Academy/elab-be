@@ -4,7 +4,7 @@ import { IOrderService } from './interfaces/orderService.interface';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
 import { CompleteOrderData, OrderList, OrderWithReagents } from './types/order.type';
 import { OrdereOptions } from './types/orderOptions.type';
-import { Order, Status } from '@prisma/client';
+import { Status } from '@prisma/client';
 import { UpdateOrderDto } from './dto/updateOrder.dto';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class OrderService implements IOrderService {
     }
   }
 
-  async updateOrder(id: number, data: UpdateOrderDto): Promise<Order> {
+  async updateOrder(id: number, data: UpdateOrderDto): Promise<OrderWithReagents> {
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {
       const { status } = data;
@@ -56,7 +56,7 @@ export class OrderService implements IOrderService {
         throw new BadRequestException(`${currentStatus} orders can't be edited`);
       }
 
-      if (currentStatus === Status.Pending && status !== Status.Submitted) {
+      if (currentStatus === Status.Pending && status && status !== Status.Submitted) {
         throw new BadRequestException(`${currentStatus} orders can be changed only to ${Status.Submitted} status`);
       }
 
@@ -69,7 +69,7 @@ export class OrderService implements IOrderService {
         }
       }
 
-      const order: Order = await this.orderRepository.update({ id, ...data });
+      const order: OrderWithReagents = await this.orderRepository.update({ id, ...data });
       this.logger.log(`[${this.updateOrder.name}] - Method finished`);
       return order;
     } catch (error) {

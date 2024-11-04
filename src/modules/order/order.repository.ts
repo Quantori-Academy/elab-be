@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
 import {
@@ -8,8 +8,9 @@ import {
   OrderWithReagents,
   OrderWithReagentCount,
   OrderWithReagentCountObject,
+  UpdateOrderData,
 } from './types/order.type';
-import { Order, Prisma, Status } from '@prisma/client';
+import { Order, Prisma, ReagentRequest, Status } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
 
@@ -107,7 +108,7 @@ export class OrderRepository implements IOrderRepository {
       const existingReagentIds: number[] = existingReagents.map((reagent) => reagent.id);
       const missingIds: number[] = requestedReagentIds.filter((id) => !existingReagentIds.includes(id));
       if (missingIds.length > 0) {
-        this.logger.error(`[${this.create.name}] - Exception thrown: invalid regent ids`);
+        this.logger.error(`[${this.create.name}] - Exception thrown: invalid reagent ids`);
         throw new NotFoundException(`The following reagent IDs not found: ${missingIds}`);
       }
 
@@ -130,10 +131,116 @@ export class OrderRepository implements IOrderRepository {
     }
   }
 
-  async update(order: PartialWithRequiredId<Order>): Promise<OrderWithReagents> {
+  async update(order: PartialWithRequiredId<UpdateOrderData>): Promise<OrderWithReagents> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
+      const { includeReagents = [], excludeReagents = [], ...orderData } = order;
       const { status } = order;
+
+      const requestedIncludeReagentIds: number[] = includeReagents.map((reagent) => reagent.id);
+      const requestedExcludeReagentIds: number[] = excludeReagents.map((reagent) => reagent.id);
+
+      const reagentsForExclude: ReagentRequest[] = await this.prisma.reagentRequest.findMany({
+        where: {
+          AND: [
+            {
+              id: {
+                in: requestedExcludeReagentIds,
+              },
+            },
+            {
+              orderId: order.id,
+            },
+          ],
+        },
+      });
+      const existingReagentIdsForExclude: number[] = reagentsForExclude.map((reagent) => reagent.id);
+      const missingIdsForExclude: number[] = requestedExcludeReagentIds.filter(
+        (id) => !existingReagentIdsForExclude.includes(id),
+      );
+      if (missingIdsForExclude.length > 0) {
+        this.logger.error(`[${this.create.name}] - Exception thrown: invalid reagent ids`);
+        throw new NotFoundException(
+          `Order with id ${order.id} doesn't have the following reagent[s] - ${missingIdsForExclude} for excluding`,
+        );
+      }
+
+      await this.prisma.$transaction([
+        this.prisma.order.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            reagents: {
+              disconnect: reagentsForExclude.map((reagent) => ({ id: reagent.id })),
+            },
+          },
+        }),
+
+        this.prisma.reagentRequest.updateMany({
+          where: {
+            id: {
+              in: existingReagentIdsForExclude,
+            },
+          },
+          data: {
+            status: Status.Pending,
+          },
+        }),
+      ]);
+
+      const reagentsForInclude = await this.prisma.reagentRequest.findMany({
+        where: {
+          AND: [
+            {
+              id: {
+                in: requestedIncludeReagentIds,
+              },
+            },
+          ],
+        },
+        include: {
+          order: true,
+        },
+      });
+
+      const reagentIdsForInclude: number[] = reagentsForInclude.map((reagent) => {
+        if (reagent.order && reagent.order.status === Status.Submitted) {
+          throw new BadRequestException(
+            `reagent with id ${reagent.id} can't be included because it belongs to order ${reagent.order.id} which is Submitted`,
+          );
+        }
+        return reagent.id;
+      });
+
+      const existingReagentForInclude = await this.prisma.reagentRequest.findMany({
+        where: {
+          id: {
+            in: reagentIdsForInclude,
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const existingReagentIdsForInclude: number[] = existingReagentForInclude.map((reagent) => reagent.id);
+      const missingIds: number[] = requestedIncludeReagentIds.filter((id) => !existingReagentIdsForInclude.includes(id));
+      if (missingIds.length > 0) {
+        this.logger.error(`[${this.create.name}] - Exception thrown: invalid reagent ids`);
+        throw new NotFoundException(`The following reagent IDs not found: ${missingIds} for including`);
+      }
+
+      await this.prisma.order.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          reagents: {
+            connect: existingReagentForInclude.map((reagent) => ({ id: reagent.id })),
+          },
+        },
+      });
 
       if (status === Status.Declined) {
         await this.prisma.reagentRequest.updateMany({
@@ -157,7 +264,11 @@ export class OrderRepository implements IOrderRepository {
 
       const updatedOrder: OrderWithReagents = await this.prisma.order.update({
         where: { id: order.id },
-        data: order,
+        data: {
+          seller: orderData.seller,
+          title: orderData.title,
+          status: orderData.status,
+        },
         include: {
           reagents: true,
         },

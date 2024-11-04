@@ -21,7 +21,7 @@ import { CreateOrderBadRequestDto, CreateOrderDto, CreateOrderNotFoundDto, Creat
 import { Request } from 'express';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Order, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
@@ -108,10 +108,10 @@ export class OrderController {
   async updateOrder(
     @Param('id', ParseIdPipe) id: number,
     @Body(new ValidationPipe({ transform: true })) updateOrderDto: UpdateOrderDto,
-  ): Promise<Order> {
+  ): Promise<OrderWithReagents> {
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {
-      const updatedOrder: Order = await this.orderService.updateOrder(id, updateOrderDto);
+      const updatedOrder: OrderWithReagents = await this.orderService.updateOrder(id, updateOrderDto);
       this.logger.log(`[${this.updateOrder.name}] - Method finished`);
       return updatedOrder;
     } catch (error) {

@@ -1,8 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { ReagentRequest, Status } from '@prisma/client';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { ArrayNotEmpty, IsArray, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { ReagentIdsDto } from './createOrder.dto';
 
 class UpdateOrderDto {
   @ApiProperty({ example: 'Title' })
@@ -19,11 +20,27 @@ class UpdateOrderDto {
   @Transform(({ value }) => (value === null ? undefined : value))
   seller?: string | undefined;
 
-  @ApiProperty({ example: 'Fulfilled' })
+  @ApiProperty({ example: 'Submitted' })
   @IsOptional()
   @Transform(({ value }) => (value === null ? undefined : value))
   @IsEnum(Status)
   status?: Status | undefined;
+
+  @ApiProperty({ example: [{ id: 2 }] })
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => ReagentIdsDto)
+  includeReagents: ReagentIdsDto[];
+
+  @ApiProperty({ example: [{ id: 1 }] })
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => ReagentIdsDto)
+  excludeReagents: ReagentIdsDto[];
 }
 
 class UpdateOrderSuccessDto {
@@ -82,6 +99,9 @@ class UpdateOrderValidationErrorDto {
       "Fulfilled/Declined orders can't be edited",
       'Pending orders can be changed only to Submitted status',
       'Order with status Submitted cannot be modified. You can only change its status to Fulfilled or Declined.',
+      "Order with id ${order.id} doesn't have the following reagent[s] - 1, 2, 3 for excluding",
+      "reagent with id 1 can't be included because it belongs to order 10 which is Submitted",
+      'The following reagent IDs not found: 1, 2, 3 for including',
     ],
   })
   message: string;
