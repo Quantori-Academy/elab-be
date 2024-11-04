@@ -103,6 +103,7 @@ enum Status {
   Ordered
   Fulfilled
   Declined
+  Submitted
 }
 
 model ReagentRequest {

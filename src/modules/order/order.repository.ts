@@ -12,7 +12,6 @@ import {
 import { Order, Prisma } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class OrderRepository implements IOrderRepository {
@@ -134,6 +133,16 @@ export class OrderRepository implements IOrderRepository {
   async update(order: PartialWithRequiredId<Order>): Promise<Order> {
     this.logger.log(`[${this.update.name}] - Method start`);
     try {
+      // const existingOrder = await this.prisma.order.findUnique({
+      //   where: { id: order.id },
+      // })
+      // if (!existingOrder) {
+      //   throw new NotFoundException(`Order not found`);
+      // }
+      // if (existingOrder.status === Status.Submitted) {
+      //   throw new NotFoundException(`Order with status ${Status.Submitted} can't be changed`);
+      // }
+
       const updatedOrder: Order = await this.prisma.order.update({
         where: { id: order.id },
         data: order,
@@ -141,9 +150,6 @@ export class OrderRepository implements IOrderRepository {
       this.logger.log(`[${this.update.name}] - Method finished`);
       return updatedOrder;
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
-        error = new NotFoundException(`Order not found`);
-      }
       this.logger.error(`[${this.update.name}] - Exception thrown: ${error}`);
       throw error;
     }
