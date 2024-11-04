@@ -10,7 +10,7 @@ import {
   OrderWithReagentCountObject,
   OrderIdMappedWithReagentIds,
 } from './types/order.type';
-import { Order, Prisma } from '@prisma/client';
+import { Order, Prisma, Status } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
 
@@ -107,13 +107,14 @@ export class OrderRepository implements IOrderRepository {
 
       const existingReagentIds: number[] = existingReagents.map((reagent) => reagent.id);
 
-      const orderWithExistingRequest = await this.prisma.order.findMany({
+      const orderWithExistingOrderedRequest = await this.prisma.order.findMany({
         where: {
           reagents: {
             some: {
               id: {
                 in: existingReagentIds,
               },
+              status: Status.Ordered,
             },
           },
         },
@@ -125,16 +126,19 @@ export class OrderRepository implements IOrderRepository {
           },
         },
       });
-      const orderIdMappedWithReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingRequest.map((order) => ({
-        orderId: order.id,
-        matchedReagentRequestIds: order.reagents.map((reagent) => reagent.id).filter((id) => existingReagentIds.includes(id)),
-      }));
 
-      if (orderIdMappedWithReagentRequestIds.length > 0) {
+      const orderIdMappedWithOrderedReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingOrderedRequest.map(
+        (order) => ({
+          orderId: order.id,
+          matchedReagentRequestIds: order.reagents.map((reagent) => reagent.id).filter((id) => existingReagentIds.includes(id)),
+        }),
+      );
+
+      if (orderIdMappedWithOrderedReagentRequestIds.length > 0) {
         const conflicts: string[] = [];
-        orderIdMappedWithReagentRequestIds.map((order) => {
+        orderIdMappedWithOrderedReagentRequestIds.map((order) => {
           conflicts.push(
-            `Order with id ${order.orderId} includes reagentRequests with ids - ${order.matchedReagentRequestIds.join(', ')}`,
+            `Order with id ${order.orderId} includes reagentRequests with id[s] - ${order.matchedReagentRequestIds.join(', ')} which has status Ordered`,
           );
         });
         throw new ConflictException(conflicts);
