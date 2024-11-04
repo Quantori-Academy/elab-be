@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
 import {
@@ -9,6 +9,7 @@ import {
   OrderWithReagentCount,
   OrderWithReagentCountObject,
   UpdateOrderData,
+  OrderIdMappedWithReagentIds,
 } from './types/order.type';
 import { Order, Prisma, ReagentRequest, Status } from '@prisma/client';
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
@@ -106,6 +107,40 @@ export class OrderRepository implements IOrderRepository {
       });
 
       const existingReagentIds: number[] = existingReagents.map((reagent) => reagent.id);
+
+      const orderWithExistingReqeust = await this.prisma.order.findMany({
+        where: {
+          reagents: {
+            some: {
+              id: {
+                in: existingReagentIds,
+              },
+            },
+          },
+        },
+        include: {
+          reagents: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      const orderIdMappedWithReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingReqeust.map((order) => ({
+        orderId: order.id,
+        matchedReagentRequestIds: order.reagents.map((reagent) => reagent.id).filter((id) => existingReagentIds.includes(id)),
+      }));
+
+      if (orderIdMappedWithReagentRequestIds.length > 0) {
+        const conflicts: string[] = [];
+        orderIdMappedWithReagentRequestIds.map((order) => {
+          conflicts.push(
+            `Order with id ${order.orderId} includes reagentRequests with ids - ${order.matchedReagentRequestIds.join(', ')}`,
+          );
+        });
+        throw new ConflictException(conflicts);
+      }
+
       const missingIds: number[] = requestedReagentIds.filter((id) => !existingReagentIds.includes(id));
       if (missingIds.length > 0) {
         this.logger.error(`[${this.create.name}] - Exception thrown: invalid reagent ids`);
@@ -123,8 +158,6 @@ export class OrderRepository implements IOrderRepository {
           reagents: true,
         },
       });
-
-      await this.deleteEmptyOrders();
       this.logger.log(`[${this.create.name}] - Method finished`);
       return order;
     } catch (error) {
@@ -348,23 +381,6 @@ export class OrderRepository implements IOrderRepository {
       return Object.keys(orderBy).length > 0 ? orderBy : undefined;
     } catch (error) {
       this.logger.error(`[${this.orderFactory.name}] - Exception thrown: ${error}`);
-      throw error;
-    }
-  }
-
-  private async deleteEmptyOrders(): Promise<void> {
-    this.logger.log(`[${this.deleteEmptyOrders.name}] - Method start`);
-    try {
-      const { count } = await this.prisma.order.deleteMany({
-        where: {
-          reagents: {
-            none: {},
-          },
-        },
-      });
-      this.logger.log(`[${this.deleteEmptyOrders.name}] - Method finished, deleted - ${count} order`);
-    } catch (error) {
-      this.logger.error(`[${this.deleteEmptyOrders.name}] - Exception thrown: ${error}`);
       throw error;
     }
   }

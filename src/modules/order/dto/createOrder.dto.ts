@@ -32,7 +32,7 @@ class CreateOrderDto {
 
   @ApiHideProperty()
   @Exclude()
-  status: Status = Status.Pending;
+  status: Status = Status.Ordered;
 }
 
 class CreateOrderSuccessDto {
@@ -101,8 +101,25 @@ class CreateOrderBadRequestDto {
   statusCode: number;
 }
 
+class CreateOrderConflictErrorDto {
+  @ApiProperty({
+    example: [
+      '1: Order with id 48 includes reagentRequests with ids - 2',
+      '2: Order with id 51 includes reagentRequests with ids - 1',
+      '3: Order with id 52 includes reagentRequests with ids - 3',
+    ],
+  })
+  message: string;
+
+  @ApiProperty({ example: 'Conflict' })
+  error: string;
+
+  @ApiProperty({ example: HttpStatus.CONFLICT })
+  statusCode: number;
+}
+
 class CreateOrderNotFoundDto {
-  @ApiProperty({ example: 'The following reagent IDs not found: 1, 2, 3' })
+  @ApiProperty({ example: "The following reagent with ID's not found: 1, 2, 3" })
   message: string;
 
   @ApiProperty({ example: 'Not Found' })
@@ -112,4 +129,11 @@ class CreateOrderNotFoundDto {
   statusCode: number;
 }
 
-export { CreateOrderDto, CreateOrderSuccessDto, CreateOrderBadRequestDto, CreateOrderNotFoundDto, ReagentIdsDto };
+export {
+  CreateOrderDto,
+  CreateOrderSuccessDto,
+  CreateOrderBadRequestDto,
+  CreateOrderNotFoundDto,
+  ReagentIdsDto,
+  CreateOrderConflictErrorDto,
+};
