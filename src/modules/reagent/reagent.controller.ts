@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
 import { IReagentService } from './interfaces/reagentService.interface';
@@ -27,6 +28,9 @@ import { IReagent } from './interfaces/reagentEntity.interface';
 import { SAMPLE_SERVICE_TOKEN } from './sample.service';
 import { ISampleService } from './interfaces/sampleService.interface';
 import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 const ROUTE = 'reagents';
 
@@ -43,9 +47,10 @@ export class ReagentController {
   @ApiBearerAuth()
   @ApiBody({ type: () => CreateReagentDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: () => CreateReagentSuccessDto })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Researcher)
   @Post('')
-  async createReagent(@Body() createReagentDto: CreateReagentDto) {
+  async createReagent(@Body(new ValidationPipe({ transform: true })) createReagentDto: CreateReagentDto) {
     return await this.reagentService.create({ ...createReagentDto, category: 'Reagent' });
   }
 
@@ -75,7 +80,10 @@ export class ReagentController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Post(':id')
-  async editReagent(@Body() updateReagentDto: UpdateReagentDto, @Param('id', ParseIdPipe) id: number) {
+  async editReagent(
+    @Body(new ValidationPipe({ transform: true })) updateReagentDto: UpdateReagentDto,
+    @Param('id', ParseIdPipe) id: number,
+  ) {
     try {
       this.logger.log('editReagent route start');
       const reagent = await this.reagentService.getReagentById(id);
@@ -107,9 +115,10 @@ export class ReagentController {
   @ApiBearerAuth()
   @ApiBody({ type: () => CreateSampleDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: () => CreateSampleSuccessDto })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Researcher)
   @Post('/create/sample')
-  async createSample(@Body() createSampleDto: CreateSampleDto) {
+  async createSample(@Body(new ValidationPipe({ transform: true })) createSampleDto: CreateSampleDto) {
     return await this.sampleService.create(createSampleDto);
   }
 }
