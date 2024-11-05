@@ -96,12 +96,7 @@ class ReagentService implements IReagentService {
         package: reagentRequest.package,
         isDeleted: false,
         category: Category.Reagent,
-        expirationDate: reagentRequestDto.expirationDate,
-        producer: reagentRequestDto.producer,
-        catalogId: reagentRequestDto.catalogId,
-        catalogLink: reagentRequestDto.catalogLink,
-        pricePerUnit: reagentRequestDto.pricePerUnit,
-        storageId: reagentRequestDto.storageId,
+        ...reagentRequestDto,
       };
 
       const reagent: IReagent = await this.create(reagentData);
