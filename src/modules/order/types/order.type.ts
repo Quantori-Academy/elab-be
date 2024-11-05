@@ -50,6 +50,6 @@ export {
   OnlyReagentId,
   OrderWithReagentCountObject,
   OrderWithReagentCount,
-  UpdateOrderData,
   OrderIdMappedWithReagentIds,
+  UpdateOrderData,
 };

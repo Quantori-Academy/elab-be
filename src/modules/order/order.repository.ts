@@ -12,6 +12,7 @@ import {
   OrderIdMappedWithReagentIds,
 } from './types/order.type';
 import { Order, Prisma, ReagentRequest, Status } from '@prisma/client';
+
 import { PartialWithRequiredId } from 'src/common/types/idRequired.type';
 import { OrderBy, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from './types/orderOptions.type';
 
@@ -108,13 +109,14 @@ export class OrderRepository implements IOrderRepository {
 
       const existingReagentIds: number[] = existingReagents.map((reagent) => reagent.id);
 
-      const orderWithExistingReqeust = await this.prisma.order.findMany({
+      const orderWithExistingOrderedRequest = await this.prisma.order.findMany({
         where: {
           reagents: {
             some: {
               id: {
                 in: existingReagentIds,
               },
+              status: Status.Ordered,
             },
           },
         },
@@ -126,16 +128,19 @@ export class OrderRepository implements IOrderRepository {
           },
         },
       });
-      const orderIdMappedWithReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingReqeust.map((order) => ({
-        orderId: order.id,
-        matchedReagentRequestIds: order.reagents.map((reagent) => reagent.id).filter((id) => existingReagentIds.includes(id)),
-      }));
 
-      if (orderIdMappedWithReagentRequestIds.length > 0) {
+      const orderIdMappedWithOrderedReagentRequestIds: OrderIdMappedWithReagentIds[] = orderWithExistingOrderedRequest.map(
+        (order) => ({
+          orderId: order.id,
+          matchedReagentRequestIds: order.reagents.map((reagent) => reagent.id).filter((id) => existingReagentIds.includes(id)),
+        }),
+      );
+
+      if (orderIdMappedWithOrderedReagentRequestIds.length > 0) {
         const conflicts: string[] = [];
-        orderIdMappedWithReagentRequestIds.map((order) => {
+        orderIdMappedWithOrderedReagentRequestIds.map((order) => {
           conflicts.push(
-            `Order with id ${order.orderId} includes reagentRequests with ids - ${order.matchedReagentRequestIds.join(', ')}`,
+            `Order with id ${order.orderId} includes reagentRequests with id[s] - ${order.matchedReagentRequestIds.join(', ')} which has status Ordered`,
           );
         });
         throw new ConflictException(conflicts);
@@ -143,8 +148,8 @@ export class OrderRepository implements IOrderRepository {
 
       const missingIds: number[] = requestedReagentIds.filter((id) => !existingReagentIds.includes(id));
       if (missingIds.length > 0) {
-        this.logger.error(`[${this.create.name}] - Exception thrown: invalid reagent ids`);
-        throw new NotFoundException(`The following reagent IDs not found: ${missingIds}`);
+        this.logger.error(`[${this.create.name}] - Exception thrown: invalid regent ids`);
+        throw new NotFoundException(`The following reagent with ID's not found: ${missingIds}`);
       }
 
       const order: OrderWithReagents = await this.prisma.order.create({
