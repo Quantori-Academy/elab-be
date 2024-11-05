@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Status } from '@prisma/client';
+import { Package, Status } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from 'src/modules/storage/types/storageOptions.type';
@@ -89,4 +89,8 @@ export class GetReagentRequestSuccessDto {
   @ApiProperty({ description: 'Created date of the Reagent Request' })
   @IsDate()
   updatedAt: Date;
+
+  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox' })
+  @IsEnum(Package)
+  package: Package | null;
 }

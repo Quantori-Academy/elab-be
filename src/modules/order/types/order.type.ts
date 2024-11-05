@@ -1,5 +1,5 @@
 import { Order, Prisma, ReagentRequest } from '@prisma/client';
-import { CreateOrderDto } from '../dto/createOrder.dto';
+import { CreateOrderDto, ReagentIdsDto } from '../dto/createOrder.dto';
 
 type OnlyReagentId = {
   id: number;
@@ -38,6 +38,12 @@ type CompleteOrderData = CreateOrderDto & {
   userId: number;
 };
 
+
+type UpdateOrderData = Order & {
+  includeReagents: ReagentIdsDto[];
+  excludeReagents: ReagentIdsDto[];
+};
+
 export {
   OrderWithReagents,
   OrderList,
@@ -46,4 +52,5 @@ export {
   OrderWithReagentCountObject,
   OrderWithReagentCount,
   OrderIdMappedWithReagentIds,
+  UpdateOrderData,
 };
