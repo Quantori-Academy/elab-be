@@ -1,7 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Category, Package } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsArray, IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+
+export class ReagentUsageDto {
+  @ApiProperty()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  reagentId: number;
+
+  @ApiProperty()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  quantityUsed: number;
+}
 
 export class CreateSampleDto {
   @ApiProperty()
@@ -31,6 +43,7 @@ export class CreateSampleDto {
   quantityLeft: number;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
+  @Type(() => Date)
   @IsDate()
   expirationDate: Date;
 
@@ -39,12 +52,11 @@ export class CreateSampleDto {
   @IsNumber()
   storageId: number;
 
-  @ApiProperty({ isArray: true, type: () => Number, required: false })
+  @ApiProperty({ isArray: true, required: false, type: () => ReagentUsageDto })
   @IsArray()
   @IsOptional()
-  @Transform(({ value }) => value.map((v: string | number) => Number(v)))
-  @IsNumber({}, { each: true })
-  usedReagentSample?: number[];
+  @Type(() => ReagentUsageDto)
+  usedReagentSample?: ReagentUsageDto[];
 }
 
 export class CreateSampleSuccessDto {

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Category, Package } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateReagentDto {
@@ -54,12 +54,13 @@ export class CreateReagentDto {
   quantityLeft: number;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
+  @Type(() => Date)
   @IsDate()
   expirationDate: Date;
 
   @ApiProperty({ example: 2 })
   @Transform(({ value }) => Number(value))
-  @IsString()
+  @IsNumber()
   storageId: number;
 
   @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1', required: false })
