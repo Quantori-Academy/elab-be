@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { ReagentRequest, Status } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsInt, IsNotEmpty, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsInt, IsNotEmpty, IsString, MaxLength, ValidateNested } from 'class-validator';
 
 class ReagentIdsDto {
   @ApiProperty({ example: 1 })
@@ -12,13 +12,15 @@ class ReagentIdsDto {
 
 class CreateOrderDto {
   @ApiProperty({ example: 'title' })
-  @IsNotEmpty()
   @MaxLength(200)
+  @IsString()
+  @IsNotEmpty()
   title: string;
 
   @ApiProperty({ example: 'oriflame' })
-  @IsNotEmpty()
   @MaxLength(200)
+  @IsString()
+  @IsNotEmpty()
   seller: string;
 
   @ApiProperty({ example: [{ id: 1 }, { id: 2 }, { id: 3 }] })

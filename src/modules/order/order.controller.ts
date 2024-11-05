@@ -1,4 +1,18 @@
-import { Body, Controller, Get, HttpStatus, Inject, Logger, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Logger,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ORDER_SERVICE_TOKEN } from './order.service';
 import { IOrderService } from './interfaces/orderService.interface';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,6 +29,13 @@ import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries..pipe';
 import { OrdereOptions } from './types/orderOptions.type';
 import { GetOrderListResponseDto, GetOrdersQueryDto, GetOrderValidationErrorsDto } from './dto/getOrder.dto';
+import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
+import {
+  UpdateOrderDto,
+  UpdateOrderNotFoundErrorDto,
+  UpdateOrderSuccessDto,
+  UpdateOrderValidationErrorDto,
+} from './dto/updateOrder.dto';
 
 const ROUTE = 'orders';
 
@@ -60,7 +81,7 @@ export class OrderController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetOrderValidationErrorsDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.ProcurementOfficer)
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
   async orderList(@Query(ValidateParseOrderOptionsPipe) options: OrdereOptions): Promise<OrderList> {
@@ -71,6 +92,30 @@ export class OrderController {
       return order;
     } catch (error) {
       this.logger.error(`[${this.orderList.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: UpdateOrderSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: UpdateOrderValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateOrderNotFoundErrorDto })
+  @Roles(Role.ProcurementOfficer)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch(':id')
+  async updateOrder(
+    @Param('id', ParseIdPipe) id: number,
+    @Body(new ValidationPipe({ transform: true })) updateOrderDto: UpdateOrderDto,
+  ): Promise<OrderWithReagents> {
+    this.logger.log(`[${this.updateOrder.name}] - Method start`);
+    try {
+      const updatedOrder: OrderWithReagents = await this.orderService.updateOrder(id, updateOrderDto);
+      this.logger.log(`[${this.updateOrder.name}] - Method finished`);
+      return updatedOrder;
+    } catch (error) {
+      this.logger.error(`[${this.updateOrder.name}] - Exception thrown: ` + error);
       throw error;
     }
   }
