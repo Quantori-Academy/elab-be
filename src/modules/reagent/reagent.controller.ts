@@ -85,6 +85,7 @@ export class ReagentController {
   @ApiBody({ type: () => UpdateReagentDto })
   @ApiResponse({ status: HttpStatus.OK, type: () => UpdateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.OK, type: GetReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.OK, type: CreateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateReagentValidationErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
