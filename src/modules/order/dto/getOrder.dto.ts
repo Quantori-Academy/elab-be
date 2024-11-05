@@ -5,6 +5,7 @@ import { Order } from '../types/orderOptions.type';
 import { OrderWithReagentCount } from '../types/order.type';
 import { HttpStatus } from '@nestjs/common';
 import { Status } from '@prisma/client';
+import { GetReagentRequestSuccessDto } from 'src/modules/reagentRequest/dto/getReagentRequest.dto';
 
 class GetOrdersQueryDto {
   @ApiProperty({ required: false, type: String, description: 'title of the order' })
@@ -95,6 +96,32 @@ class GetOrderListResponseDto {
   size: number;
 }
 
+class GetOneOrderResponseDto {
+  @ApiProperty({ example: 19 })
+  id: number;
+
+  @ApiProperty({ example: 3 })
+  userId: number;
+
+  @ApiProperty({ example: 'title' })
+  title: string;
+
+  @ApiProperty({ example: 'Oriflame' })
+  seller: string;
+
+  @ApiProperty({ example: 'Pending' })
+  status: Status;
+
+  @ApiProperty({ example: '2024-10-29T11:39:54.455Z' })
+  createdAt: string;
+
+  @ApiProperty({ example: '2024-10-31T13:48:19.996Z' })
+  updatedAt: string;
+
+  @ApiProperty({ type: [GetReagentRequestSuccessDto] })
+  reagents: GetReagentRequestSuccessDto[];
+}
+
 class GetOrderValidationErrorsDto {
   @ApiProperty({
     example: [
@@ -116,4 +143,4 @@ class GetOrderValidationErrorsDto {
   statusCode: number;
 }
 
-export { GetOrdersQueryDto, GetOrderListResponseDto, GetOrderValidationErrorsDto };
+export { GetOrdersQueryDto, GetOrderListResponseDto, GetOrderValidationErrorsDto, GetOneOrderResponseDto };
