@@ -13,6 +13,16 @@ class ReagentRepository implements IReagentRepository {
 
   constructor(private prisma: PrismaService) {}
 
+  async findManyById(ids: number[]): Promise<IReagent[]> {
+    return await this.prisma.reagent.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
+
   async create(reagent: IReagent): Promise<IReagent> {
     return await this.prisma.reagent.create({
       data: reagent,
@@ -21,33 +31,18 @@ class ReagentRepository implements IReagentRepository {
 
   async createSample(sample: CreateSampleDto): Promise<IReagent> {
     const { usedReagentSample, ...sampleRest } = sample;
-    console.log(sample);
-    const newSample = await this.prisma.reagent.create({
+    return await this.prisma.reagent.create({
       data: {
         ...sampleRest,
         category: 'Sample',
+        usedReagentSample: {
+          connect: usedReagentSample?.map((reagent) => ({ id: reagent.reagentId })),
+        },
+      },
+      include: {
+        usedReagentSample: true,
       },
     });
-    if (usedReagentSample && usedReagentSample.length > 0) {
-      const promises = await Promise.all(
-        usedReagentSample.map(async (usedReagents) => {
-          const result = await this.prisma.usage.create({
-            data: {
-              usedQuantity: usedReagents.quantityUsed,
-              usedReagentId: usedReagents.reagentId,
-              sampleId: newSample.id,
-            },
-          });
-          console.log('reslut', result);
-        }),
-      );
-      console.log(promises);
-    }
-    const createdReagent = await this.findById(newSample.id);
-    if (!createdReagent) {
-      throw new Error('Reagent not found after creation');
-    }
-    return createdReagent;
   }
 
   async update(reagent: IReagent): Promise<IReagent> {

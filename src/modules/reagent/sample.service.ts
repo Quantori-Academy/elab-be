@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { ISampleService } from './interfaces/sampleService.interface';
@@ -15,32 +15,32 @@ class SampleService implements ISampleService {
       this.logger.log(`${this.create.name} - START`);
       const { usedReagentSample } = data;
       if (usedReagentSample) {
-        const promises = usedReagentSample.map(async ({ reagentId, quantityUsed }) => {
-          const reagent = await this.reagentRepository.findById(reagentId);
-          return { reagent, quantityUsed, reagentId };
-        });
-        const results = await Promise.all(promises);
-        for (const { reagent, quantityUsed, reagentId } of results) {
-          if (!reagent || reagent.quantityLeft === undefined || reagent.id === undefined) {
-            throw new BadRequestException(`Invalid reagent data for ID: ${reagentId}`);
+        const results = await this.reagentRepository.findManyById(usedReagentSample.map((reagent) => reagent.reagentId));
+        for (const result of results) {
+          if (!result || result.quantityLeft === undefined || result.id === undefined) {
+            throw new BadRequestException(`Invalid reagent data`);
           }
-          if (reagent.quantityLeft === 0) {
-            throw new BadRequestException(`The reagent ${reagent.id} doesn't have enough quantityLeft`);
+          if (result.quantityLeft === 0) {
+            throw new BadRequestException(`The reagent ${result.name} (id- ${result.id}) doesn't have enough quantityLeft`);
           }
-          if (reagent.quantityLeft < quantityUsed) {
+          const usedData = usedReagentSample.find((reagent) => reagent.reagentId === result.id);
+          if (!usedData) {
+            throw new BadRequestException(`Used data for reagent ${result.name} (id- ${result.id}) not found`);
+          }
+          if (result.quantityLeft < usedData?.quantityUsed) {
             throw new BadRequestException(
-              `The reagent ${reagent.id} doesn't have enough quantityLeft (${reagent.quantityLeft}), to be used this much - ${quantityUsed}`,
+              `The reagent ${result.name} (id- ${result.id}) doesn't have enough quantityLeft (${result.quantityLeft}), to be used this much - ${usedData.quantityUsed}`,
             );
           }
-          const newQuantityLeft = reagent.quantityLeft - quantityUsed;
+          const newQuantityLeft = result.quantityLeft - usedData.quantityUsed;
           const isDeleted = newQuantityLeft === 0;
-          await this.reagentRepository.updateById({ quantityLeft: newQuantityLeft }, reagent.id, isDeleted);
+          await this.reagentRepository.updateById({ quantityLeft: newQuantityLeft }, result.id, isDeleted);
         }
       }
       return await this.reagentRepository.createSample(data);
     } catch (error) {
       this.logger.error('Failed to create a sample: ', error);
-      throw new InternalServerErrorException('Failed to create a sample!');
+      throw error;
     }
   }
 }

@@ -6,6 +6,7 @@ import { IReagent } from './reagentEntity.interface';
 import { CreateSampleDto } from '../dto/createSample.dto';
 
 export interface IReagentRepository extends IRepository<IReagent> {
+  findManyById(ids: number[]): Promise<IReagent[]>;
   findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
   getAllByStructure(
     structure: string,
