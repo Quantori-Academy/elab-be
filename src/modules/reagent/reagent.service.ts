@@ -1,11 +1,11 @@
-import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
-import { Category } from '@prisma/client';
+import { Category, Status } from '@prisma/client';
 import { CreateReagentFromRequestDto } from './dto/createReagentFromRequest.dto';
 import { REQUEST_SERVICE_TOKEN } from '../reagentRequest/reagentRequest.service';
 import { IReagentRequestService } from '../reagentRequest/interfaces/reagentRequestService.interface';
@@ -85,6 +85,10 @@ class ReagentService implements IReagentService {
       const reagentRequest = await this.requestService.getRequestById(reagentRequestId);
       if (!reagentRequest) return null;
 
+      if (reagentRequest.status !== Status.Fulfilled) {
+        throw new BadRequestException("Reagent request is not fulfilled, can't create reagent");
+      }
+
       const reagentData: IReagent = {
         name: reagentRequest.name,
         casNumber: reagentRequest.casNumber ?? '',
@@ -100,6 +104,7 @@ class ReagentService implements IReagentService {
       };
 
       const reagent: IReagent = await this.create(reagentData);
+
       this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
       return reagent;
     } catch (error) {
