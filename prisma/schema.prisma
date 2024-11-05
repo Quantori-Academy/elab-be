@@ -77,18 +77,8 @@ model Reagent {
   updatedAt     DateTime @updatedAt
   storage       Storage  @relation(fields: [storageId], references: [id])
 
-  usedReagentSample    Usage[]    @relation("UsedReagent")
-  usedBy               Usage[]    @relation("Sample")
-}
-
-model Usage {
-  id                    Int      @id @default(autoincrement())
-  usedQuantity          Float
-  sampleId              Int?
-  usedReagentId         Int?
-
-  sample                Reagent?  @relation("Sample", fields: [sampleId], references: [id])
-  usedReagent           Reagent?  @relation("UsedReagent", fields: [usedReagentId], references: [id])
+  usedReagentSample    Reagent[]   @relation("Prepared")
+  usedBy               Reagent[]    @relation("Prepared")
 }
 
 model Storage {
