@@ -5,11 +5,18 @@ import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOption
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { Category } from '@prisma/client';
+import { CreateReagentFromRequestDto } from './dto/createReagentFromRequest.dto';
+import { REQUEST_SERVICE_TOKEN } from '../reagentRequest/reagentRequest.service';
+import { IReagentRequestService } from '../reagentRequest/interfaces/reagentRequestService.interface';
 
 @Injectable()
 class ReagentService implements IReagentService {
   private readonly logger = new Logger(ReagentService.name);
-  constructor(@Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository) {}
+  constructor(
+    @Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository,
+    @Inject(REQUEST_SERVICE_TOKEN) private requestService: IReagentRequestService,
+  ) {}
 
   async create(data: IReagent): Promise<IReagent> {
     try {
@@ -66,6 +73,43 @@ class ReagentService implements IReagentService {
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
       throw new InternalServerErrorException('Failed to edit a reagent!');
+    }
+  }
+
+  async createReagentFromReagentRequest(
+    reagentRequestId: number,
+    reagentRequestDto: CreateReagentFromRequestDto,
+  ): Promise<IReagent | null> {
+    this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method start`);
+    try {
+      const reagentRequest = await this.requestService.getRequestById(reagentRequestId);
+      if (!reagentRequest) return null;
+
+      const reagentData: IReagent = {
+        name: reagentRequest.name,
+        casNumber: reagentRequest.casNumber ?? '',
+        quantityUnit: reagentRequest.quantityUnit,
+        totalQuantity: reagentRequest.desiredQuantity,
+        description: 'created from reagent request',
+        quantityLeft: reagentRequest.desiredQuantity,
+        structure: reagentRequest.structureSmiles ?? undefined,
+        package: reagentRequest.package,
+        isDeleted: false,
+        category: Category.Reagent,
+        expirationDate: reagentRequestDto.expirationDate,
+        producer: reagentRequestDto.producer,
+        catalogId: reagentRequestDto.catalogId,
+        catalogLink: reagentRequestDto.catalogLink,
+        pricePerUnit: reagentRequestDto.pricePerUnit,
+        storageId: reagentRequestDto.storageId,
+      };
+
+      const reagent: IReagent = await this.create(reagentData);
+      this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
+      return reagent;
+    } catch (error) {
+      this.logger.error(`[${this.createReagentFromReagentRequest.name}] - Exception thrown` + error);
+      throw error;
     }
   }
 }

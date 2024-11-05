@@ -28,9 +28,16 @@ import { IReagent } from './interfaces/reagentEntity.interface';
 import { SAMPLE_SERVICE_TOKEN } from './sample.service';
 import { ISampleService } from './interfaces/sampleService.interface';
 import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import {
+  CreateReagentFromRequestDto,
+  CreateReagentValidationErrorDto,
+  ReagentNotFoundErrorDto,
+} from './dto/createReagentFromRequest.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Role } from '@prisma/client';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
 const ROUTE = 'reagents';
 
@@ -77,6 +84,35 @@ export class ReagentController {
   @ApiBearerAuth()
   @ApiBody({ type: () => UpdateReagentDto })
   @ApiResponse({ status: HttpStatus.OK, type: () => UpdateReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.OK, type: GetReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateReagentValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: ReagentNotFoundErrorDto })
+  @Roles(Role.ProcurementOfficer)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('reagent-request/:reagentRequestId')
+  async createReagentFromRequest(
+    @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
+    @Body(new ValidationPipe({ transform: true, whitelist: true })) reagentRequestDto: CreateReagentFromRequestDto,
+  ): Promise<IReagent> {
+    this.logger.log(`[${this.createReagentFromRequest.name}] - Method start`);
+    try {
+      const reagent: IReagent | null = await this.reagentService.createReagentFromReagentRequest(
+        reagentRequestId,
+        reagentRequestDto,
+      );
+      if (!reagent) throw new NotFoundException('Reagent request is not found');
+      this.logger.log(`[${this.createReagentFromRequest.name}] - Method finished`);
+      return reagent;
+    } catch (error) {
+      this.logger.error(`[${this.createReagentFromRequest.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Post(':id')
