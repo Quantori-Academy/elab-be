@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
 import { IReagentService } from './interfaces/reagentService.interface';
@@ -24,6 +25,16 @@ import { ValidateParseForSearchPipe } from './pipes/validateParseForSearch.pipe'
 import { UpdateReagentDto, UpdateReagentSuccessDto } from './dto/updateReagent.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import {
+  CreateReagentFromRequestDto,
+  CreateReagentValidationErrorDto,
+  ReagentNotFoundErrorDto,
+} from './dto/createReagentFromRequest.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Role } from '@prisma/client';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
 const ROUTE = 'reagents';
 
@@ -60,6 +71,34 @@ export class ReagentController {
   @Get('/search')
   async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
     return await this.reagentService.searchByStructure(searchByStructureDto);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateReagentValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: ReagentNotFoundErrorDto })
+  @Roles(Role.ProcurementOfficer)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('reagent-request/:reagentRequestId')
+  async createReagentFromRequest(
+    @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
+    @Body(new ValidationPipe({ transform: true, whitelist: true })) reagentRequestDto: CreateReagentFromRequestDto,
+  ): Promise<IReagent> {
+    this.logger.log(`[${this.createReagentFromRequest.name}] - Method start`);
+    try {
+      const reagent: IReagent | null = await this.reagentService.createReagentFromReagentRequest(
+        reagentRequestId,
+        reagentRequestDto,
+      );
+      if (!reagent) throw new NotFoundException('Reagent request is not found');
+      this.logger.log(`[${this.createReagentFromRequest.name}] - Method finished`);
+      return reagent;
+    } catch (error) {
+      this.logger.error(`[${this.createReagentFromRequest.name}] - Exception thrown: ` + error);
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
