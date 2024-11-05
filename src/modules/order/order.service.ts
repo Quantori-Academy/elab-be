@@ -38,6 +38,18 @@ export class OrderService implements IOrderService {
     }
   }
 
+  async getOrderById(id: number): Promise<OrderWithReagents | null> {
+    this.logger.log(`[${this.getOrderById.name}] - Method start`);
+    try {
+      const order: OrderWithReagents | null = await this.orderRepository.findById(id, true);
+      this.logger.log(`[${this.getOrderById.name}] - Method finished`);
+      return order;
+    } catch (error) {
+      this.logger.error(`[${this.getOrderById.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
+
   async updateOrder(id: number, data: UpdateOrderDto): Promise<OrderWithReagents> {
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {
