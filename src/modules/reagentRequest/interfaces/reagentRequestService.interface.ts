@@ -8,4 +8,5 @@ export interface IReagentRequestService {
   getReagentRequestsForResearchers(options: ReagentRequestOptions, id: number): Promise<IReagentRequest[]>;
   getRequestById(id: number): Promise<IReagentRequest | null>;
   editReagentRequest(data: UpdateReagentRequestDto, id: number): Promise<IReagentRequest>;
+  deleteReagentRequest(id: number): Promise<void>;
 }

@@ -53,6 +53,7 @@ class CreateReagentValidationErrorDto {
       'pricePerUnit must be a number conforming to the specified constraints',
       'expirationDate should not be empty',
       'expirationDate must be a Date instance',
+      "Reagent request is not fulfilled, can't create reagent",
     ],
   })
   message: string;
