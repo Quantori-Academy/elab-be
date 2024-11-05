@@ -104,7 +104,6 @@ class ReagentService implements IReagentService {
       };
 
       const reagent: IReagent = await this.create(reagentData);
-      await this.requestService.deleteReagentRequest(reagentRequestId); // delete or mark as created???
       this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
       return reagent;
     } catch (error) {

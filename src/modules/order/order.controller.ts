@@ -116,7 +116,6 @@ export class OrderController {
     @Param('id', ParseIdPipe) id: number,
     @Body(new ValidationPipe({ transform: true, whitelist: true })) updateOrderDto: UpdateOrderDto,
   ): Promise<OrderWithReagents> {
-    console.log(updateOrderDto);
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {
       const updatedOrder: OrderWithReagents = await this.orderService.updateOrder(id, updateOrderDto);
