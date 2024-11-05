@@ -5,6 +5,7 @@ import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOption
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
+import { Category, ReagentRequest } from '@prisma/client';
 
 @Injectable()
 class ReagentService implements IReagentService {
@@ -66,6 +67,37 @@ class ReagentService implements IReagentService {
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
       throw new InternalServerErrorException('Failed to edit a reagent!');
+    }
+  }
+
+  async createReagentFromReagentRequest(reagentRequest: ReagentRequest): Promise<void> {
+    this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method start`);
+    try {
+      const reagent: IReagent = {
+        name: reagentRequest.name,
+        casNumber: reagentRequest.casNumber ?? '',
+        quantityUnit: reagentRequest.quantityUnit,
+        totalQuantity: reagentRequest.desiredQuantity,
+        description: 'created from reagent request',
+        quantityLeft: reagentRequest.desiredQuantity,
+        structure: reagentRequest.structureSmiles ?? undefined,
+        package: reagentRequest.package,
+        isDeleted: false,
+        category: Category.Reagent,
+
+        // to be changed, for now
+        expirationDate: new Date(), // ???
+        producer: '', // ??
+        catalogId: '', // ??
+        catalogLink: '', // ??
+        pricePerUnit: 0, // ??
+        storageId: 1, // ??
+      };
+      await this.create(reagent);
+      this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
+    } catch (error) {
+      this.logger.error(`[${this.createReagentFromReagentRequest.name}] - Exception thrown` + error);
+      throw error;
     }
   }
 }
