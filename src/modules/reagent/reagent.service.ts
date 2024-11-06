@@ -86,7 +86,7 @@ class ReagentService implements IReagentService {
       if (!reagentRequest) return null;
 
       if (reagentRequest.status !== Status.Fulfilled) {
-        throw new BadRequestException("Reagent request is not fulfilled, can't create reagent");
+        throw new BadRequestException('Only from Fulfilled requests can be created reagents');
       }
 
       const reagentData: IReagent = {
@@ -103,7 +103,10 @@ class ReagentService implements IReagentService {
         ...reagentRequestDto,
       };
 
-      const reagent: IReagent = await this.create(reagentData);
+      const [reagent] = await Promise.all([
+        this.create(reagentData),
+        this.requestService.editReagentRequest({ status: Status.Completed }, reagentRequestId),
+      ]);
 
       this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
       return reagent;
