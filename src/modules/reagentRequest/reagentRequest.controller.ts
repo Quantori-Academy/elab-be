@@ -58,9 +58,8 @@ export class ReagentRequestController {
     const user = req.user;
     if (user.role === Role.ProcurementOfficer) {
       return await this.requestService.getReagentRequestsForProcurementOficcer(queryDto);
-    } else {
-      return await this.requestService.getReagentRequestsForResearchers(queryDto, user.id);
     }
+    return await this.requestService.getReagentRequestsForResearchers(queryDto, user.id);
   }
 
   @ApiBearerAuth()
@@ -77,5 +76,21 @@ export class ReagentRequestController {
       this.logger.error('Error in controller path POST /:id ', error);
       throw error;
     }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetReagentRequestSuccessDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND })
+  @Roles(Role.ProcurementOfficer, Role.Researcher)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get(':id')
+  async getReagentRequestById(@Param('id', ParseIdPipe) id: number, @Req() req: any) {
+    const user = req.user;
+    const request = await this.requestService.getRequestById(id);
+    if (!request) throw new NotFoundException('Reagent Request with this ID - NOT FOUND');
+    if (user.role === Role.ProcurementOfficer) {
+      return request;
+    }
+    return await this.requestService.getRequestByIdForResearcher(id, user.id);
   }
 }
