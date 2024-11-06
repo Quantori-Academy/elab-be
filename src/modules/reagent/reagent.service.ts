@@ -3,8 +3,8 @@ import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
-import { IReagent } from './interfaces/reagentEntity.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
+import { IReagent } from './interfaces/reagentEntity.interface';
 
 @Injectable()
 class ReagentService implements IReagentService {

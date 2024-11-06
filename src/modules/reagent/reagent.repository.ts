@@ -2,9 +2,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { FilterOptions, FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
 import { Prisma } from '@prisma/client';
-import { IReagentRepository } from './interfaces/reagentRepository.interface';
-import { IReagent } from './interfaces/reagentEntity.interface';
+import { IReagentRepository, IWhereClause } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
+import { IReagent } from './interfaces/reagentEntity.interface';
+import { CreateSampleDto } from './dto/createSample.dto';
 
 @Injectable()
 class ReagentRepository implements IReagentRepository {
@@ -12,9 +13,35 @@ class ReagentRepository implements IReagentRepository {
 
   constructor(private prisma: PrismaService) {}
 
+  async findManyById(ids: number[]): Promise<IReagent[]> {
+    return await this.prisma.reagent.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+  }
+
   async create(reagent: IReagent): Promise<IReagent> {
     return await this.prisma.reagent.create({
       data: reagent,
+    });
+  }
+
+  async createSample(sample: CreateSampleDto): Promise<IReagent> {
+    const { usedReagentSample, ...sampleRest } = sample;
+    return await this.prisma.reagent.create({
+      data: {
+        ...sampleRest,
+        category: 'Sample',
+        usedReagentSample: {
+          connect: usedReagentSample?.map((reagent) => ({ id: reagent.reagentId })),
+        },
+      },
+      include: {
+        usedReagentSample: true,
+      },
     });
   }
 
@@ -22,6 +49,9 @@ class ReagentRepository implements IReagentRepository {
     return await this.prisma.reagent.update({
       where: { id: reagent.id },
       data: reagent,
+      include: {
+        usedReagentSample: true,
+      },
     });
   }
 
@@ -31,6 +61,9 @@ class ReagentRepository implements IReagentRepository {
       data: {
         ...data,
         isDeleted,
+      },
+      include: {
+        usedReagentSample: true,
       },
     });
   }
@@ -46,20 +79,26 @@ class ReagentRepository implements IReagentRepository {
   async findById(id: number): Promise<IReagent | null> {
     return await this.prisma.reagent.findUnique({
       where: { id },
+      include: {
+        usedReagentSample: true,
+      },
     });
   }
 
   async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
-    const whereClause: any = { isDeleted: false };
+    const whereClause: IWhereClause = { isDeleted: false };
 
     if (filter?.category) {
       whereClause.category = filter.category;
     }
 
     if (filter?.name) {
-      whereClause.name = filter.name;
+      whereClause.name = {
+        contains: filter.name,
+        mode: 'insensitive',
+      };
     }
 
     if (filter?.storageId) {
@@ -79,6 +118,7 @@ class ReagentRepository implements IReagentRepository {
             },
           },
         },
+        usedReagentSample: true,
       },
       skip,
       take,

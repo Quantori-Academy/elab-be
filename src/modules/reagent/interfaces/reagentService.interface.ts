@@ -1,6 +1,6 @@
 import { ReagentOptions, ReagentSearchOptions } from './reagentOptions.interface';
-import { IReagent } from './reagentEntity.interface';
 import { UpdateReagentDto } from '../dto/updateReagent.dto';
+import { IReagent } from './reagentEntity.interface';
 
 export interface IReagentService {
   create(data: IReagent): Promise<IReagent>;
