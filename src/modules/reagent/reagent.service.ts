@@ -1,4 +1,4 @@
-import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
@@ -19,7 +19,7 @@ class ReagentService implements IReagentService {
       return reagent;
     } catch (error) {
       this.logger.error('Failed to create a reagent: ', error);
-      throw new InternalServerErrorException('Failed to create a reagent!');
+      throw error;
     }
   }
 
@@ -30,7 +30,7 @@ class ReagentService implements IReagentService {
       return await this.reagentRepository.findAll(filter, pagination, sort);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
-      throw new InternalServerErrorException('Failed to fetch a reagents!');
+      throw error;
     }
   }
 
@@ -41,7 +41,7 @@ class ReagentService implements IReagentService {
       return await this.reagentRepository.getAllByStructure(structure, pagination, sort, flag);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
-      throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
+      throw error;
     }
   }
 
@@ -52,7 +52,7 @@ class ReagentService implements IReagentService {
       return reagent;
     } catch (error) {
       this.logger.error('Failed to fetch a reagent by ID: ', error);
-      throw new InternalServerErrorException('Failed to fetch a reagent by ID!');
+      throw error;
     }
   }
 
@@ -65,7 +65,17 @@ class ReagentService implements IReagentService {
       return newReagent;
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
-      throw new InternalServerErrorException('Failed to edit a reagent!');
+      throw error;
+    }
+  }
+
+  async deleteReagentById(id: number): Promise<IReagent> {
+    try {
+      this.logger.log('deleteReagentById method start');
+      return await this.reagentRepository.delete(id);
+    } catch (error) {
+      this.logger.error('Failed to delete a reagent: ', error);
+      throw error;
     }
   }
 }

@@ -8,4 +8,5 @@ export interface IReagentService {
   searchByStructure(options: ReagentSearchOptions): Promise<IReagent | IReagent[]>;
   getReagentById(id: number): Promise<IReagent | null>;
   editReagent(data: UpdateReagentDto, id: number): Promise<IReagent>;
+  deleteReagentById(id: number): Promise<IReagent>;
 }
