@@ -1,15 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
-import { IsEnum, IsInt, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateReagentDto {
-  @ApiProperty({ description: 'Edit left quantity of a Reagent', example: 100 })
+  @ApiProperty({ description: 'Edit left quantity of a Reagent', example: 100, required: false })
+  @IsOptional()
   @IsInt()
-  quantityLeft: number;
+  quantityLeft?: number;
 
-  @ApiProperty({ description: 'Edit the the storage location by id', example: 2 })
+  @ApiProperty({ description: 'Edit the the storage location by id', example: 2, required: false })
+  @IsOptional()
   @IsInt()
-  storageId: number;
+  storageId?: number;
 }
 
 export class UpdateReagentSuccessDto {

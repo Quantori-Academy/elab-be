@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Category, Package } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateReagentDto {
@@ -8,23 +8,28 @@ export class CreateReagentDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: '58-08-2' })
+  @ApiProperty({ example: '58-08-2', required: false })
+  @IsOptional()
   @IsString()
-  casNumber: string;
+  casNumber?: string;
 
-  @ApiProperty({ example: 'Producer Name' })
+  @ApiProperty({ example: 'Producer Name', required: false })
+  @IsOptional()
   @IsString()
   producer: string;
 
-  @ApiProperty({ example: 'CATALOG001' })
+  @ApiProperty({ example: 'CATALOG001', required: false })
+  @IsOptional()
   @IsString()
   catalogId: string;
 
-  @ApiProperty({ example: 'https://e-shop.com/catalog' })
+  @ApiProperty({ example: 'https://e-shop.com/catalog', required: false })
+  @IsOptional()
   @IsString()
   catalogLink: string;
 
-  @ApiProperty({ example: 234 })
+  @ApiProperty({ example: 234, required: false })
+  @IsOptional()
   @Transform(({ value }) => Number(value))
   @IsNumber()
   pricePerUnit: number;
@@ -35,10 +40,11 @@ export class CreateReagentDto {
 
   @ApiProperty({ example: 5.5 })
   @Transform(({ value }) => Number(value))
-  @IsString()
+  @IsNumber()
   totalQuantity: number;
 
-  @ApiProperty({ example: 'A sample reagent' })
+  @ApiProperty({ example: 'A sample reagent', required: false })
+  @IsOptional()
   @IsString()
   description: string;
 
@@ -48,24 +54,21 @@ export class CreateReagentDto {
   quantityLeft: number;
 
   @ApiProperty({ example: '2024-12-31T23:59:59Z' })
+  @Type(() => Date)
   @IsDate()
   expirationDate: Date;
 
   @ApiProperty({ example: 2 })
   @Transform(({ value }) => Number(value))
-  @IsString()
+  @IsNumber()
   storageId: number;
 
-  @ApiProperty({ enum: Category, description: 'Category is either Reagent or Sample' })
-  @IsEnum(Category)
-  category: Category;
-
-  @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1' })
+  @ApiProperty({ example: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1', required: false })
   @IsOptional()
   @IsString()
   structure?: string;
 
-  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox' })
+  @ApiProperty({ enum: Package, description: 'Package (enum) is either Bottle or SolventsBox or PackageBox', required: false })
   @IsOptional()
   @IsEnum(Package)
   package: Package;
@@ -82,7 +85,7 @@ export class CreateReagentSuccessDto {
 
   @ApiProperty({ example: '58-08-2' })
   @IsString()
-  casNumber: string;
+  casNumber?: string | null;
 
   @ApiProperty({ example: 'Producer Name' })
   @IsString()
@@ -110,7 +113,7 @@ export class CreateReagentSuccessDto {
 
   @ApiProperty({ example: 'A sample reagent' })
   @IsString()
-  description: string;
+  description: string | null;
 
   @ApiProperty({ example: 0 })
   @IsNumber()

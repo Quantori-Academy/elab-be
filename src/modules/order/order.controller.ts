@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Inject,
   Logger,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -34,7 +35,12 @@ import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries..pipe';
 import { OrdereOptions } from './types/orderOptions.type';
-import { GetOrderListResponseDto, GetOrdersQueryDto, GetOrderValidationErrorsDto } from './dto/getOrder.dto';
+import {
+  GetOneOrderResponseDto,
+  GetOrderListResponseDto,
+  GetOrdersQueryDto,
+  GetOrderValidationErrorsDto,
+} from './dto/getOrder.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import {
   UpdateOrderDto,
@@ -42,6 +48,7 @@ import {
   UpdateOrderSuccessDto,
   UpdateOrderValidationErrorDto,
 } from './dto/updateOrder.dto';
+import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 
 const ROUTE = 'orders';
 
@@ -99,6 +106,28 @@ export class OrderController {
       return order;
     } catch (error) {
       this.logger.error(`[${this.orderList.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetOneOrderResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: ParseIdPipeErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateOrderNotFoundErrorDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get(':id')
+  async getOrderById(@Param('id', ParseIdPipe) id: number) {
+    this.logger.log(`[${this.getOrderById.name}] - Method start`);
+    try {
+      const order: OrderWithReagents | null = await this.orderService.getOrderById(id);
+      if (!order) throw new NotFoundException('Order Not Found');
+      this.logger.log(`[${this.getOrderById.name}] - Method finished`);
+      return order;
+    } catch (error) {
+      this.logger.error(`[${this.getOrderById.name}] - Exception thrown` + error);
       throw error;
     }
   }

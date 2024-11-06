@@ -3,12 +3,12 @@ import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
-import { IReagent } from './interfaces/reagentEntity.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { Category, Status } from '@prisma/client';
 import { CreateReagentFromRequestDto } from './dto/createReagentFromRequest.dto';
 import { REQUEST_SERVICE_TOKEN } from '../reagentRequest/reagentRequest.service';
 import { IReagentRequestService } from '../reagentRequest/interfaces/reagentRequestService.interface';
+import { IReagent } from './interfaces/reagentEntity.interface';
 
 @Injectable()
 class ReagentService implements IReagentService {

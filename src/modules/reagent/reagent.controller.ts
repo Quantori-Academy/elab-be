@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
 import { IReagentService } from './interfaces/reagentService.interface';
-import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CreateReagentDto, CreateReagentSuccessDto } from './dto/createReagent.dto';
 import { GetReagentDto, GetReagentErrorDto, GetReagentSuccessDto } from './dto/getReagent.dto';
@@ -35,6 +35,12 @@ import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { SAMPLE_SERVICE_TOKEN } from './sample.service';
+import { ISampleService } from './interfaces/sampleService.interface';
+import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 
 const ROUTE = 'reagents';
 
@@ -43,20 +49,25 @@ const ROUTE = 'reagents';
 export class ReagentController {
   private logger = new Logger(ReagentController.name);
 
-  constructor(@Inject(REAGENT_SERVICE_TOKEN) private reagentService: IReagentService) {}
+  constructor(
+    @Inject(REAGENT_SERVICE_TOKEN) private reagentService: IReagentService,
+    @Inject(SAMPLE_SERVICE_TOKEN) private sampleService: ISampleService,
+  ) {}
 
   @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
-  @UseGuards(AuthGuard)
+  @ApiBody({ type: () => CreateReagentDto })
+  @ApiResponse({ status: HttpStatus.CREATED, type: () => CreateReagentSuccessDto })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Researcher)
   @Post('')
-  async createReagent(@Body() createReagentDto: CreateReagentDto) {
-    return await this.reagentService.create(createReagentDto);
+  async createReagent(@Body(new ValidationPipe({ transform: true })) createReagentDto: CreateReagentDto) {
+    return await this.reagentService.create({ ...createReagentDto, category: 'Reagent' });
   }
 
   @ApiBearerAuth()
   @ApiQuery({ type: () => GetReagentDto })
-  @ApiResponse({ status: HttpStatus.OK, type: [GetReagentSuccessDto] })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetReagentErrorDto })
+  @ApiResponse({ status: HttpStatus.OK, type: () => GetReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: () => GetReagentErrorDto })
   @UseGuards(AuthGuard)
   @Get('')
   async getReagents(@Query(ValidateParseReagentOptionsPipe) getReagentDto: ReagentOptions) {
@@ -65,8 +76,8 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiQuery({ type: () => SearchByStructureDto })
-  @ApiResponse({ status: HttpStatus.OK, type: [SearchByStructureSuccessDto] })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: SearchByStructureErrorDto })
+  @ApiResponse({ status: HttpStatus.OK, type: () => SearchByStructureSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: () => SearchByStructureErrorDto })
   @UseGuards(AuthGuard)
   @Get('/search')
   async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
@@ -103,10 +114,14 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
+  @ApiBody({ type: () => UpdateReagentDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Post(':id')
-  async editReagent(@Body() updateReagentDto: UpdateReagentDto, @Param('id', ParseIdPipe) id: number) {
+  async editReagent(
+    @Body(new ValidationPipe({ transform: true })) updateReagentDto: UpdateReagentDto,
+    @Param('id', ParseIdPipe) id: number,
+  ) {
     try {
       this.logger.log('editReagent route start');
       const reagent = await this.reagentService.getReagentById(id);
@@ -119,7 +134,7 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.OK, type: [GetReagentSuccessDto] })
+  @ApiResponse({ status: HttpStatus.OK, type: () => GetReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Get(':id')
@@ -133,5 +148,15 @@ export class ReagentController {
       this.logger.error('Error in controller in POST editReagent: ', error);
       throw error;
     }
+  }
+
+  @ApiBearerAuth()
+  @ApiBody({ type: () => CreateSampleDto })
+  @ApiResponse({ status: HttpStatus.CREATED, type: () => CreateSampleSuccessDto })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Researcher)
+  @Post('/create/sample')
+  async createSample(@Body(new ValidationPipe({ transform: true })) createSampleDto: CreateSampleDto) {
+    return await this.sampleService.create(createSampleDto);
   }
 }

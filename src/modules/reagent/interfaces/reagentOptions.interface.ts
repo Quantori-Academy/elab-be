@@ -1,3 +1,5 @@
+import { Category } from '@prisma/client';
+
 export enum Order {
   ASC = 'asc',
   DESC = 'desc',
@@ -13,7 +15,7 @@ export type SortOptions = {
 
 export type FilterOptions = {
   name?: string;
-  category?: string;
+  category?: Category;
   storageId?: number;
 };
 
