@@ -2,8 +2,10 @@ import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { ReagentRequest, Status } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsIn, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { ReagentIdsDto } from './createOrder.dto';
+
+const allowedStatuses = [Status.Fulfilled, Status.Declined, Status.Submitted];
 
 class UpdateOrderDto {
   @ApiProperty({ example: 'Title' })
@@ -23,7 +25,9 @@ class UpdateOrderDto {
   @ApiProperty({ example: 'Submitted' })
   @IsOptional()
   @Transform(({ value }) => (value === null ? undefined : value))
-  @IsEnum(Status)
+  @IsIn(allowedStatuses, {
+    message: `Status must be one of the following: ${allowedStatuses.join(', ')}`,
+  })
   status?: Status | undefined;
 
   @ApiProperty({ example: [{ id: 2 }] })
@@ -95,7 +99,7 @@ class UpdateOrderValidationErrorDto {
       'title must be shorter than or equal to 200 characters',
       'seller must be a string',
       'seller must be shorter than or equal to 200 characters',
-      'status must be one of the following values: Pending, Ordered, Fulfilled, Declined',
+      'status must be one of the following values: Submitted, Fulfilled, Declined',
       "Fulfilled/Declined orders can't be edited",
       'Pending orders can be changed only to Submitted status',
       'Order with status Submitted cannot be modified. You can only change its status to Fulfilled or Declined.',

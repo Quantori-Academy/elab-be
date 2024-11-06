@@ -104,6 +104,7 @@ enum Status {
   Fulfilled
   Declined
   Submitted
+  Completed
 }
 
 model ReagentRequest {
