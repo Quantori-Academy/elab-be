@@ -64,6 +64,16 @@ class ReagentRequestService implements IReagentRequestService {
       throw new InternalServerErrorException('Failed to edit a Reagent Request!');
     }
   }
+
+  async getRequestByIdForResearcher(id: number, userId: number): Promise<IReagentRequest | null> {
+    try {
+      this.logger.log(`${this.getRequestById.name} START`);
+      return await this.requestRepository.findById(id, userId);
+    } catch (error) {
+      this.logger.error('Failed to fetch Reagent Request by ID: ', error);
+      throw new InternalServerErrorException('Failed to fetch a Reagent Request by ID!');
+    }
+  }
 }
 
 const REQUEST_SERVICE_TOKEN = Symbol('REQUEST_SERVICE_TOKEN');
