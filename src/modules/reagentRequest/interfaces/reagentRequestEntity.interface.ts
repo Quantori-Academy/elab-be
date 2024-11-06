@@ -15,4 +15,9 @@ export interface IReagentRequest {
   createdAt?: Date;
   updatedAt?: Date;
   orderId?: number | null;
+  producer?: string | null;
+  catalogId?: string | null;
+  catalogLink?: string | null;
+  pricePerUnit?: number | null;
+  expirationDate?: Date | null;
 }
