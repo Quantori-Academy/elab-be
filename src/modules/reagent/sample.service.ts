@@ -16,26 +16,34 @@ class SampleService implements ISampleService {
       const { usedReagentSample } = data;
       if (usedReagentSample) {
         const results = await this.reagentRepository.findManyById(usedReagentSample.map((reagent) => reagent.reagentId));
+        const error = [];
         for (const result of results) {
           if (!result || result.quantityLeft === undefined || result.id === undefined) {
-            throw new BadRequestException(`Invalid reagent data`);
-          }
-          if (result.quantityLeft === 0) {
-            throw new BadRequestException(`The reagent ${result.name} (id- ${result.id}) doesn't have enough quantityLeft`);
+            throw new BadRequestException(`Invalid usedReagentSample object`);
           }
           const usedData = usedReagentSample.find((reagent) => reagent.reagentId === result.id);
           if (!usedData) {
             throw new BadRequestException(`Used data for reagent ${result.name} (id- ${result.id}) not found`);
           }
-          if (result.quantityLeft < usedData?.quantityUsed) {
-            throw new BadRequestException(
-              `The reagent ${result.name} (id- ${result.id}) doesn't have enough quantityLeft (${result.quantityLeft}), to be used this much - ${usedData.quantityUsed}`,
-            );
+          if (result.quantityLeft === 0) {
+            error.push({
+              reagentId: usedData.reagentId,
+              errorMessage: `The reagent ${result.name} (ID: ${result.id}) has no quantity left.`,
+            });
+          } else if (result.quantityLeft < usedData?.quantityUsed) {
+            error.push({
+              reagentId: usedData.reagentId,
+              errorMessage: `Insufficient quantity of reagent ${result.name} (ID: ${result.id}). Available: ${result.quantityLeft}, required: ${usedData.quantityUsed}.`,
+            });
           }
           const newQuantityLeft = result.quantityLeft - usedData.quantityUsed;
           const isDeleted = newQuantityLeft === 0;
           await this.reagentRepository.updateById({ quantityLeft: newQuantityLeft }, result.id, isDeleted);
         }
+        if (error.length > 0)
+          throw new BadRequestException({
+            details: error,
+          });
       }
       return await this.reagentRepository.createSample(data);
     } catch (error) {
