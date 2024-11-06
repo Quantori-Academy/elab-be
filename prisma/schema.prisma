@@ -77,8 +77,8 @@ model Reagent {
   updatedAt     DateTime @updatedAt
   storage       Storage  @relation(fields: [storageId], references: [id])
 
-  usedReagentSample    Reagent[]   @relation("Prepared")
-  usedBy               Reagent[]    @relation("Prepared")
+  usedReagentSample    Reagent[]   @relation("Prepared")  //parents  Reagents or Samples that were used during the creation of this Sample
+  usedBy               Reagent[]    @relation("Prepared")  //children Samples that were created by using this Reagent or a Sample
 }
 
 model Storage {
