@@ -11,6 +11,7 @@ import {
   Query,
   Req,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { REQUEST_SERVICE_TOKEN } from './reagentRequest.service';
@@ -39,7 +40,7 @@ export class ReagentRequestController {
   @Roles(Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
-  async create(@Body() createRequestDto: CreateRequestDto, @Req() req: any) {
+  async create(@Body(new ValidationPipe({ transform: true })) createRequestDto: CreateRequestDto, @Req() req: any) {
     const dtoWithUserId = {
       ...createRequestDto,
       userId: parseInt(req.user.id),
