@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Inject,
@@ -120,5 +121,16 @@ export class ReagentController {
   @Post('/create/sample')
   async createSample(@Body(new ValidationPipe({ transform: true })) createSampleDto: CreateSampleDto) {
     return await this.sampleService.create(createSampleDto);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.CREATED, type: () => GetReagentSuccessDto })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Delete(':id')
+  async deleteReagentById(@Param('id', ParseIdPipe) id: number) {
+    const reagent: IReagent | null = await this.reagentService.getReagentById(id);
+    if (!reagent) throw new NotFoundException('Reagent Not Found!');
+    return await this.reagentService.deleteReagentById(id);
   }
 }
