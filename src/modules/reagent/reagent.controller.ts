@@ -33,9 +33,6 @@ import {
   CreateReagentValidationErrorDto,
   ReagentNotFoundErrorDto,
 } from './dto/createReagentFromRequest.dto';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Role } from '@prisma/client';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
 
