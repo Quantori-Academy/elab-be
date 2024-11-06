@@ -126,6 +126,12 @@ model ReagentRequest {
   order                 Order?   @relation(fields: [orderId], references: [id])
   orderId               Int?
   package               Package?
+  producer              String?
+  catalogId             String?
+  catalogLink           String?
+  pricePerUnit          Float?
+  expirationDate        DateTime?
+
 }
 
 model Order {
