@@ -64,17 +64,6 @@ class ReagentRequestService implements IReagentRequestService {
       throw new InternalServerErrorException('Failed to edit a Reagent Request!');
     }
   }
-
-  async deleteReagentRequest(id: number): Promise<void> {
-    this.logger.log(`[${this.deleteReagentRequest.name}] - Method start`);
-    try {
-      await this.requestRepository.delete(id);
-      this.logger.log(`[${this.deleteReagentRequest.name}] - Method finished`);
-    } catch (error) {
-      this.logger.error(`[${this.deleteReagentRequest.name}] - Exception thrown` + error);
-      throw new InternalServerErrorException('Failed to edit a Reagent Request!');
-    }
-  }
 }
 
 const REQUEST_SERVICE_TOKEN = Symbol('REQUEST_SERVICE_TOKEN');
