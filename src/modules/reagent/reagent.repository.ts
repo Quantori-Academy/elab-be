@@ -144,16 +144,20 @@ class ReagentRepository implements IReagentRepository {
     let inputString;
     console.log(isFullStructure);
     if (isFullStructure === undefined) {
-      inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
-                   FROM "Reagent" 
-                   WHERE "isDeleted" = FALSE AND structure @>$1`;
+      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", s.name AS storage_name, r.name AS room_name, re."totalQuantity", re."quantityUnit", re."casNumber" 
+                   FROM "Reagent" re
+                   JOIN "Storage" s ON s.id = re."storageId"
+                   JOIN "Room" r ON s."roomId" = r.id 
+                   WHERE re."isDeleted" = FALSE AND re.structure @>$1`;
     } else {
       console.log(isFullStructure);
-      inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
-                   FROM "Reagent" 
+      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", s.name AS storage_name, r.name AS room_name, re."totalQuantity", re."quantityUnit", re."casNumber" 
+                   FROM "Reagent" re
+                   JOIN "Storage" s ON s.id = re."storageId"
+                   JOIN "Room" r ON s."roomId" = r.id
                    WHERE 
-                      (${isFullStructure} = TRUE AND "isDeleted" = FALSE AND structure =$1) OR
-                      (${isFullStructure} = FALSE AND "isDeleted" = FALSE AND structure @>$1 AND structure !=$1)`;
+                      (${isFullStructure} = TRUE AND re."isDeleted" = FALSE AND re.structure =$1) OR
+                      (${isFullStructure} = FALSE AND re."isDeleted" = FALSE AND re.structure @>$1 AND re.structure !=$1)`;
     }
 
     if (orderBy) {
