@@ -85,7 +85,7 @@ export class ReagentController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: ReagentNotFoundErrorDto })
   @Roles(Role.ProcurementOfficer)
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('reagent-request/:reagentRequestId')
+  @Post('reagent-request/:reagentRequestId/:storageId')
   async createReagentFromRequest(
     @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
     @Param('storageId', ParseIdPipe) storageId: number,
