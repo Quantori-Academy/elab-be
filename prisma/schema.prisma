@@ -67,7 +67,7 @@ model Reagent {
   totalQuantity Float
   description   String?
   quantityLeft  Float
-  expirationDate  DateTime
+  expirationDate  DateTime?
   storageId     Int
   category      Category
   structure     String?
