@@ -35,6 +35,9 @@ import {
 } from './dto/createReagentFromRequest.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 const ROUTE = 'reagents';
 
