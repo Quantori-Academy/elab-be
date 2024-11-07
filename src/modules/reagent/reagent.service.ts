@@ -6,16 +6,16 @@ import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { Category, Status } from '@prisma/client';
 import { CreateReagentFromRequestDto } from './dto/createReagentFromRequest.dto';
-import { REQUEST_SERVICE_TOKEN } from '../reagentRequest/reagentRequest.service';
-import { IReagentRequestService } from '../reagentRequest/interfaces/reagentRequestService.interface';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repository';
+import { IReagentRequestRepository } from '../reagentRequest/interfaces/reagentRequestRepository.interface';
 
 @Injectable()
 class ReagentService implements IReagentService {
   private readonly logger = new Logger(ReagentService.name);
   constructor(
     @Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository,
-    @Inject(REQUEST_SERVICE_TOKEN) private requestService: IReagentRequestService,
+    @Inject(REQUEST_REPOSITORY_TOKEN) private requestRepository: IReagentRequestRepository,
   ) {}
 
   async create(data: IReagent): Promise<IReagent> {
@@ -82,7 +82,7 @@ class ReagentService implements IReagentService {
   ): Promise<IReagent | null> {
     this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method start`);
     try {
-      const reagentRequest = await this.requestService.getRequestById(reagentRequestId);
+      const reagentRequest = await this.requestRepository.findById(reagentRequestId);
       if (!reagentRequest) return null;
 
       if (reagentRequest.status !== Status.Fulfilled) {
@@ -105,7 +105,7 @@ class ReagentService implements IReagentService {
 
       const [reagent] = await Promise.all([
         this.create(reagentData),
-        this.requestService.editReagentRequest({ status: Status.Completed }, reagentRequestId),
+        this.requestRepository.updateById({ status: Status.Completed }, reagentRequestId),
       ]);
 
       this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
