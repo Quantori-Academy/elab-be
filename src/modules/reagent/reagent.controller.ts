@@ -25,12 +25,12 @@ import { ValidateParseForSearchPipe } from './pipes/validateParseForSearch.pipe'
 import { UpdateReagentDto, UpdateReagentSuccessDto } from './dto/updateReagent.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { IReagent } from './interfaces/reagentEntity.interface';
-import { SAMPLE_SERVICE_TOKEN } from './sample.service';
-import { ISampleService } from './interfaces/sampleService.interface';
-import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
 import { CreateReagentValidationErrorDto, ReagentNotFoundErrorDto } from './dto/createReagentFromRequest.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { SAMPLE_SERVICE_TOKEN } from './sample.service';
+import { ISampleService } from './interfaces/sampleService.interface';
+import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
@@ -104,6 +104,7 @@ export class ReagentController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
+  @ApiBody({ type: () => UpdateReagentDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Post(':id')
