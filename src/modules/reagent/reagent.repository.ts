@@ -146,14 +146,14 @@ class ReagentRepository implements IReagentRepository {
     if (isFullStructure === undefined) {
       inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
                    FROM "Reagent" 
-                   WHERE isDeleted = FALSE AND structure @>$1`;
+                   WHERE "isDeleted" = FALSE AND structure @>$1`;
     } else {
       console.log(isFullStructure);
       inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
                    FROM "Reagent" 
                    WHERE 
-                      (${isFullStructure} = TRUE AND isDeleted = FALSE AND structure =$1) OR
-                      (${isFullStructure} = FALSE AND isDeleted = FALSE AND structure @>$1 AND structure !=$1)`;
+                      (${isFullStructure} = TRUE AND "isDeleted" = FALSE AND structure =$1) OR
+                      (${isFullStructure} = FALSE AND "isDeleted" = FALSE AND structure @>$1 AND structure !=$1)`;
     }
 
     if (orderBy) {
