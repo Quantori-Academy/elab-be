@@ -28,11 +28,7 @@ import { IReagent } from './interfaces/reagentEntity.interface';
 import { SAMPLE_SERVICE_TOKEN } from './sample.service';
 import { ISampleService } from './interfaces/sampleService.interface';
 import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
-import {
-  CreateReagentFromRequestDto,
-  CreateReagentValidationErrorDto,
-  ReagentNotFoundErrorDto,
-} from './dto/createReagentFromRequest.dto';
+import { CreateReagentValidationErrorDto, ReagentNotFoundErrorDto } from './dto/createReagentFromRequest.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -82,10 +78,6 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
-  @ApiBody({ type: () => UpdateReagentDto })
-  @ApiResponse({ status: HttpStatus.OK, type: () => UpdateReagentSuccessDto })
-  @ApiResponse({ status: HttpStatus.OK, type: GetReagentSuccessDto })
-  @ApiResponse({ status: HttpStatus.OK, type: CreateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateReagentValidationErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
@@ -96,14 +88,11 @@ export class ReagentController {
   @Post('reagent-request/:reagentRequestId')
   async createReagentFromRequest(
     @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
-    @Body(new ValidationPipe({ transform: true, whitelist: true })) reagentRequestDto: CreateReagentFromRequestDto,
+    @Param('storageId', ParseIdPipe) storageId: number,
   ): Promise<IReagent> {
     this.logger.log(`[${this.createReagentFromRequest.name}] - Method start`);
     try {
-      const reagent: IReagent | null = await this.reagentService.createReagentFromReagentRequest(
-        reagentRequestId,
-        reagentRequestDto,
-      );
+      const reagent: IReagent | null = await this.reagentService.createReagentFromReagentRequest(reagentRequestId, storageId);
       if (!reagent) throw new NotFoundException('Reagent request is not found');
       this.logger.log(`[${this.createReagentFromRequest.name}] - Method finished`);
       return reagent;

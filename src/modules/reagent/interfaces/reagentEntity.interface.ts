@@ -12,7 +12,7 @@ export interface IReagent {
   totalQuantity: number;
   description?: string | null;
   quantityLeft: number;
-  expirationDate: Date;
+  expirationDate?: Date | null;
   storageId: number;
   category: Category;
   package?: Package | null;

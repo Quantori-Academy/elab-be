@@ -5,7 +5,6 @@ import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOption
 import { IReagentRepository } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { Category, Status } from '@prisma/client';
-import { CreateReagentFromRequestDto } from './dto/createReagentFromRequest.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repository';
 import { IReagentRequestRepository } from '../reagentRequest/interfaces/reagentRequestRepository.interface';
@@ -76,10 +75,7 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async createReagentFromReagentRequest(
-    reagentRequestId: number,
-    reagentRequestDto: CreateReagentFromRequestDto,
-  ): Promise<IReagent | null> {
+  async createReagentFromReagentRequest(reagentRequestId: number, storageId: number): Promise<IReagent | null> {
     this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method start`);
     try {
       const reagentRequest = await this.requestRepository.findById(reagentRequestId);
@@ -90,6 +86,7 @@ class ReagentService implements IReagentService {
       }
 
       const reagentData: IReagent = {
+        storageId,
         name: reagentRequest.name,
         casNumber: reagentRequest.casNumber ?? '',
         quantityUnit: reagentRequest.quantityUnit,
@@ -100,7 +97,11 @@ class ReagentService implements IReagentService {
         package: reagentRequest.package,
         isDeleted: false,
         category: Category.Reagent,
-        ...reagentRequestDto,
+        expirationDate: reagentRequest.expirationDate,
+        producer: reagentRequest.producer,
+        catalogId: reagentRequest.catalogId,
+        catalogLink: reagentRequest.catalogLink,
+        pricePerUnit: reagentRequest.pricePerUnit,
       };
 
       const [reagent] = await Promise.all([
