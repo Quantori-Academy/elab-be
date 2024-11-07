@@ -17,6 +17,7 @@ class SampleService implements ISampleService {
       if (usedReagentSample) {
         const results = await this.reagentRepository.findManyById(usedReagentSample.map((reagent) => reagent.reagentId));
         const error = [];
+        const updates = [];
         for (const result of results) {
           if (!result || result.quantityLeft === undefined || result.id === undefined) {
             throw new BadRequestException(`Invalid usedReagentSample object`);
@@ -38,12 +39,16 @@ class SampleService implements ISampleService {
           }
           const newQuantityLeft = result.quantityLeft - usedData.quantityUsed;
           const isDeleted = newQuantityLeft === 0;
-          await this.reagentRepository.updateById({ quantityLeft: newQuantityLeft }, result.id, isDeleted);
+          updates.push({ newQuantityLeft, id: result.id, isDeleted });
         }
-        if (error.length > 0)
+        if (error.length > 0) {
           throw new BadRequestException({
             details: error,
           });
+        }
+        for (const update of updates) {
+          await this.reagentRepository.updateById({ quantityLeft: update.newQuantityLeft }, update.id, update.isDeleted);
+        }
       }
       return await this.reagentRepository.createSample(data);
     } catch (error) {
