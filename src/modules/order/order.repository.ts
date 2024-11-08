@@ -163,6 +163,7 @@ export class OrderRepository implements IOrderRepository {
           reagents: true,
         },
       });
+
       this.logger.log(`[${this.create.name}] - Method finished`);
       return order;
     } catch (error) {
@@ -271,7 +272,7 @@ export class OrderRepository implements IOrderRepository {
         throw new NotFoundException(`The following reagent IDs not found: ${missingIds} for including`);
       }
 
-      await this.prisma.order.update({
+      const orderWithConnectedReagents: OrderWithReagents = await this.prisma.order.update({
         where: {
           id: order.id,
         },
@@ -279,6 +280,9 @@ export class OrderRepository implements IOrderRepository {
           reagents: {
             connect: existingReagentForInclude.map((reagent) => ({ id: reagent.id })),
           },
+        },
+        include: {
+          reagents: true,
         },
       });
 
@@ -298,6 +302,17 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Fulfilled,
+          },
+        });
+      } else if (status === Status.Submitted) {
+        await this.prisma.reagentRequest.updateMany({
+          where: {
+            id: {
+              in: orderWithConnectedReagents.reagents.map((order) => order.id),
+            },
+          },
+          data: {
+            status: Status.Ordered,
           },
         });
       }
