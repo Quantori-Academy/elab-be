@@ -144,14 +144,22 @@ class ReagentRepository implements IReagentRepository {
     let inputString;
     console.log(isFullStructure);
     if (isFullStructure === undefined) {
-      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", s.name AS storage_name, r.name AS room_name, re."totalQuantity", re."quantityUnit", re."casNumber" 
+      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", 
+                   json_build_object(
+                      'name', s."name",
+                      'room', json_build_object('name', r."name")
+                   ) AS storage
                    FROM "Reagent" re
                    JOIN "Storage" s ON s.id = re."storageId"
                    JOIN "Room" r ON s."roomId" = r.id 
                    WHERE re."isDeleted" = FALSE AND re.structure @>$1`;
     } else {
       console.log(isFullStructure);
-      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", s.name AS storage_name, r.name AS room_name, re."totalQuantity", re."quantityUnit", re."casNumber" 
+      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber",
+                   json_build_object(
+                      'name', s."name",
+                      'room', json_build_object('name', r."name")
+                   ) AS storage
                    FROM "Reagent" re
                    JOIN "Storage" s ON s.id = re."storageId"
                    JOIN "Room" r ON s."roomId" = r.id
