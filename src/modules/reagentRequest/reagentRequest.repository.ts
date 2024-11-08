@@ -51,8 +51,13 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     });
   }
 
-  async findById(id: number): Promise<IReagentRequest | null> {
+  async findById(id: number, userId?: number): Promise<IReagentRequest | null> {
     this.logger.log('findById method start');
+    if (userId) {
+      return await this.prisma.reagentRequest.findUnique({
+        where: { id, userId },
+      });
+    }
     return await this.prisma.reagentRequest.findUnique({
       where: { id },
     });

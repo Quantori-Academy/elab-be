@@ -7,7 +7,7 @@ import { CreateSampleDto } from '../dto/createSample.dto';
 
 export interface IReagentRepository extends IRepository<IReagent> {
   findManyById(ids: number[]): Promise<IReagent[]>;
-  findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]>;
+  findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<ReagentList>;
   getAllByStructure(
     structure: string,
     pagination?: PaginationOptions,
@@ -27,3 +27,8 @@ export interface IWhereClause {
   };
   storageId?: number;
 }
+
+export type ReagentList = {
+  reagents: IReagent[];
+  size: number;
+};

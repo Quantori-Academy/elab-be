@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
-import { IReagentRepository } from './interfaces/reagentRepository.interface';
+import { IReagentRepository, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { Category, Status } from '@prisma/client';
 import { IReagent } from './interfaces/reagentEntity.interface';
@@ -25,18 +25,18 @@ class ReagentService implements IReagentService {
       return reagent;
     } catch (error) {
       this.logger.error('Failed to create a reagent: ', error);
-      throw new InternalServerErrorException('Failed to create a reagent!');
+      throw error;
     }
   }
 
-  async getReagents(options: ReagentOptions): Promise<IReagent[]> {
+  async getReagents(options: ReagentOptions): Promise<ReagentList> {
     try {
       this.logger.log('getReagents method start');
       const { filter, pagination, sort } = options || {};
       return await this.reagentRepository.findAll(filter, pagination, sort);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
-      throw new InternalServerErrorException('Failed to fetch a reagents!');
+      throw error;
     }
   }
 
@@ -47,7 +47,7 @@ class ReagentService implements IReagentService {
       return await this.reagentRepository.getAllByStructure(structure, pagination, sort, flag);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
-      throw new InternalServerErrorException('Failed to fetch a reagents in a search by Structure!');
+      throw error;
     }
   }
 
@@ -58,7 +58,7 @@ class ReagentService implements IReagentService {
       return reagent;
     } catch (error) {
       this.logger.error('Failed to fetch a reagent by ID: ', error);
-      throw new InternalServerErrorException('Failed to fetch a reagent by ID!');
+      throw error;
     }
   }
 
@@ -71,7 +71,17 @@ class ReagentService implements IReagentService {
       return newReagent;
     } catch (error) {
       this.logger.error('Failed to edit a reagent: ', error);
-      throw new InternalServerErrorException('Failed to edit a reagent!');
+      throw error;
+    }
+  }
+
+  async deleteReagentById(id: number): Promise<IReagent> {
+    try {
+      this.logger.log('deleteReagentById method start');
+      return await this.reagentRepository.delete(id);
+    } catch (error) {
+      this.logger.error('Failed to delete a reagent: ', error);
+      throw error;
     }
   }
 

@@ -2,7 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { FilterOptions, FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
 import { Prisma } from '@prisma/client';
-import { IReagentRepository, IWhereClause } from './interfaces/reagentRepository.interface';
+import { IReagentRepository, IWhereClause, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { CreateSampleDto } from './dto/createSample.dto';
@@ -85,7 +85,7 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<IReagent[]> {
+  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<ReagentList> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     const whereClause: IWhereClause = { isDeleted: false };
@@ -104,26 +104,34 @@ class ReagentRepository implements IReagentRepository {
     if (filter?.storageId) {
       whereClause.storageId = filter.storageId;
     }
-
-    return await this.prisma.reagent.findMany({
-      where: whereClause,
-      include: {
-        storage: {
-          select: {
-            name: true,
-            room: {
-              select: {
-                name: true,
+    const [reagents, size] = await this.prisma.$transaction([
+      this.prisma.reagent.findMany({
+        where: whereClause,
+        include: {
+          storage: {
+            select: {
+              name: true,
+              room: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
+          usedReagentSample: true,
         },
-        usedReagentSample: true,
-      },
-      skip,
-      take,
-      orderBy,
-    });
+        skip,
+        take,
+        orderBy,
+      }),
+      this.prisma.reagent.count({
+        where: whereClause,
+      }),
+    ]);
+    return {
+      reagents,
+      size,
+    };
   }
 
   async delete(id: number): Promise<IReagent> {
@@ -144,16 +152,28 @@ class ReagentRepository implements IReagentRepository {
     let inputString;
     console.log(isFullStructure);
     if (isFullStructure === undefined) {
-      inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
-                   FROM "Reagent" 
-                   WHERE "isDeleted" = FALSE AND structure @>$1`;
+      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", 
+                   json_build_object(
+                      'name', s."name",
+                      'room', json_build_object('name', r."name")
+                   ) AS storage
+                   FROM "Reagent" re
+                   JOIN "Storage" s ON s.id = re."storageId"
+                   JOIN "Room" r ON s."roomId" = r.id 
+                   WHERE re."isDeleted" = FALSE AND re.structure @>$1`;
     } else {
       console.log(isFullStructure);
-      inputString = `SELECT name, "category", "structure", "description", "quantityLeft", "storageId" 
-                   FROM "Reagent" 
+      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber",
+                   json_build_object(
+                      'name', s."name",
+                      'room', json_build_object('name', r."name")
+                   ) AS storage
+                   FROM "Reagent" re
+                   JOIN "Storage" s ON s.id = re."storageId"
+                   JOIN "Room" r ON s."roomId" = r.id
                    WHERE 
-                      (${isFullStructure} = TRUE AND "isDeleted" = FALSE AND structure =$1) OR
-                      (${isFullStructure} = FALSE AND "isDeleted" = FALSE AND structure @>$1 AND structure !=$1)`;
+                      (${isFullStructure} = TRUE AND re."isDeleted" = FALSE AND re.structure =$1) OR
+                      (${isFullStructure} = FALSE AND re."isDeleted" = FALSE AND re.structure @>$1 AND re.structure !=$1)`;
     }
 
     if (orderBy) {

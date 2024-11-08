@@ -71,8 +71,7 @@ export class StorageController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: GetStorageValidationErrorsDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @Get('')
   async getStorages(@Query(ValidateParseStorageOptionsPipe) options: StorageOptions) {
     this.logger.log(`[${this.getStorages.name}] - Method start`);
@@ -92,7 +91,6 @@ export class StorageController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: UpdateStorageNotFoundErrorDto })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get(':id')
   async getStorageById(@Param('id', ParseIdPipe) id: number) {
