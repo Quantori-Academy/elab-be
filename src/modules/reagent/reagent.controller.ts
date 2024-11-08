@@ -126,7 +126,7 @@ export class ReagentController {
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: () => GetReagentSuccessDto })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.ProcurementOfficer)
   @Delete(':id')
   async deleteReagentById(@Param('id', ParseIdPipe) id: number) {
     const reagent: IReagent | null = await this.reagentService.getReagentById(id);
