@@ -2,7 +2,7 @@ import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestj
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
-import { IReagentRepository } from './interfaces/reagentRepository.interface';
+import { IReagentRepository, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
 
@@ -23,7 +23,7 @@ class ReagentService implements IReagentService {
     }
   }
 
-  async getReagents(options: ReagentOptions): Promise<IReagent[]> {
+  async getReagents(options: ReagentOptions): Promise<ReagentList> {
     try {
       this.logger.log('getReagents method start');
       const { filter, pagination, sort } = options || {};
