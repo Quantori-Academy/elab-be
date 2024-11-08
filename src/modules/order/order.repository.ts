@@ -152,17 +152,31 @@ export class OrderRepository implements IOrderRepository {
         throw new NotFoundException(`The following reagent with ID's not found: ${missingIds}`);
       }
 
-      const order: OrderWithReagents = await this.prisma.order.create({
-        data: {
-          ...data,
-          reagents: {
-            connect: data.reagents.map((reagent) => ({ id: reagent.id })),
+      const [order] = await this.prisma.$transaction([
+        this.prisma.order.create({
+          data: {
+            ...data,
+            reagents: {
+              connect: data.reagents.map((reagent) => ({ id: reagent.id })),
+            },
           },
-        },
-        include: {
-          reagents: true,
-        },
-      });
+          include: {
+            reagents: true,
+          },
+        }),
+
+        this.prisma.reagentRequest.updateMany({
+          where: {
+            id: {
+              in: requestedReagentIds,
+            },
+          },
+          data: {
+            status: Status.Ordered,
+          },
+        }),
+      ]);
+
       this.logger.log(`[${this.create.name}] - Method finished`);
       return order;
     } catch (error) {
