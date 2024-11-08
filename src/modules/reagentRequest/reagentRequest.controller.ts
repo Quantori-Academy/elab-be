@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Inject,
@@ -88,9 +89,9 @@ export class ReagentRequestController {
     const user = req.user;
     const request = await this.requestService.getRequestById(id);
     if (!request) throw new NotFoundException('Reagent Request with this ID - NOT FOUND');
-    if (user.role === Role.ProcurementOfficer) {
+    if (user.role === Role.ProcurementOfficer || user.id === request.userId) {
       return request;
     }
-    return await this.requestService.getRequestByIdForResearcher(id, user.id);
+    throw new ForbiddenException('Access to this Reagent Request is denied');
   }
 }
