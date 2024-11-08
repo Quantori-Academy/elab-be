@@ -152,17 +152,30 @@ export class OrderRepository implements IOrderRepository {
         throw new NotFoundException(`The following reagent with ID's not found: ${missingIds}`);
       }
 
-      const order: OrderWithReagents = await this.prisma.order.create({
-        data: {
-          ...data,
-          reagents: {
-            connect: data.reagents.map((reagent) => ({ id: reagent.id })),
+      const [order] = await this.prisma.$transaction([
+        this.prisma.order.create({
+          data: {
+            ...data,
+            reagents: {
+              connect: data.reagents.map((reagent) => ({ id: reagent.id })),
+            },
           },
-        },
-        include: {
-          reagents: true,
-        },
-      });
+          include: {
+            reagents: true,
+          },
+        }),
+
+        this.prisma.reagentRequest.updateMany({
+          where: {
+            id: {
+              in: requestedReagentIds,
+            },
+          },
+          data: {
+            status: Status.Ordered,
+          },
+        }),
+      ]);
 
       this.logger.log(`[${this.create.name}] - Method finished`);
       return order;
@@ -272,7 +285,7 @@ export class OrderRepository implements IOrderRepository {
         throw new NotFoundException(`The following reagent IDs not found: ${missingIds} for including`);
       }
 
-      const orderWithConnectedReagents: OrderWithReagents = await this.prisma.order.update({
+      await this.prisma.order.update({
         where: {
           id: order.id,
         },
@@ -302,17 +315,6 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Fulfilled,
-          },
-        });
-      } else if (status === Status.Submitted) {
-        await this.prisma.reagentRequest.updateMany({
-          where: {
-            id: {
-              in: orderWithConnectedReagents.reagents.map((order) => order.id),
-            },
-          },
-          data: {
-            status: Status.Ordered,
           },
         });
       }
