@@ -307,7 +307,9 @@ export class OrderRepository implements IOrderRepository {
       } else if (status === Status.Submitted) {
         await this.prisma.reagentRequest.updateMany({
           where: {
-            id: orderWithConnectedReagents.id,
+            id: {
+              in: orderWithConnectedReagents.reagents.map((order) => order.id),
+            },
           },
           data: {
             status: Status.Ordered,
