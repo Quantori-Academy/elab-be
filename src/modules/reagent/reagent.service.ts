@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
