@@ -75,7 +75,10 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     const whereClause: IWhereClause = {};
 
     if (filter?.name) {
-      whereClause.name = filter.name;
+      whereClause.name = {
+        contains: filter.name,
+        mode: 'insensitive',
+      };
     }
     if (filter?.status) {
       whereClause.status = filter.status;
