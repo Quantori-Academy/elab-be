@@ -41,11 +41,10 @@ export class ValidateParseStorageOptionsPipe implements PipeTransform {
     }
 
     const filters: StorageFilterOptions = {
-      fullPath: queryDto.fullPath,
-      roomName: queryDto.roomName,
-      storageName: queryDto.storageName,
+      fullPath: queryDto.fullPath?.trim(),
+      roomName: queryDto.roomName?.trim(),
+      storageName: queryDto.storageName?.trim(),
     };
-
     const sorts: StorageSortOptions = {
       alphabeticalStorageName: queryDto.alphabeticalStorageName,
       alphabeticalRoomName: queryDto.alphabeticalRoomName,

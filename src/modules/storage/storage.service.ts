@@ -38,7 +38,7 @@ export class StorageService implements IStorageService {
       if (fullPath || roomName) {
         let finalRoomName: string = roomName ?? '';
         if (fullPath) {
-          const [roomName = '', storageName = ''] = fullPath.split(' ');
+          const [roomName = '', storageName = ''] = fullPath.split(' ').filter((val) => val != '');
           filterBy.name = storageName;
           finalRoomName = roomName;
         }
