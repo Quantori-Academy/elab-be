@@ -1,5 +1,11 @@
 import { BadRequestException, HttpStatus, Injectable, PipeTransform } from '@nestjs/common';
-import { FilterOptions, PaginationOptions, ReagentOptions, SortOptions } from '../interfaces/reagentOptions.interface';
+import {
+  FilterOptions,
+  FlagOptions,
+  PaginationOptions,
+  ReagentOptions,
+  SortOptions,
+} from '../interfaces/reagentOptions.interface';
 import { plainToClass } from 'class-transformer';
 import { GetReagentDto } from '../dto/getReagent.dto';
 import { validate, ValidationError } from 'class-validator';
@@ -31,6 +37,7 @@ export class ValidateParseReagentOptionsPipe implements PipeTransform {
       name: queryDto.name,
       category: queryDto.category,
       storageId: queryDto.storageId,
+      structure: queryDto.structure,
     };
 
     const sort: SortOptions = {
@@ -44,10 +51,15 @@ export class ValidateParseReagentOptionsPipe implements PipeTransform {
       take: queryDto.take,
     };
 
+    const flag: FlagOptions = {
+      isFullStructure: queryDto.isFullStructure,
+    };
+
     const options: ReagentOptions = {
       filter,
       sort,
       pagination,
+      flag,
     };
     return options;
   }
