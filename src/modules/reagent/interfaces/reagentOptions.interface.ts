@@ -17,6 +17,7 @@ export type FilterOptions = {
   name?: string;
   category?: Category;
   storageId?: number;
+  structure?: string;
 };
 
 export type PaginationOptions = {
@@ -32,11 +33,5 @@ export type ReagentOptions = {
   filter: FilterOptions;
   sort: SortOptions;
   pagination: PaginationOptions;
-};
-
-export type ReagentSearchOptions = {
-  sort: SortOptions;
-  pagination: PaginationOptions;
-  structure: string;
   flag: FlagOptions;
 };

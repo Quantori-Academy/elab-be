@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
-import { ReagentOptions, ReagentSearchOptions } from './interfaces/reagentOptions.interface';
+import { ReagentOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { Category, Status } from '@prisma/client';
@@ -32,21 +32,10 @@ class ReagentService implements IReagentService {
   async getReagents(options: ReagentOptions): Promise<ReagentList> {
     try {
       this.logger.log('getReagents method start');
-      const { filter, pagination, sort } = options || {};
-      return await this.reagentRepository.findAll(filter, pagination, sort);
+      const { filter, pagination, sort, flag } = options || {};
+      return await this.reagentRepository.findAll(filter, pagination, sort, flag);
     } catch (error) {
       this.logger.error('Failed to fetch a reagents: ', error);
-      throw error;
-    }
-  }
-
-  async searchByStructure(options: ReagentSearchOptions): Promise<IReagent | IReagent[]> {
-    try {
-      this.logger.log('searchByStructure method start');
-      const { pagination, sort, structure, flag } = options || {};
-      return await this.reagentRepository.getAllByStructure(structure, pagination, sort, flag);
-    } catch (error) {
-      this.logger.error('Failed to fetch a reagents in a search by Structure: ', error);
       throw error;
     }
   }

@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Category } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Order } from 'src/modules/storage/types/storageOptions.type';
 
 export class GetReagentDto {
@@ -21,6 +21,21 @@ export class GetReagentDto {
   @IsNumber()
   @Transform(({ value }) => Number(value))
   storageId?: number;
+
+  @ApiProperty({ example: 'c1cccnc1' })
+  @IsOptional()
+  @IsString()
+  structure?: string;
+
+  @ApiProperty({
+    required: false,
+    type: Boolean,
+    description: 'The flag to retrieve either the full structures or substructures',
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  isFullStructure?: boolean;
 
   @ApiProperty({ required: false, enum: Order, description: 'Sorting by the name of Reagent (asc | desc)' })
   @IsOptional()

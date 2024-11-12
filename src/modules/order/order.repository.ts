@@ -294,6 +294,9 @@ export class OrderRepository implements IOrderRepository {
             connect: existingReagentForInclude.map((reagent) => ({ id: reagent.id })),
           },
         },
+        include: {
+          reagents: true,
+        },
       });
 
       if (status === Status.Declined) {

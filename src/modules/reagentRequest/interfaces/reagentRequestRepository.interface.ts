@@ -11,7 +11,10 @@ export interface IReagentRequestRepository extends IRepository<IReagentRequest> 
 }
 
 export interface IWhereClause {
-  name?: string;
+  name?: {
+    contains: string;
+    mode: 'insensitive';
+  };
   status?: Status;
   userId?: number;
 }
