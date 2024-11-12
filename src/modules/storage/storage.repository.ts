@@ -115,6 +115,30 @@ export class StorageRepository implements IStorageRepository {
     }
   }
 
+  async findAllBylocationPath(roomIds: number[], storageName: string): Promise<StorageList> {
+    this.logger.log(`[${this.findAllBylocationPath.name}] - Method start`);
+    try {
+      const where: Prisma.StorageWhereInput = {
+        roomId: {
+          in: roomIds,
+        },
+        name: {
+          contains: storageName,
+          mode: 'insensitive',
+        },
+      };
+      const [storages, size] = await this.prisma.$transaction([
+        this.prisma.storage.findMany({ where }),
+        this.prisma.storage.count({ where }),
+      ]);
+      this.logger.log(`[${this.findAllBylocationPath.name}] - Method finished,`);
+      return { storages, size };
+    } catch (error) {
+      this.logger.error(`[${this.findAllBylocationPath.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
+
   async findAllByName(
     storageName: string,
     pagination?: StoragePaginationOptions,
