@@ -12,6 +12,7 @@ export interface IStorageRepository extends IRepository<Storage> {
   create(storageDto: StorageCreation): Promise<Storage>;
   findAllByName(storageName: string, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
   findAll(filterBy?: FilterBy, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<StorageList>;
+  findAllBylocationPath(roomIds: number[], storageName: string): Promise<StorageList>;
   update(data: PartialWithRequiredId<Storage>): Promise<Storage>;
   findAllByRoom(
     roomId: number,
