@@ -2,7 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { FilterOptions, FlagOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentOptions.interface';
 import { Prisma } from '@prisma/client';
-import { IReagentRepository, IWhereClause, ReagentList } from './interfaces/reagentRepository.interface';
+import { CountResult, IReagentRepository, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { CreateSampleDto } from './dto/createSample.dto';
@@ -85,95 +85,54 @@ class ReagentRepository implements IReagentRepository {
     });
   }
 
-  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sorting?: SortOptions): Promise<ReagentList> {
-    const { skip = 0, take = 10 } = pagination || {};
-    const orderBy = this.orderFactory(sorting);
-    const whereClause: IWhereClause = { isDeleted: false };
-
-    if (filter?.category) {
-      whereClause.category = filter.category;
-    }
-
-    if (filter?.name) {
-      whereClause.name = {
-        contains: filter.name,
-        mode: 'insensitive',
-      };
-    }
-
-    if (filter?.storageId) {
-      whereClause.storageId = filter.storageId;
-    }
-    const [reagents, size] = await this.prisma.$transaction([
-      this.prisma.reagent.findMany({
-        where: whereClause,
-        include: {
-          storage: {
-            select: {
-              name: true,
-              room: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-          usedReagentSample: true,
-        },
-        skip,
-        take,
-        orderBy,
-      }),
-      this.prisma.reagent.count({
-        where: whereClause,
-      }),
-    ]);
-    return {
-      reagents,
-      size,
-    };
-  }
-
-  async delete(id: number): Promise<IReagent> {
-    return await this.prisma.reagent.delete({
-      where: { id },
-    });
-  }
-
-  async getAllByStructure(
-    structure: string,
+  async findAll(
+    filter?: FilterOptions,
     pagination?: PaginationOptions,
     sorting?: SortOptions,
     flag?: FlagOptions,
-  ): Promise<IReagent | IReagent[]> {
+  ): Promise<ReagentList> {
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sorting);
     const { isFullStructure } = flag || {};
-    let inputString;
-    console.log(isFullStructure);
-    if (isFullStructure === undefined) {
-      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", 
+
+    const countQuery = `SELECT COUNT(*) AS size `;
+    const searchQuery = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", 
                    json_build_object(
                       'name', s."name",
                       'room', json_build_object('name', r."name")
                    ) AS storage
-                   FROM "Reagent" re
-                   JOIN "Storage" s ON s.id = re."storageId"
-                   JOIN "Room" r ON s."roomId" = r.id 
-                   WHERE re."isDeleted" = FALSE AND re.structure @>$1`;
-    } else {
-      console.log(isFullStructure);
-      inputString = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber",
-                   json_build_object(
-                      'name', s."name",
-                      'room', json_build_object('name', r."name")
-                   ) AS storage
-                   FROM "Reagent" re
+                    `;
+
+    let inputString = `FROM "Reagent" re
                    JOIN "Storage" s ON s.id = re."storageId"
                    JOIN "Room" r ON s."roomId" = r.id
-                   WHERE 
-                      (${isFullStructure} = TRUE AND re."isDeleted" = FALSE AND re.structure =$1) OR
-                      (${isFullStructure} = FALSE AND re."isDeleted" = FALSE AND re.structure @>$1 AND re.structure !=$1)`;
+                   WHERE re."isDeleted" = FALSE `;
+
+    const params: any[] = [];
+    if (filter?.name) {
+      inputString += `AND re."name" ILIKE '%' || $${params.length + 1} || '%' `;
+      params.push(filter.name);
+    }
+
+    if (filter?.category) {
+      inputString += `AND re."category" = $${params.length + 1}::"Category" `;
+      params.push(filter.category);
+    }
+
+    if (filter?.storageId) {
+      inputString += `AND re."storageId" = $${params.length + 1} `;
+      params.push(filter.storageId);
+    }
+
+    if (filter?.structure) {
+      if (isFullStructure === undefined) {
+        inputString += `AND re."structure" @>$${params.length + 1} `;
+      } else if (isFullStructure === true) {
+        inputString += `AND re."structure" =$${params.length + 1} `;
+      } else if (isFullStructure === false) {
+        inputString += `AND re."structure" @>$${params.length + 1} AND re."structure" !=$${params.length + 1} `;
+      }
+      params.push(filter.structure);
     }
 
     if (orderBy) {
@@ -194,7 +153,21 @@ class ReagentRepository implements IReagentRepository {
 
     inputString += ` LIMIT ${take} OFFSET ${skip}`;
     console.log(inputString);
-    return await this.prisma.$queryRawUnsafe(inputString, structure);
+    console.log(searchQuery + inputString);
+    console.log(countQuery + inputString);
+    const reagents: IReagent[] = await this.prisma.$queryRawUnsafe(searchQuery + inputString, ...params);
+    const count = await this.prisma.$queryRawUnsafe<CountResult[]>(countQuery + inputString, ...params);
+    const size = count[0]?.size.toString() ?? 0;
+    return {
+      reagents,
+      size,
+    };
+  }
+
+  async delete(id: number): Promise<IReagent> {
+    return await this.prisma.reagent.delete({
+      where: { id },
+    });
   }
 
   private orderFactory(
