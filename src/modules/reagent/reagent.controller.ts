@@ -24,12 +24,15 @@ import { ReagentOptions } from './interfaces/reagentOptions.interface';
 import { UpdateReagentDto, UpdateReagentSuccessDto } from './dto/updateReagent.dto';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { CreateReagentValidationErrorDto, ReagentNotFoundErrorDto } from './dto/createReagentFromRequest.dto';
+import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
+import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { SAMPLE_SERVICE_TOKEN } from './sample.service';
 import { ISampleService } from './interfaces/sampleService.interface';
 import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { RolesGuard } from 'src/common/guards/roles.guard';
 
 const ROUTE = 'reagents';
 
@@ -64,8 +67,43 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
+  @ApiQuery({ type: () => SearchByStructureDto })
+  @ApiResponse({ status: HttpStatus.OK, type: () => SearchByStructureSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: () => SearchByStructureErrorDto })
+  @UseGuards(AuthGuard)
+  @Get('/search')
+  async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
+    return await this.reagentService.searchByStructure(searchByStructureDto);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateReagentValidationErrorDto })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, type: ReagentNotFoundErrorDto })
+  @Roles(Role.ProcurementOfficer)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('reagent-request/:reagentRequestId/:storageId')
+  async createReagentFromRequest(
+    @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
+    @Param('storageId', ParseIdPipe) storageId: number,
+  ): Promise<IReagent> {
+    this.logger.log(`[${this.createReagentFromRequest.name}] - Method start`);
+    try {
+      const reagent: IReagent | null = await this.reagentService.createReagentFromReagentRequest(reagentRequestId, storageId);
+      if (!reagent) throw new NotFoundException('Reagent request is not found');
+      this.logger.log(`[${this.createReagentFromRequest.name}] - Method finished`);
+      return reagent;
+    } catch (error) {
+      this.logger.error(`[${this.createReagentFromRequest.name}] - Exception thrown: ` + error);
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: [UpdateReagentSuccessDto] })
   @ApiBody({ type: () => UpdateReagentDto })
-  @ApiResponse({ status: HttpStatus.OK, type: () => UpdateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
   @Post(':id')

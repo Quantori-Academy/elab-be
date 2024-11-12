@@ -143,7 +143,7 @@ export class OrderController {
   @Patch(':id')
   async updateOrder(
     @Param('id', ParseIdPipe) id: number,
-    @Body(new ValidationPipe({ transform: true })) updateOrderDto: UpdateOrderDto,
+    @Body(new ValidationPipe({ transform: true, whitelist: true })) updateOrderDto: UpdateOrderDto,
   ): Promise<OrderWithReagents> {
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {

@@ -6,5 +6,6 @@ import { RequestRepositoryProvider } from './reagentRequest.repository';
 @Module({
   providers: [RequestServiceProvider, RequestRepositoryProvider],
   controllers: [ReagentRequestController],
+  exports: [RequestRepositoryProvider],
 })
 export class ReagentRequestModule {}

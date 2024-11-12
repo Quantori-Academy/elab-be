@@ -1,15 +1,21 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
+import { Category, Status } from '@prisma/client';
 import { IReagent } from './interfaces/reagentEntity.interface';
+import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repository';
+import { IReagentRequestRepository } from '../reagentRequest/interfaces/reagentRequestRepository.interface';
 
 @Injectable()
 class ReagentService implements IReagentService {
   private readonly logger = new Logger(ReagentService.name);
-  constructor(@Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository) {}
+  constructor(
+    @Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository,
+    @Inject(REQUEST_REPOSITORY_TOKEN) private requestRepository: IReagentRequestRepository,
+  ) {}
 
   async create(data: IReagent): Promise<IReagent> {
     try {
@@ -64,6 +70,48 @@ class ReagentService implements IReagentService {
       return await this.reagentRepository.delete(id);
     } catch (error) {
       this.logger.error('Failed to delete a reagent: ', error);
+      throw error;
+    }
+  }
+
+  async createReagentFromReagentRequest(reagentRequestId: number, storageId: number): Promise<IReagent | null> {
+    this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method start`);
+    try {
+      const reagentRequest = await this.requestRepository.findById(reagentRequestId);
+      if (!reagentRequest) return null;
+
+      if (reagentRequest.status !== Status.Fulfilled) {
+        throw new BadRequestException('Only from Fulfilled requests can be created reagents');
+      }
+
+      const reagentData: IReagent = {
+        storageId,
+        name: reagentRequest.name,
+        casNumber: reagentRequest.casNumber ?? '',
+        quantityUnit: reagentRequest.quantityUnit,
+        totalQuantity: reagentRequest.desiredQuantity,
+        description: 'created from reagent request',
+        quantityLeft: reagentRequest.desiredQuantity,
+        structure: reagentRequest.structureSmiles ?? undefined,
+        package: reagentRequest.package,
+        isDeleted: false,
+        category: Category.Reagent,
+        expirationDate: reagentRequest.expirationDate,
+        producer: reagentRequest.producer,
+        catalogId: reagentRequest.catalogId,
+        catalogLink: reagentRequest.catalogLink,
+        pricePerUnit: reagentRequest.pricePerUnit,
+      };
+
+      const [reagent] = await Promise.all([
+        this.create(reagentData),
+        this.requestRepository.updateById({ status: Status.Completed }, reagentRequestId),
+      ]);
+
+      this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
+      return reagent;
+    } catch (error) {
+      this.logger.error(`[${this.createReagentFromReagentRequest.name}] - Exception thrown` + error);
       throw error;
     }
   }
