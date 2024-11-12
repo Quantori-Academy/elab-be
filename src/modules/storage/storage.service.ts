@@ -4,12 +4,12 @@ import { IStorageRepository } from './interfaces/storageRepository.interface';
 import { IStorageService } from './interfaces/storageService.interface';
 import { Storage } from '@prisma/client';
 import { CreateStorageLocationsDto } from './dto/createStorageLocation.dto';
-import { ROOM_SERVICE_TOKEN } from '../room/room.service';
-import { IRoomService } from '../room/interfaces/roomService.interface';
 import { FilterBy, StorageList, StorageWithReagents, UpdatedStorages } from './types/storage.types';
 import { StorageFilterOptions, StoragePaginationOptions, StorageSortOptions, StorageOptions } from './types/storageOptions.type';
 import { UpdateStroageDto } from './dto/updateStorage.dto';
 import { MoveItemsDto } from './dto/moveItems.dto';
+import { ROOM_REPOSITORY_TOKEN } from '../room/room.repository';
+import { IRoomRepository } from '../room/interfaces/roomRepository.interface';
 
 @Injectable()
 export class StorageService implements IStorageService {
@@ -17,7 +17,7 @@ export class StorageService implements IStorageService {
 
   constructor(
     @Inject(STORAGE_REPOSITORY_TOKEN) private storageRepository: IStorageRepository,
-    @Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService,
+    @Inject(ROOM_REPOSITORY_TOKEN) private roomRepository: IRoomRepository,
   ) {}
 
   async getStorages(options: StorageOptions): Promise<StorageList> {
@@ -27,17 +27,22 @@ export class StorageService implements IStorageService {
         size: 0,
         storages: [],
       };
-      const { roomName, storageName }: StorageFilterOptions = options.filter;
+      const { roomName, storageName, fullPath }: StorageFilterOptions = options.filter;
       const pagination: StoragePaginationOptions = options.pagination;
       const sort: StorageSortOptions = options.sort;
-
       const filterBy: FilterBy = {
         name: storageName,
         roomIds: undefined,
       };
 
-      if (roomName) {
-        const roomIds: number[] = await this.roomService.getRoomIdsBySubName(roomName);
+      if (fullPath || roomName) {
+        let finalRoomName: string = roomName ?? '';
+        if (fullPath) {
+          const [roomName = '', storageName = ''] = fullPath.split(' ').filter((val) => val != '');
+          filterBy.name = storageName;
+          finalRoomName = roomName;
+        }
+        const roomIds: number[] = await this.roomRepository.findRoomIdsBySubName(finalRoomName);
         filterBy.roomIds = roomIds;
       }
 
@@ -68,7 +73,7 @@ export class StorageService implements IStorageService {
     try {
       const { roomName, name, description = null } = storageDto;
 
-      const roomId: number | null = await this.roomService.getRoomIdByName(roomName);
+      const roomId: number | null = await this.roomRepository.findRoomIdByName(roomName);
       if (!roomId) throw new NotFoundException(`Room ${roomName} - Doesn't exists`);
 
       const existingStorage: Storage | null = await this.storageRepository.findUniqueStorage(roomId, name);

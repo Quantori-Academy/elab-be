@@ -6,6 +6,11 @@ import { HttpStatus } from '@nestjs/common';
 import { Room } from '@prisma/client';
 
 class GetStoragesQueryDto {
+  @ApiProperty({ required: false, type: String, description: 'Full path of storage location' })
+  @IsOptional()
+  @IsString()
+  fullPath?: string;
+
   @ApiProperty({ required: false, type: String, description: 'name of the room' })
   @IsOptional()
   @IsString()
