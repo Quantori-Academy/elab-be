@@ -30,21 +30,19 @@ export class StorageService implements IStorageService {
       const { roomName, storageName, fullPath }: StorageFilterOptions = options.filter;
       const pagination: StoragePaginationOptions = options.pagination;
       const sort: StorageSortOptions = options.sort;
-
-      if (fullPath) {
-        const [roomName = '', storageName = ''] = fullPath.split(' ');
-        const roomIds: number[] = await this.roomRepository.findRoomIdsBySubName(roomName);
-        storageList = await this.storageRepository.findAllBylocationPath(roomIds, storageName);
-        return storageList;
-      }
-
       const filterBy: FilterBy = {
         name: storageName,
         roomIds: undefined,
       };
 
-      if (roomName) {
-        const roomIds: number[] = await this.roomRepository.findRoomIdsBySubName(roomName);
+      if (fullPath || roomName) {
+        let finalRoomName: string = roomName ?? '';
+        if (fullPath) {
+          const [roomName = '', storageName = ''] = fullPath.split(' ');
+          filterBy.name = storageName;
+          finalRoomName = roomName;
+        }
+        const roomIds: number[] = await this.roomRepository.findRoomIdsBySubName(finalRoomName);
         filterBy.roomIds = roomIds;
       }
 

@@ -10,7 +10,6 @@ export interface IStorageRepository extends IRepository<Storage> {
   findById(id: number, includeReagents?: boolean): Promise<Storage | StorageWithReagents | null>; // implementation
   findUniqueStorage(roomId: number, storageName: string): Promise<Storage | null>;
   create(storageDto: StorageCreation): Promise<Storage>;
-  findAllBylocationPath(roomIds: number[], storageName: string): Promise<StorageList>;
   findAllByName(storageName: string, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<Storage[]>;
   findAll(filterBy?: FilterBy, pagination?: StoragePaginationOptions, sortOptions?: StorageSortOptions): Promise<StorageList>;
   update(data: PartialWithRequiredId<Storage>): Promise<Storage>;
