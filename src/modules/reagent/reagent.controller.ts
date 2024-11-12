@@ -67,16 +67,6 @@ export class ReagentController {
   }
 
   @ApiBearerAuth()
-  @ApiQuery({ type: () => SearchByStructureDto })
-  @ApiResponse({ status: HttpStatus.OK, type: () => SearchByStructureSuccessDto })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: () => SearchByStructureErrorDto })
-  @UseGuards(AuthGuard)
-  @Get('/search')
-  async searchByStructure(@Query(ValidateParseForSearchPipe) searchByStructureDto: ReagentSearchOptions) {
-    return await this.reagentService.searchByStructure(searchByStructureDto);
-  }
-
-  @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateReagentSuccessDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, type: CreateReagentValidationErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
