@@ -8,7 +8,7 @@ import { IReagent } from './interfaces/reagentEntity.interface';
 import { CreateSampleDto } from './dto/createSample.dto';
 
 @Injectable()
-class ReagentRepository implements IReagentRepository {
+export class ReagentRepository implements IReagentRepository {
   private logger = new Logger(ReagentRepository.name);
 
   constructor(private prisma: PrismaService) {}
@@ -100,7 +100,7 @@ class ReagentRepository implements IReagentRepository {
                    json_build_object(
                       'name', s."name",
                       'room', json_build_object('name', r."name")
-                   ) AS storage
+                   ) AS storage, re."storageId"
                     `;
 
     let inputString = `FROM "Reagent" re
@@ -134,18 +134,19 @@ class ReagentRepository implements IReagentRepository {
       }
       params.push(filter.structure);
     }
+    inputString += ` GROUP BY re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", re."storageId", s."name", r."name" `;
 
     if (orderBy) {
       if (Array.isArray(orderBy)) {
         const orderClause = orderBy.map((order) => {
           const [key, value] = Object.entries(order)[0];
-          return `"${key}" ${value}`;
+          return `re."${key}" ${value}`;
         });
         inputString += ` ORDER BY ${orderClause.join(' ,')}`;
         console.log(` ORDER BY ${orderClause.join(' ,')}`);
       } else {
         const orderClause = Object.entries(orderBy).map(([key, value]) => {
-          return `"${key}" ${value}`;
+          return `re."${key}" ${value}`;
         });
         inputString += ` ORDER BY ${orderClause[0]} `;
       }
