@@ -96,7 +96,7 @@ export class ReagentRepository implements IReagentRepository {
     const { isFullStructure } = flag || {};
 
     const countQuery = `SELECT COUNT(*) AS size `;
-    const searchQuery = `SELECT re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", 
+    const searchQuery = `SELECT re."id", re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", 
                    json_build_object(
                       'name', s."name",
                       'room', json_build_object('name', r."name")
@@ -134,7 +134,7 @@ export class ReagentRepository implements IReagentRepository {
       }
       params.push(filter.structure);
     }
-    inputString += ` GROUP BY re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", re."storageId", s."name", r."name" `;
+    inputString += ` GROUP BY re."id", re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", re."storageId", s."name", r."name" `;
 
     if (orderBy) {
       if (Array.isArray(orderBy)) {
