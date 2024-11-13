@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IReagentRequest } from './interfaces/reagentRequestEntity.interface';
-import { IReagentRequestRepository, IWhereClause } from './interfaces/reagentRequestRepository.interface';
+import { IReagentRequestRepository, IWhereClause, RequestList } from './interfaces/reagentRequestRepository.interface';
 import { Prisma } from '@prisma/client';
 import { FilterOptions, OrderBy, PaginationOptions, SortOptions } from './interfaces/reagentRequestOptions.interface';
 import { UpdateReagentRequestDto } from './dto/updateReagentRequest.dto';
@@ -63,12 +63,7 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     });
   }
 
-  async findAll(
-    filter?: FilterOptions,
-    pagination?: PaginationOptions,
-    sort?: SortOptions,
-    id?: number,
-  ): Promise<IReagentRequest[]> {
+  async findAll(filter?: FilterOptions, pagination?: PaginationOptions, sort?: SortOptions, id?: number): Promise<RequestList> {
     this.logger.log('findAll method start');
     const { skip = 0, take = 10 } = pagination || {};
     const orderBy = this.orderFactory(sort);
@@ -88,12 +83,21 @@ class ReagentRequestRepository implements IReagentRequestRepository {
       whereClause.userId = id;
     }
     this.logger.log(`[${this.findAll.name}] - Finished`);
-    return await this.prisma.reagentRequest.findMany({
-      where: whereClause,
-      skip,
-      take,
-      orderBy,
-    });
+    const [requests, size] = await this.prisma.$transaction([
+      this.prisma.reagentRequest.findMany({
+        where: whereClause,
+        skip,
+        take,
+        orderBy,
+      }),
+      this.prisma.reagentRequest.count({
+        where: whereClause,
+      }),
+    ]);
+    return {
+      requests,
+      size,
+    };
   }
 
   private orderFactory(

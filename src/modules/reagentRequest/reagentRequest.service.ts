@@ -3,7 +3,7 @@ import { REQUEST_REPOSITORY_TOKEN } from './reagentRequest.repository';
 import { IReagentRequest } from './interfaces/reagentRequestEntity.interface';
 import { IReagentRequestService } from './interfaces/reagentRequestService.interface';
 import { ReagentRequestOptions } from './interfaces/reagentRequestOptions.interface';
-import { IReagentRequestRepository } from './interfaces/reagentRequestRepository.interface';
+import { IReagentRequestRepository, RequestList } from './interfaces/reagentRequestRepository.interface';
 import { UpdateReagentRequestDto } from './dto/updateReagentRequest.dto';
 
 @Injectable()
@@ -24,7 +24,7 @@ class ReagentRequestService implements IReagentRequestService {
     }
   }
 
-  async getReagentRequestsForProcurementOficcer(options: ReagentRequestOptions): Promise<IReagentRequest[]> {
+  async getReagentRequestsForProcurementOficcer(options: ReagentRequestOptions): Promise<RequestList> {
     try {
       this.logger.log(`${this.getReagentRequestsForProcurementOficcer.name} - Start`);
       const { filter, pagination, sort } = options || {};
@@ -35,7 +35,7 @@ class ReagentRequestService implements IReagentRequestService {
     }
   }
 
-  async getReagentRequestsForResearchers(options: ReagentRequestOptions, id: number): Promise<IReagentRequest[]> {
+  async getReagentRequestsForResearchers(options: ReagentRequestOptions, id: number): Promise<RequestList> {
     try {
       this.logger.log(`${this.getReagentRequestsForResearchers.name} - Start`);
       const { filter, pagination, sort } = options || {};
