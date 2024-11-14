@@ -132,7 +132,7 @@ model ReagentRequest {
   catalogLink           String?
   pricePerUnit          Float?
   expirationDate        DateTime?
-
+  hide                  Boolean @default(false)
 }
 
 model Order {
