@@ -33,8 +33,8 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
-import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries..pipe';
-import { OrdereOptions } from './types/orderOptions.type';
+import { ValidateParseOrderOptionsPipe } from './pipes/validateParseQueries.pipe';
+import { OrderOptions } from './types/orderOptions.type';
 import {
   GetOneOrderResponseDto,
   GetOrderListResponseDto,
@@ -98,7 +98,7 @@ export class OrderController {
   @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
-  async orderList(@Query(ValidateParseOrderOptionsPipe) options: OrdereOptions): Promise<OrderList> {
+  async orderList(@Query(ValidateParseOrderOptionsPipe) options: OrderOptions): Promise<OrderList> {
     this.logger.log(`[${this.orderList.name}] - Method start`);
     try {
       const order: OrderList = await this.orderService.orderList(options);

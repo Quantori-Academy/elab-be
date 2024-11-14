@@ -36,10 +36,10 @@ type OrderPaginationOptions = {
   take?: number | undefined;
 };
 
-type OrdereOptions = {
+type OrderOptions = {
   filter: OrderFilterOptions;
   sort: OrderSortOptions;
   pagination: OrderPaginationOptions;
 };
 
-export { OrdereOptions, OrderFilterOptions, OrderSortOptions, OrderPaginationOptions, Order, OrderBy };
+export { OrderOptions, OrderFilterOptions, OrderSortOptions, OrderPaginationOptions, Order, OrderBy };

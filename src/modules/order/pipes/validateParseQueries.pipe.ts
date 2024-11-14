@@ -1,12 +1,12 @@
 import { Injectable, PipeTransform, BadRequestException, HttpStatus } from '@nestjs/common';
 import { validate, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { OrdereOptions, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from '../types/orderOptions.type';
+import { OrderOptions, OrderFilterOptions, OrderPaginationOptions, OrderSortOptions } from '../types/orderOptions.type';
 import { GetOrdersQueryDto } from '../dto/getOrder.dto';
 
 @Injectable()
 export class ValidateParseOrderOptionsPipe implements PipeTransform {
-  async transform(queries: any): Promise<OrdereOptions> {
+  async transform(queries: any): Promise<OrderOptions> {
     const queryDto = plainToClass(GetOrdersQueryDto, queries);
 
     const errors: ValidationError[] = await validate(queryDto);
@@ -66,7 +66,7 @@ export class ValidateParseOrderOptionsPipe implements PipeTransform {
       take: queryDto.take,
     };
 
-    const options: OrdereOptions = {
+    const options: OrderOptions = {
       filter: filters,
       sort: sorts,
       pagination: paginations,

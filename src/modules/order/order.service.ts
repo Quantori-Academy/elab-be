@@ -3,7 +3,7 @@ import { ORDER_REPOSITORY_TOKEN } from './order.repository';
 import { IOrderService } from './interfaces/orderService.interface';
 import { IOrderRepository } from './interfaces/orderRepository.interface';
 import { CompleteOrderData, OrderList, OrderWithReagents } from './types/order.type';
-import { OrdereOptions } from './types/orderOptions.type';
+import { OrderOptions } from './types/orderOptions.type';
 import { Status } from '@prisma/client';
 import { UpdateOrderDto } from './dto/updateOrder.dto';
 
@@ -25,7 +25,7 @@ export class OrderService implements IOrderService {
     }
   }
 
-  async orderList(options: OrdereOptions): Promise<OrderList> {
+  async orderList(options: OrderOptions): Promise<OrderList> {
     try {
       this.logger.log(`[${this.orderList.name}] - Method start`);
       const { filter, pagination, sort } = options;
