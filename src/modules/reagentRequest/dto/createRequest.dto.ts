@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Package, Status } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateRequestDto {
   @ApiProperty({ example: 'Reagent A' })
@@ -66,6 +66,12 @@ export class CreateRequestDto {
   @Transform(({ value }) => (value === undefined ? null : new Date(value)))
   @IsDate()
   expirationDate: Date | null;
+
+  @ApiProperty({ example: 'false' })
+  @IsOptional()
+  @Transform(({ value }) => (value === undefined || value === null ? false : value))
+  @IsBoolean()
+  hide: boolean;
 }
 
 export class CreateRequestSuccessDto {
