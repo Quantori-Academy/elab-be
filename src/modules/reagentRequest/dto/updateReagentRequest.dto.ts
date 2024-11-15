@@ -1,15 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Status } from '@prisma/client';
+import { Package, Status } from '@prisma/client';
+import { Transform } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateReagentRequestDto {
-  @ApiProperty({ enum: Status, description: 'Changing the status of Reagent Request' })
+  @ApiProperty({ enum: Status, description: 'Changing the status of Reagent Request', required: false })
+  @IsOptional()
   @IsEnum(Status)
-  status: Status;
+  status?: Status;
 
-  @ApiProperty({ description: 'Adding the comments by Procurement Officer' })
+  @ApiProperty({ description: 'Adding the comments by Procurement Officer', required: false })
+  @IsString()
   @IsOptional()
   procurementComments?: string;
+
+  @ApiProperty({ description: 'Adding the comments by Procurement Officer', required: false })
+  @IsNumber()
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  desiredQuantity?: number;
+
+  @ApiProperty({ description: 'Adding the comments by Procurement Officer', required: false })
+  @IsEnum(Package)
+  @IsOptional()
+  package?: Package;
 }
 
 export class UpdateReagentRequestSuccessDto {
