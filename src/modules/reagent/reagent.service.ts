@@ -10,7 +10,7 @@ import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repos
 import { IReagentRequestRepository } from '../reagentRequest/interfaces/reagentRequestRepository.interface';
 
 @Injectable()
-class ReagentService implements IReagentService {
+export class ReagentService implements IReagentService {
   private readonly logger = new Logger(ReagentService.name);
   constructor(
     @Inject(REAGENT_REPOSITORY_TOKEN) private reagentRepository: IReagentRepository,
