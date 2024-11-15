@@ -8,6 +8,7 @@ import {
   Logger,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -96,7 +97,7 @@ export class ReagentController {
   @ApiBody({ type: () => UpdateReagentDto })
   @ApiResponse({ status: HttpStatus.NOT_FOUND })
   @UseGuards(AuthGuard)
-  @Post(':id')
+  @Patch(':id')
   async editReagent(
     @Body(new ValidationPipe({ transform: true })) updateReagentDto: UpdateReagentDto,
     @Param('id', ParseIdPipe) id: number,

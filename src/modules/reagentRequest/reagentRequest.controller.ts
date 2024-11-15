@@ -8,6 +8,7 @@ import {
   Logger,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -68,8 +69,11 @@ export class ReagentRequestController {
   @ApiResponse({ status: HttpStatus.CREATED, type: UpdateReagentRequestSuccessDto })
   @Roles(Role.ProcurementOfficer)
   @UseGuards(AuthGuard, RolesGuard)
-  @Post(':id')
-  async editReagentRequest(@Param('id', ParseIdPipe) id: number, @Body() updateReagentRequestDto: UpdateReagentRequestDto) {
+  @Patch(':id')
+  async editReagentRequest(
+    @Param('id', ParseIdPipe) id: number,
+    @Body(new ValidationPipe({ transform: true })) updateReagentRequestDto: UpdateReagentRequestDto,
+  ) {
     try {
       const request = await this.requestService.getRequestById(id);
       if (!request) throw new NotFoundException('Reagent Request with this ID - NOT FOUND');
