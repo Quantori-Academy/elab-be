@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReagentService } from './reagent.service';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
 import { Category, Package } from '@prisma/client';
+import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repository';
 
 describe('Reagent Service', () => {
   let reagentService: ReagentService;
@@ -72,10 +73,18 @@ describe('Reagent Service', () => {
     updateById: jest.fn(),
     delete: jest.fn(),
   };
+  const mockRequestRepository = {
+    findById: jest.fn(),
+    updateById: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ReagentService, { provide: REAGENT_REPOSITORY_TOKEN, useValue: mockReagentRepository }],
+      providers: [
+        ReagentService,
+        { provide: REAGENT_REPOSITORY_TOKEN, useValue: mockReagentRepository },
+        { provide: REQUEST_REPOSITORY_TOKEN, useValue: mockRequestRepository },
+      ],
     }).compile();
     reagentService = module.get<ReagentService>(ReagentService);
   });
