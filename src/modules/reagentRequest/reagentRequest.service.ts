@@ -7,7 +7,7 @@ import { IReagentRequestRepository, RequestList } from './interfaces/reagentRequ
 import { UpdateReagentRequestDto } from './dto/updateReagentRequest.dto';
 
 @Injectable()
-class ReagentRequestService implements IReagentRequestService {
+export class ReagentRequestService implements IReagentRequestService {
   private logger = new Logger(ReagentRequestService.name);
 
   constructor(@Inject(REQUEST_REPOSITORY_TOKEN) private requestRepository: IReagentRequestRepository) {}

@@ -1,69 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReagentService } from './reagent.service';
 import { REAGENT_REPOSITORY_TOKEN } from './reagent.repository';
-import { Category, Package } from '@prisma/client';
+import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repository';
+import {
+  deletedReagent,
+  mockReagent,
+  mockReagentRequest,
+  reagentData,
+  reagentList,
+  updatedReagent,
+  updateDto,
+  updateDtoWithZero,
+} from './mocks/reagentMocks';
 
 describe('Reagent Service', () => {
   let reagentService: ReagentService;
-
-  const reagentList = {
-    reagents: [
-      {
-        id: 1,
-        name: 'Reagent Unit Test',
-        casNumber: '12-45-6',
-        producer: 'Producer Unit Test',
-        catalogId: 'CATALOG001',
-        catalogLink: 'https://e-shop.com/catalog',
-        pricePerUnit: 400,
-        quantityUnit: 'ml',
-        totalQuantity: 30,
-        description: 'Reagent for unit test',
-        quantityLeft: 30,
-        expirationDate: new Date(),
-        storageId: 2,
-        structure: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Reagent,
-        isDeleted: false,
-      },
-      {
-        id: 2,
-        name: 'Reagent Unit Test 2',
-        casNumber: '12-45-6',
-        producer: 'Producer for Unit Test',
-        catalogId: 'CATALOG003',
-        catalogLink: 'https://e-shop.com/catalog',
-        pricePerUnit: 700,
-        quantityUnit: 'ml',
-        totalQuantity: 80,
-        description: 'Reagent for unit test',
-        quantityLeft: 65,
-        expirationDate: new Date(),
-        storageId: 1,
-        structure: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Reagent,
-        isDeleted: false,
-      },
-      {
-        id: 3,
-        name: 'Sample Unit Test',
-        casNumber: '78-90-5',
-        quantityUnit: 'ml',
-        totalQuantity: 50,
-        description: 'Sample for unit test',
-        quantityLeft: 40,
-        expirationDate: new Date(),
-        storageId: 2,
-        structure: 'c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Sample,
-        isDeleted: false,
-      },
-    ],
-    size: 3,
-  };
 
   const mockReagentRepository = {
     create: jest.fn(),
@@ -73,9 +24,18 @@ describe('Reagent Service', () => {
     delete: jest.fn(),
   };
 
+  const mockRequestRepository = {
+    findById: jest.fn(),
+    updateById: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ReagentService, { provide: REAGENT_REPOSITORY_TOKEN, useValue: mockReagentRepository }],
+      providers: [
+        ReagentService,
+        { provide: REAGENT_REPOSITORY_TOKEN, useValue: mockReagentRepository },
+        { provide: REQUEST_REPOSITORY_TOKEN, useValue: mockRequestRepository },
+      ],
     }).compile();
     reagentService = module.get<ReagentService>(ReagentService);
   });
@@ -86,24 +46,6 @@ describe('Reagent Service', () => {
 
   describe('CREATE Reagent Method', () => {
     it('should create reagent with correct data', async () => {
-      const reagentData = {
-        name: 'Reagent Unit Test',
-        casNumber: '12-45-6',
-        producer: 'Producer Unit Test',
-        catalogId: 'CATALOG001',
-        catalogLink: 'https://e-shop.com/catalog',
-        pricePerUnit: 400,
-        quantityUnit: 'ml',
-        totalQuantity: 30,
-        description: 'Reagent for unit test',
-        quantityLeft: 30,
-        expirationDate: new Date(),
-        storageId: 2,
-        structure: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Reagent,
-      };
-
       mockReagentRepository.create.mockResolvedValue(reagentList.reagents[0]);
 
       const result = await reagentService.create(reagentData);
@@ -144,24 +86,6 @@ describe('Reagent Service', () => {
 
   describe('EDIT Reagent by ID Method', () => {
     it('should update a reagent and return the updated reagent', async () => {
-      const updateDto = { quantityLeft: 20, storageId: 1 };
-      const updatedReagent = {
-        id: 5,
-        casNumber: '12-45-6',
-        producer: 'Producer Unit Test',
-        catalogId: 'CATALOG001',
-        catalogLink: 'https://e-shop.com/catalog',
-        pricePerUnit: 400,
-        quantityUnit: 'ml',
-        totalQuantity: 30,
-        description: 'Reagent for unit test',
-        quantityLeft: 20,
-        expirationDate: new Date(),
-        storageId: 1,
-        structure: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Reagent,
-      };
       mockReagentRepository.updateById.mockResolvedValue(updatedReagent);
       const result = await reagentService.editReagent(updateDto, 5);
 
@@ -170,59 +94,39 @@ describe('Reagent Service', () => {
     });
 
     it('should be marked as deleted if quantityLeft is 0', async () => {
-      const updateDto = { quantityLeft: 0, storageId: 1 };
-      const updatedReagent = {
-        id: 5,
-        casNumber: '12-45-6',
-        producer: 'Producer Unit Test',
-        catalogId: 'CATALOG001',
-        catalogLink: 'https://e-shop.com/catalog',
-        pricePerUnit: 400,
-        quantityUnit: 'ml',
-        totalQuantity: 30,
-        description: 'Reagent for unit test',
-        quantityLeft: 0,
-        expirationDate: new Date(),
-        storageId: 1,
-        structure: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Reagent,
-        isDeleted: true,
-      };
-
       mockReagentRepository.updateById.mockResolvedValue(updatedReagent);
-      const result = await reagentService.editReagent(updateDto, 5);
+      const result = await reagentService.editReagent(updateDtoWithZero, 5);
 
-      expect(mockReagentRepository.updateById).toHaveBeenCalledWith(updateDto, 5, true);
+      expect(mockReagentRepository.updateById).toHaveBeenCalledWith(updateDtoWithZero, 5, true);
       expect(result).toEqual(updatedReagent);
     });
   });
 
   describe('DELETE Reagent By ID', () => {
     it('should delete reagent by id', async () => {
-      const deletedReagent = {
-        id: 5,
-        casNumber: '12-45-6',
-        producer: 'Producer Unit Test',
-        catalogId: 'CATALOG001',
-        catalogLink: 'https://e-shop.com/catalog',
-        pricePerUnit: 400,
-        quantityUnit: 'ml',
-        totalQuantity: 30,
-        description: 'Reagent for unit test',
-        quantityLeft: 0,
-        expirationDate: new Date(),
-        storageId: 1,
-        structure: 'Cc1nc(C)c(C(=O)N/N=C/c2cccnc2)cc1C(=O)N/N=C/c1cccnc1',
-        package: Package.Bottle,
-        category: Category.Reagent,
-        isDeleted: true,
-      };
       mockReagentRepository.delete.mockResolvedValue(deletedReagent);
       const result = await reagentService.deleteReagentById(5);
 
       expect(mockReagentRepository.delete).toHaveBeenCalledWith(5);
       expect(result).toEqual(deletedReagent);
+    });
+  });
+
+  describe('CREATE Reagent From Reagent Request', () => {
+    it('should create a reagent from a fulfilled reagent request', async () => {
+      mockRequestRepository.findById.mockResolvedValue(mockReagentRequest);
+      mockRequestRepository.updateById.mockResolvedValue({});
+      mockReagentRepository.create.mockResolvedValue(mockReagent);
+
+      const result = await reagentService.createReagentFromReagentRequest(1, 1);
+      expect(mockRequestRepository.findById).toHaveBeenCalledWith(1);
+      expect(mockReagentRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'H2O',
+          storageId: 1,
+        }),
+      );
+      expect(result).toEqual(mockReagent);
     });
   });
 });
