@@ -85,13 +85,13 @@ class ReagentRequestRepository implements IReagentRequestRepository {
     this.logger.log(`[${this.findAll.name}] - Finished`);
     const [requests, size] = await this.prisma.$transaction([
       this.prisma.reagentRequest.findMany({
-        where: whereClause,
+        where: { ...whereClause, hide: false },
         skip,
         take,
         orderBy,
       }),
       this.prisma.reagentRequest.count({
-        where: whereClause,
+        where: { ...whereClause, hide: false },
       }),
     ]);
     return {
