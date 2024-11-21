@@ -42,7 +42,8 @@ export class CreateSampleDto {
   @IsNumber()
   quantityLeft: number;
 
-  @ApiProperty({ example: '2024-12-31T23:59:59Z' })
+  @ApiProperty({ example: '2024-12-31T23:59:59Z', required: false })
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   expirationDate: Date;
