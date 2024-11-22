@@ -156,14 +156,15 @@ export class ReagentRepository implements IReagentRepository {
       }
     }
 
-    const fullInputString = inputString + ` LIMIT ${take} OFFSET ${skip}`;
+    inputString += ` LIMIT ${take} OFFSET ${skip}`;
     console.log(inputString);
     console.log(searchQuery + inputString);
     console.log(countQuery + inputString);
-    const reagents: IReagent[] = await this.prisma.$queryRawUnsafe(searchQuery + fullInputString, ...params);
+    const reagents: IReagent[] = await this.prisma.$queryRawUnsafe(searchQuery + inputString, ...params);
     return {
       reagents,
       size,
+      pageSize: reagents.length,
     };
   }
 

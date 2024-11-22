@@ -19,6 +19,7 @@ export interface IReagentRepository extends IRepository<IReagent> {
 export type ReagentList = {
   reagents: IReagent[];
   size: number;
+  pageSize: number;
 };
 
 export type CountResult = { size: number };
