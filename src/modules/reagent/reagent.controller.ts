@@ -11,7 +11,9 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { REAGENT_SERVICE_TOKEN } from './reagent.service';
@@ -34,6 +36,8 @@ import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto'
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
 
 const ROUTE = 'reagents';
 
@@ -149,5 +153,27 @@ export class ReagentController {
     const reagent: IReagent | null = await this.reagentService.getReagentById(id);
     if (!reagent) throw new NotFoundException('Reagent Not Found!');
     return await this.reagentService.deleteReagentById(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, './uploads');
+        },
+        filename: (req, file, cb) => {
+          cb(null, file.originalname);
+        },
+      }),
+    }),
+  )
+  @Post('/upload')
+  async uploadCsv(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+    return await this.reagentService.uploadCsvFile(file.path);
   }
 }
