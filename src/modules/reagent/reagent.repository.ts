@@ -134,6 +134,10 @@ export class ReagentRepository implements IReagentRepository {
       }
       params.push(filter.structure);
     }
+
+    const count = await this.prisma.$queryRawUnsafe<CountResult[]>(countQuery + inputString, ...params);
+    const size = Number(count[0]?.size) ?? 0;
+
     inputString += ` GROUP BY re."id", re."name", re."category", re."structure", re."description", re."quantityLeft", re."totalQuantity", re."quantityUnit", re."casNumber", re."storageId", s."name", r."name" `;
 
     if (orderBy) {
@@ -157,11 +161,10 @@ export class ReagentRepository implements IReagentRepository {
     console.log(searchQuery + inputString);
     console.log(countQuery + inputString);
     const reagents: IReagent[] = await this.prisma.$queryRawUnsafe(searchQuery + inputString, ...params);
-    const count = await this.prisma.$queryRawUnsafe<CountResult[]>(countQuery + inputString, ...params);
-    const size = count[0]?.size.toString() ?? 0;
     return {
       reagents,
       size,
+      pageSize: reagents.length,
     };
   }
 
