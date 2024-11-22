@@ -120,8 +120,7 @@ export class RoomController {
   @ApiResponse({ status: HttpStatus.OK, type: [GetRoomSuccessDto] })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, type: ForbiddenErrorDto })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, type: TokenErrorResponseDto })
-  @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @Get('')
   async getRooms() {
     this.logger.log(`[${this.getRooms.name}] - Method start`);
