@@ -4,6 +4,10 @@ import { IDashboardService } from './interfaces/dashboardService.interface';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AdminDashboardDto } from './dto/adminDashboard.dto';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
+import { ResearcherDashboardDto } from './dto/researcherDashboard.dto';
 
 const ROUTE = 'dashboard';
 
@@ -14,9 +18,19 @@ export class DashboardController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: () => AdminDashboardDto })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   @Get('/admin')
   async adminDashboard() {
     return await this.dashboardService.adminDashboard();
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: () => ResearcherDashboardDto })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Researcher)
+  @Get('/researcher')
+  async researcherDashboard() {
+    return await this.dashboardService.researcherDashboard();
   }
 }
