@@ -1,9 +1,11 @@
 import { Prisma, Role } from '@prisma/client';
 import { IReagent } from 'src/modules/reagent/interfaces/reagentEntity.interface';
+import { IReagentRequest } from 'src/modules/reagentRequest/interfaces/reagentRequestEntity.interface';
 
 export interface IDashboardService {
   adminDashboard(): Promise<AdminReturnObject>;
   researcherDashboard(): Promise<ResearcherReturnObject>;
+  procurementOficcerDashboard(year: number, month: number): Promise<ProcurementOfficerReturnObject>;
 }
 
 export type AdminReturnObject = {
@@ -42,4 +44,13 @@ export type ResearcherReturnObject = {
   })[];
   expiredList: IReagent[];
   emptyList: IReagent[];
+};
+
+export type ProcurementOfficerReturnObject = {
+  requestList: IReagentRequest[];
+  requestByStatuses: (Prisma.PickEnumerable<Prisma.ReagentRequestGroupByOutputType, 'status'[]> & {
+    _count: {
+      id: number;
+    };
+  })[];
 };

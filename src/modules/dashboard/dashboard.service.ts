@@ -1,7 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AdminReturnObject, IDashboardService, ResearcherReturnObject } from './interfaces/dashboardService.interface';
+import {
+  AdminReturnObject,
+  IDashboardService,
+  ProcurementOfficerReturnObject,
+  ResearcherReturnObject,
+} from './interfaces/dashboardService.interface';
 import { IReagent } from '../reagent/interfaces/reagentEntity.interface';
+import { IReagentRequest } from '../reagentRequest/interfaces/reagentRequestEntity.interface';
 
 @Injectable()
 class DashboardService implements IDashboardService {
@@ -34,7 +40,7 @@ class DashboardService implements IDashboardService {
         userNumberInRoles,
       };
     } catch (error) {
-      this.logger.log(`${this.adminDashboard.name} - Error - ${error}`);
+      this.logger.error(`${this.adminDashboard.name} - Error - ${error}`);
       throw error;
     }
   }
@@ -74,7 +80,7 @@ class DashboardService implements IDashboardService {
       const emptyList: IReagent[] = reagents.filter(
         (reagent) => reagent.quantityLeft <= reagent.totalQuantity / 2 || reagent.quantityLeft === 0,
       );
-
+      this.logger.log(`${this.researcherDashboard.name} - Finish`);
       return {
         reagentsVsSampleNumber,
         reagentsVsSampleExpiredNumber,
@@ -83,7 +89,41 @@ class DashboardService implements IDashboardService {
         emptyList,
       };
     } catch (error) {
-      this.logger.log(`${this.researcherDashboard.name} - Error - ${error}`);
+      this.logger.error(`${this.researcherDashboard.name} - Error - ${error}`);
+      throw error;
+    }
+  }
+
+  async procurementOficcerDashboard(year: number, month: number): Promise<ProcurementOfficerReturnObject> {
+    try {
+      this.logger.log(`${this.procurementOficcerDashboard.name} - Start`);
+      if (month < 1 || month > 12) {
+        throw new BadRequestException('Invalid month value. Must be between 1 and 12.');
+      }
+      const requestList: IReagentRequest[] = await this.prisma.reagentRequest.findMany({
+        orderBy: {
+          createdAt: 'asc',
+        },
+      });
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 1);
+      const requestByStatuses = await this.prisma.reagentRequest.groupBy({
+        by: ['status'],
+        _count: { id: true },
+        where: {
+          createdAt: {
+            gte: startDate,
+            lt: endDate,
+          },
+        },
+      });
+      this.logger.log(`${this.procurementOficcerDashboard.name} - Finish`);
+      return {
+        requestList,
+        requestByStatuses,
+      };
+    } catch (error) {
+      this.logger.error(`${this.procurementOficcerDashboard.name} - Error - ${error}`);
       throw error;
     }
   }
