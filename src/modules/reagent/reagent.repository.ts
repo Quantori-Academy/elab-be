@@ -13,6 +13,12 @@ export class ReagentRepository implements IReagentRepository {
 
   constructor(private prisma: PrismaService) {}
 
+  async createMany(reagents: IReagent[]): Promise<IReagent[]> {
+    return await this.prisma.reagent.createManyAndReturn({
+      data: reagents,
+    });
+  }
+
   async findManyById(ids: number[]): Promise<IReagent[]> {
     return await this.prisma.reagent.findMany({
       where: {

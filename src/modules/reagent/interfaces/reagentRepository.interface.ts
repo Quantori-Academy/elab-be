@@ -14,6 +14,7 @@ export interface IReagentRepository extends IRepository<IReagent> {
   ): Promise<ReagentList>;
   updateById(data: UpdateReagentDto, id: number, isDeleted: boolean): Promise<IReagent>;
   createSample(sample: CreateSampleDto): Promise<IReagent>;
+  createMany(reagents: IReagent[]): Promise<IReagent[]>;
 }
 
 export type ReagentList = {

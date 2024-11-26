@@ -4,10 +4,12 @@ import { IReagentService } from './interfaces/reagentService.interface';
 import { ReagentOptions } from './interfaces/reagentOptions.interface';
 import { IReagentRepository, ReagentList } from './interfaces/reagentRepository.interface';
 import { UpdateReagentDto } from './dto/updateReagent.dto';
-import { Category, Status } from '@prisma/client';
+import { Category, Package, Status } from '@prisma/client';
 import { IReagent } from './interfaces/reagentEntity.interface';
 import { REQUEST_REPOSITORY_TOKEN } from '../reagentRequest/reagentRequest.repository';
 import { IReagentRequestRepository } from '../reagentRequest/interfaces/reagentRequestRepository.interface';
+import * as fs from 'fs';
+import * as Papa from 'papaparse';
 
 @Injectable()
 export class ReagentService implements IReagentService {
@@ -112,6 +114,46 @@ export class ReagentService implements IReagentService {
       return reagent;
     } catch (error) {
       this.logger.error(`[${this.createReagentFromReagentRequest.name}] - Exception thrown` + error);
+      throw error;
+    }
+  }
+
+  async uploadCsvFile(filePath: string): Promise<{ message: string }> {
+    try {
+      const fileBuffer = fs.readFileSync(filePath, 'utf8');
+
+      const parsedData = Papa.parse(fileBuffer, {
+        header: true,
+        skipEmptyLines: true,
+      });
+
+      if (parsedData.errors.length) {
+        throw new Error(`Error with parsing CSV: ${JSON.stringify(parsedData.errors)}`);
+      }
+      const reagents = parsedData.data.map((row: IReagent) => ({
+        name: row.name?.trim(),
+        casNumber: row.casNumber?.trim(),
+        producer: row.producer?.trim(),
+        catalogId: row.catalogId?.trim(),
+        catalogLink: row.catalogLink?.trim(),
+        pricePerUnit: row.pricePerUnit ? parseFloat(row.pricePerUnit.toString()) : 0,
+        quantityUnit: row.quantityUnit?.trim(),
+        totalQuantity: row.totalQuantity ? parseFloat(row.totalQuantity.toString()) : 0,
+        description: row.description?.trim(),
+        quantityLeft: row.quantityLeft ? parseFloat(row.quantityLeft.toString()) : 0,
+        expirationDate: row.expirationDate ? new Date(row.expirationDate) : null,
+        storageId: row.storageId ? parseInt(row.storageId.toString(), 10) : 0,
+        structure: row.structure?.trim(),
+        package:
+          row.package?.trim() && Object.values(Package).includes(row.package.replace(/\s+/g, '') as Package)
+            ? (row.package.trim() as Package)
+            : null,
+        category: Category.Reagent,
+      }));
+      await this.reagentRepository.createMany(reagents);
+      return { message: 'csv parsed and saved in database' };
+    } catch (error) {
+      this.logger.error(`[${this.uploadCsvFile.name}] - Exception thrown` + error);
       throw error;
     }
   }
