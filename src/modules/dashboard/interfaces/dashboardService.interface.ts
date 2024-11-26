@@ -12,11 +12,9 @@ export type AdminReturnObject = {
   roomNumber: number;
   storageNumber: number;
   userNumber: number;
-  storageNumberInRoom: {
-    roomId: number;
-    _count: {
-      id: number;
-    };
+  storageCountWithRoomNames: {
+    roomName: string | undefined;
+    storageCount: number;
   }[];
   userNumberInRoles: {
     role: Role;

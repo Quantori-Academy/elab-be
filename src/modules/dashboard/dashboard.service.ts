@@ -27,6 +27,17 @@ class DashboardService implements IDashboardService {
         by: ['roomId'],
         _count: { id: true },
       });
+      const storageCountWithRoomNames = await Promise.all(
+        storageNumberInRoom.map(async (group) => {
+          const room = await this.prisma.room.findUnique({
+            where: { id: group.roomId },
+          });
+          return {
+            roomName: room?.name,
+            storageCount: group._count.id,
+          };
+        }),
+      );
       const userNumberInRoles = await this.prisma.user.groupBy({
         by: ['role'],
         _count: { id: true },
@@ -36,7 +47,7 @@ class DashboardService implements IDashboardService {
         roomNumber,
         storageNumber,
         userNumber,
-        storageNumberInRoom,
+        storageCountWithRoomNames,
         userNumberInRoles,
       };
     } catch (error) {
