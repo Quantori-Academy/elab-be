@@ -7,7 +7,7 @@ import { AdminDashboardDto } from './dto/adminDashboard.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { ResearcherDashboardDto } from './dto/researcherDashboard.dto';
+import { ResearcherDashboardDto, ResearcherDashboardQueryDto } from './dto/researcherDashboard.dto';
 import { ProcurementOfficerDashboardDto, ProcurementOfficerDashboardQueryDto } from './dto/procurementOficcerdashboard.dto';
 
 const ROUTE = 'dashboard';
@@ -27,12 +27,17 @@ export class DashboardController {
   }
 
   @ApiBearerAuth()
+  @ApiQuery({ type: () => ResearcherDashboardQueryDto })
   @ApiResponse({ status: HttpStatus.OK, type: () => ResearcherDashboardDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Researcher)
   @Get('/researcher')
-  async researcherDashboard() {
-    return await this.dashboardService.researcherDashboard();
+  async researcherDashboard(@Query() query: ResearcherDashboardQueryDto) {
+    const { year, month } = query;
+    const todayYear = new Date().getFullYear();
+    const todayMonth = new Date().getMonth() + 1;
+    return await this.dashboardService.researcherDashboard(year ?? todayYear, month ?? todayMonth);
   }
 
   @ApiBearerAuth()
@@ -44,6 +49,8 @@ export class DashboardController {
   @Get('/procurement_officer')
   async procurementOfficerDashboard(@Query() query: ProcurementOfficerDashboardQueryDto) {
     const { year, month } = query;
-    return await this.dashboardService.procurementOficcerDashboard(year ?? 2024, month ?? 1);
+    const todayYear = new Date().getFullYear();
+    const todayMonth = new Date().getMonth() + 1;
+    return await this.dashboardService.procurementOficcerDashboard(year ?? todayYear, month ?? todayMonth);
   }
 }

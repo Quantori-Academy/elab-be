@@ -56,9 +56,12 @@ class DashboardService implements IDashboardService {
     }
   }
 
-  async researcherDashboard(): Promise<ResearcherReturnObject> {
+  async researcherDashboard(year: number, month: number): Promise<ResearcherReturnObject> {
     try {
       this.logger.log(`${this.researcherDashboard.name} - Start`);
+      if (month < 1 || month > 12) {
+        throw new BadRequestException('Invalid month value. Must be between 1 and 12.');
+      }
       const reagentsVsSampleNumber = await this.prisma.reagent.groupBy({
         by: ['category'],
         _count: { id: true },
@@ -87,17 +90,26 @@ class DashboardService implements IDashboardService {
         },
         take: 10,
       });
-      const reagents = await this.prisma.reagent.findMany();
-      const emptyList: IReagent[] = reagents.filter(
+      const emptyOrExpiredList: IReagent[] = expiredList.filter(
         (reagent) => reagent.quantityLeft <= reagent.totalQuantity / 2 || reagent.quantityLeft === 0,
       );
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 1);
+      const requestList: IReagentRequest[] = await this.prisma.reagentRequest.findMany({
+        where: {
+          createdAt: {
+            gte: startDate,
+            lt: endDate,
+          },
+        },
+      });
       this.logger.log(`${this.researcherDashboard.name} - Finish`);
       return {
         reagentsVsSampleNumber,
         reagentsVsSampleExpiredNumber,
         reagentsVsSampleEmptyNumber,
-        expiredList,
-        emptyList,
+        emptyOrExpiredList,
+        requestList,
       };
     } catch (error) {
       this.logger.error(`${this.researcherDashboard.name} - Error - ${error}`);

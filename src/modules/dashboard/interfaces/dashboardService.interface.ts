@@ -4,7 +4,7 @@ import { IReagentRequest } from 'src/modules/reagentRequest/interfaces/reagentRe
 
 export interface IDashboardService {
   adminDashboard(): Promise<AdminReturnObject>;
-  researcherDashboard(): Promise<ResearcherReturnObject>;
+  researcherDashboard(year: number, month: number): Promise<ResearcherReturnObject>;
   procurementOficcerDashboard(year: number, month: number): Promise<ProcurementOfficerReturnObject>;
 }
 
@@ -40,8 +40,8 @@ export type ResearcherReturnObject = {
       id: number;
     };
   })[];
-  expiredList: IReagent[];
-  emptyList: IReagent[];
+  emptyOrExpiredList: IReagent[];
+  requestList: IReagentRequest[];
 };
 
 export type ProcurementOfficerReturnObject = {
