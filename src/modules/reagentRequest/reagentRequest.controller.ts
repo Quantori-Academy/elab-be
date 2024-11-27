@@ -39,7 +39,7 @@ export class ReagentRequestController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateRequestSuccessDto })
-  @Roles(Role.Researcher)
+  @Roles(Role.Researcher, Role.ProcurementOfficer)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
   async create(@Body(new ValidationPipe({ transform: true })) createRequestDto: CreateRequestDto, @Req() req: any) {
