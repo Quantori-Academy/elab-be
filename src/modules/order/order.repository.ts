@@ -116,7 +116,6 @@ export class OrderRepository implements IOrderRepository {
               id: {
                 in: existingReagentIds,
               },
-              status: Status.Ordered,
             },
           },
         },
@@ -140,7 +139,7 @@ export class OrderRepository implements IOrderRepository {
         const conflicts: string[] = [];
         orderIdMappedWithOrderedReagentRequestIds.map((order) => {
           conflicts.push(
-            `Order with id ${order.orderId} includes reagentRequests with id[s] - ${order.matchedReagentRequestIds.join(', ')} which has status Ordered`,
+            `Order with id ${order.orderId} includes reagentRequests with id[s] - ${order.matchedReagentRequestIds.join(', ')}`,
           );
         });
         throw new ConflictException(conflicts);
@@ -172,7 +171,7 @@ export class OrderRepository implements IOrderRepository {
             },
           },
           data: {
-            status: Status.Ordered,
+            status: Status.Pending,
           },
         }),
       ]);
@@ -306,6 +305,25 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Pending,
+            orderId: null,
+          },
+        });
+      } else if (status === Status.Ordered) {
+        await this.prisma.reagentRequest.updateMany({
+          where: {
+            orderId: order.id,
+          },
+          data: {
+            status: Status.Ordered,
+          },
+        });
+      } else if (status === Status.Submitted) {
+        await this.prisma.reagentRequest.updateMany({
+          where: {
+            orderId: order.id,
+          },
+          data: {
+            status: Status.Ordered,
           },
         });
       } else if (status === Status.Fulfilled) {
