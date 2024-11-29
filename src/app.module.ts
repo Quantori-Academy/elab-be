@@ -10,6 +10,7 @@ import * as cookieParser from 'cookie-parser';
 import { ReagentModule } from './modules/reagent/reagent.module';
 import { ReagentRequestModule } from './modules/reagentRequest/reagentRequest.module';
 import { OrderModule } from './modules/order/order.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { OrderModule } from './modules/order/order.module';
     ReagentModule,
     ReagentRequestModule,
     OrderModule,
+    DashboardModule,
   ],
 })
 export class AppModule implements NestModule {
