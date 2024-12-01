@@ -133,6 +133,7 @@ model ReagentRequest {
   pricePerUnit          Float?
   expirationDate        DateTime?
   hide                  Boolean @default(false)
+  amount                Int    @default(1)
 }
 
 model Order {
