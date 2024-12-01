@@ -308,15 +308,6 @@ export class OrderRepository implements IOrderRepository {
             orderId: null,
           },
         });
-      } else if (status === Status.Ordered) {
-        await this.prisma.reagentRequest.updateMany({
-          where: {
-            orderId: order.id,
-          },
-          data: {
-            status: Status.Ordered,
-          },
-        });
       } else if (status === Status.Submitted) {
         await this.prisma.reagentRequest.updateMany({
           where: {
