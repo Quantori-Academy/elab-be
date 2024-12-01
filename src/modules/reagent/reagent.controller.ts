@@ -83,10 +83,10 @@ export class ReagentController {
   async createReagentFromRequest(
     @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
     @Param('storageId', ParseIdPipe) storageId: number,
-  ): Promise<IReagent> {
+  ): Promise<IReagent[]> {
     this.logger.log(`[${this.createReagentFromRequest.name}] - Method start`);
     try {
-      const reagent: IReagent | null = await this.reagentService.createReagentFromReagentRequest(reagentRequestId, storageId);
+      const reagent: IReagent[] | null = await this.reagentService.createReagentFromReagentRequest(reagentRequestId, storageId);
       if (!reagent) throw new NotFoundException('Reagent request is not found');
       this.logger.log(`[${this.createReagentFromRequest.name}] - Method finished`);
       return reagent;
