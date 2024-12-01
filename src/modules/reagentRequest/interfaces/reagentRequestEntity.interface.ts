@@ -20,4 +20,5 @@ export interface IReagentRequest {
   catalogLink?: string | null;
   pricePerUnit?: number | null;
   expirationDate?: Date | null;
+  amount: number;
 }
