@@ -8,7 +8,7 @@ export interface IReagentService {
   getReagents(options: ReagentOptions): Promise<ReagentList>;
   getReagentById(id: number): Promise<IReagent | null>;
   editReagent(data: UpdateReagentDto, id: number): Promise<IReagent>;
-  createReagentFromReagentRequest(reagentRequestId: number, storageId: number): Promise<IReagent | null>;
+  createReagentFromReagentRequest(reagentRequestId: number, storageId: number): Promise<IReagent[] | null>;
   deleteReagentById(id: number): Promise<IReagent>;
   uploadCsvFile(filePath: string): Promise<{ message: string }>;
 }

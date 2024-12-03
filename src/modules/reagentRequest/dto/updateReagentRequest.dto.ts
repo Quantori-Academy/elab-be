@@ -14,16 +14,22 @@ export class UpdateReagentRequestDto {
   @IsOptional()
   procurementComments?: string;
 
-  @ApiProperty({ description: 'Adding the comments by Procurement Officer', required: false })
+  @ApiProperty({ description: 'Changing the desired Quantity', required: false })
   @IsNumber()
   @Transform(({ value }) => Number(value))
   @IsOptional()
   desiredQuantity?: number;
 
-  @ApiProperty({ description: 'Adding the comments by Procurement Officer', required: false })
+  @ApiProperty({ description: 'Changing the package', required: false })
   @IsEnum(Package)
   @IsOptional()
   package?: Package;
+
+  @ApiProperty({ description: 'Adding the amount', required: false })
+  @IsNumber()
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  amount?: number;
 }
 
 export class UpdateReagentRequestSuccessDto {

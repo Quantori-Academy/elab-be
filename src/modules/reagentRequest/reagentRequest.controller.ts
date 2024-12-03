@@ -46,6 +46,7 @@ export class ReagentRequestController {
     const dtoWithUserId = {
       ...createRequestDto,
       userId: parseInt(req.user.id),
+      amount: 1,
     };
     return await this.requestService.create(dtoWithUserId);
   }

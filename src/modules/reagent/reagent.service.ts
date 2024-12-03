@@ -76,7 +76,7 @@ export class ReagentService implements IReagentService {
     }
   }
 
-  async createReagentFromReagentRequest(reagentRequestId: number, storageId: number): Promise<IReagent | null> {
+  async createReagentFromReagentRequest(reagentRequestId: number, storageId: number): Promise<IReagent[] | null> {
     this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method start`);
     try {
       const reagentRequest = await this.requestRepository.findById(reagentRequestId);
@@ -86,32 +86,35 @@ export class ReagentService implements IReagentService {
         throw new BadRequestException('Only from Fulfilled requests can be created reagents');
       }
 
-      const reagentData: IReagent = {
-        storageId,
-        name: reagentRequest.name,
-        casNumber: reagentRequest.casNumber ?? '',
-        quantityUnit: reagentRequest.quantityUnit,
-        totalQuantity: reagentRequest.desiredQuantity,
-        description: 'created from reagent request',
-        quantityLeft: reagentRequest.desiredQuantity,
-        structure: reagentRequest.structureSmiles ?? undefined,
-        package: reagentRequest.package,
-        isDeleted: false,
-        category: Category.Reagent,
-        expirationDate: reagentRequest.expirationDate,
-        producer: reagentRequest.producer,
-        catalogId: reagentRequest.catalogId,
-        catalogLink: reagentRequest.catalogLink,
-        pricePerUnit: reagentRequest.pricePerUnit,
-      };
+      const reagentsData: IReagent[] = [];
+      for (let i = 1; i <= reagentRequest.amount; i++) {
+        reagentsData.push({
+          storageId,
+          name: reagentRequest.name,
+          casNumber: reagentRequest.casNumber ?? '',
+          quantityUnit: reagentRequest.quantityUnit,
+          totalQuantity: reagentRequest.desiredQuantity,
+          description: 'created from reagent request',
+          quantityLeft: reagentRequest.desiredQuantity,
+          structure: reagentRequest.structureSmiles ?? undefined,
+          package: reagentRequest.package,
+          isDeleted: false,
+          category: Category.Reagent,
+          expirationDate: reagentRequest.expirationDate,
+          producer: reagentRequest.producer,
+          catalogId: reagentRequest.catalogId,
+          catalogLink: reagentRequest.catalogLink,
+          pricePerUnit: reagentRequest.pricePerUnit,
+        });
+      }
 
-      const [reagent] = await Promise.all([
-        this.create(reagentData),
+      const [reagents] = await Promise.all([
+        this.reagentRepository.createMany(reagentsData),
         this.requestRepository.updateById({ status: Status.Completed }, reagentRequestId),
       ]);
 
       this.logger.log(`[${this.createReagentFromReagentRequest.name}] - Method finished`);
-      return reagent;
+      return reagents;
     } catch (error) {
       this.logger.error(`[${this.createReagentFromReagentRequest.name}] - Exception thrown` + error);
       throw error;
