@@ -172,6 +172,7 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Pending,
+            inOrder: true
           },
         }),
       ]);
@@ -306,6 +307,7 @@ export class OrderRepository implements IOrderRepository {
           data: {
             status: Status.Pending,
             orderId: null,
+            inOrder: false
           },
         });
       } else if (status === Status.Submitted) {
@@ -315,6 +317,7 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Ordered,
+            inOrder: true,
           },
         });
       } else if (status === Status.Fulfilled) {
@@ -324,6 +327,7 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Fulfilled,
+            inOrder: true
           },
         });
       }
