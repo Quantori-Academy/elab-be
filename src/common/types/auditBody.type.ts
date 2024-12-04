@@ -5,6 +5,6 @@ export type AuditBody = {
     userId?: number;
     action: string;
     entity?: Entity;
-    oldData?: Record<string, any>;
-    newData?: Record<string, any>;
+    oldData?: any | null;
+    newData?: any | null;
 }
