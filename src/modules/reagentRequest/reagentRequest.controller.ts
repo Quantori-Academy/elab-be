@@ -22,12 +22,14 @@ import { CreateRequestDto, CreateRequestSuccessDto } from './dto/createRequest.d
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Entity, Role } from '@prisma/client';
 import { GetReagentRequestDto, GetReagentRequestSuccessDto } from './dto/getReagentRequest.dto';
 import { ValidateParseQueries } from './pipes/validateParseQueries.pipe';
 import { ReagentRequestOptions } from './interfaces/reagentRequestOptions.interface';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UpdateReagentRequestDto, UpdateReagentRequestSuccessDto } from './dto/updateReagentRequest.dto';
+import { AuditLogService } from 'src/common/services/auditLog.service';
+import { UserPayload } from '../user/interfaces/userEntity.interface';
 
 const ROUTE = 'reagent_requests';
 
@@ -35,7 +37,7 @@ const ROUTE = 'reagent_requests';
 @Controller(ROUTE)
 export class ReagentRequestController {
   private logger = new Logger(ReagentRequestController.name);
-  constructor(@Inject(REQUEST_SERVICE_TOKEN) private requestService: IReagentRequestService) {}
+  constructor(@Inject(REQUEST_SERVICE_TOKEN) private requestService: IReagentRequestService, private auditLogService: AuditLogService) {}
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateRequestSuccessDto })
@@ -43,12 +45,20 @@ export class ReagentRequestController {
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
   async create(@Body(new ValidationPipe({ transform: true })) createRequestDto: CreateRequestDto, @Req() req: any) {
+    const user: UserPayload = (req as any).user as UserPayload; 
     const dtoWithUserId = {
       ...createRequestDto,
-      userId: parseInt(req.user.id),
+      userId: user.id!,
       amount: 1,
     };
-    return await this.requestService.create(dtoWithUserId);
+    const reagentRequest =  await this.requestService.create(dtoWithUserId);
+    await this.auditLogService.createAuditLog({
+      userId: user.id!,
+      action: 'CREATE REAGENT REQUEST',
+      entity: Entity.Reagent,
+      newData: reagentRequest
+    });
+    return reagentRequest;
   }
 
   @ApiBearerAuth()
@@ -73,12 +83,22 @@ export class ReagentRequestController {
   @Patch(':id')
   async editReagentRequest(
     @Param('id', ParseIdPipe) id: number,
+    @Req() req: any,
     @Body(new ValidationPipe({ transform: true })) updateReagentRequestDto: UpdateReagentRequestDto,
   ) {
     try {
       const request = await this.requestService.getRequestById(id);
       if (!request) throw new NotFoundException('Reagent Request with this ID - NOT FOUND');
-      return await this.requestService.editReagentRequest(updateReagentRequestDto, id);
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const updatedRequest =  await this.requestService.editReagentRequest(updateReagentRequestDto, id);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'UPDATE REAGENT REQUEST',
+        entity: Entity.Reagent,
+        oldData: request,
+        newData: updatedRequest
+      });
+      return updatedRequest; 
     } catch (error) {
       this.logger.error('Error in controller path POST /:id ', error);
       throw error;
