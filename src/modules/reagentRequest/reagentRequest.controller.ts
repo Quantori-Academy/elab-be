@@ -55,7 +55,7 @@ export class ReagentRequestController {
     await this.auditLogService.createAuditLog({
       userId: user.id!,
       action: 'CREATE REAGENT REQUEST',
-      entity: Entity.Reagent,
+      entity: Entity.ReagentRequest,
       newData: reagentRequest
     });
     return reagentRequest;
@@ -94,7 +94,7 @@ export class ReagentRequestController {
       await this.auditLogService.createAuditLog({
         userId: user.id!,
         action: 'UPDATE REAGENT REQUEST',
-        entity: Entity.Reagent,
+        entity: Entity.ReagentRequest,
         oldData: request,
         newData: updatedRequest
       });
