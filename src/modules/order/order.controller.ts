@@ -28,7 +28,7 @@ import {
 import { Request } from 'express';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Entity, Role } from '@prisma/client';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
@@ -85,6 +85,7 @@ export class OrderController {
       await this.auditLogService.createAuditLog({
         userId: user.id!,
         action: 'CREATE ORDER',
+        entity: Entity.Order,
         newData: order,
       })
       this.logger.log(`[${this.createOrder.name}] - Method finished`);
@@ -160,6 +161,7 @@ export class OrderController {
       await this.auditLogService.createAuditLog({
         userId: user.id!,
         action: 'UPDATE ORDER',
+        entity: Entity.Order,
         oldData: oldOrder || null,
         newData: updatedOrder 
       })

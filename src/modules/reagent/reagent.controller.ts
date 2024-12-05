@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -35,9 +36,11 @@ import { ISampleService } from './interfaces/sampleService.interface';
 import { CreateSampleDto, CreateSampleSuccessDto } from './dto/createSample.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Entity, Role } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { AuditLogService } from 'src/common/services/auditLog.service';
+import { UserPayload } from '../user/interfaces/userEntity.interface';
 
 const ROUTE = 'reagents';
 
@@ -49,6 +52,7 @@ export class ReagentController {
   constructor(
     @Inject(REAGENT_SERVICE_TOKEN) private reagentService: IReagentService,
     @Inject(SAMPLE_SERVICE_TOKEN) private sampleService: ISampleService,
+    private auditLogService: AuditLogService
   ) {}
 
   @ApiBearerAuth()
@@ -57,8 +61,16 @@ export class ReagentController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Researcher)
   @Post('')
-  async createReagent(@Body(new ValidationPipe({ transform: true })) createReagentDto: CreateReagentDto) {
-    return await this.reagentService.create({ ...createReagentDto, category: 'Reagent' });
+  async createReagent(@Req() req: Request, @Body(new ValidationPipe({ transform: true })) createReagentDto: CreateReagentDto) {
+    const user: UserPayload = (req as any).user as UserPayload; 
+    const reagent =  await this.reagentService.create({ ...createReagentDto, category: 'Reagent' });
+    await this.auditLogService.createAuditLog({
+      userId: user.id!,
+      action: 'CREATE REAGENT',
+      entity: Entity.Reagent,
+      newData: reagent
+    })
+    return reagent;
   }
 
   @ApiBearerAuth()
@@ -81,13 +93,21 @@ export class ReagentController {
   @UseGuards(AuthGuard, RolesGuard)
   @Post('reagent-request/:reagentRequestId/:storageId')
   async createReagentFromRequest(
+    @Req() req: Request,
     @Param('reagentRequestId', ParseIdPipe) reagentRequestId: number,
     @Param('storageId', ParseIdPipe) storageId: number,
   ): Promise<IReagent[]> {
     this.logger.log(`[${this.createReagentFromRequest.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload; 
       const reagent: IReagent[] | null = await this.reagentService.createReagentFromReagentRequest(reagentRequestId, storageId);
       if (!reagent) throw new NotFoundException('Reagent request is not found');
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'CREATE REAGENT FROM REQUEST',
+        entity: Entity.Reagent,
+        newData: reagent
+      })
       this.logger.log(`[${this.createReagentFromRequest.name}] - Method finished`);
       return reagent;
     } catch (error) {
@@ -103,14 +123,24 @@ export class ReagentController {
   @UseGuards(AuthGuard)
   @Patch(':id')
   async editReagent(
+    @Req() req: Request,
     @Body(new ValidationPipe({ transform: true })) updateReagentDto: UpdateReagentDto,
     @Param('id', ParseIdPipe) id: number,
   ) {
     try {
       this.logger.log('editReagent route start');
+      const user: UserPayload = (req as any).user as UserPayload; 
       const reagent = await this.reagentService.getReagentById(id);
       if (!reagent) throw new NotFoundException('Reagent Not Found!');
-      return await this.reagentService.editReagent(updateReagentDto, id);
+      const updatedReagent = await this.reagentService.editReagent(updateReagentDto, id);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'UPDATE REAGENT',
+        entity: Entity.Reagent,
+        oldData: reagent,
+        newData: updatedReagent
+      })
+      return updatedReagent;
     } catch (error) {
       this.logger.error('Error in controller in POST editReagent: ', error);
       throw error;
@@ -140,8 +170,16 @@ export class ReagentController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Researcher)
   @Post('/create/sample')
-  async createSample(@Body(new ValidationPipe({ transform: true })) createSampleDto: CreateSampleDto) {
-    return await this.sampleService.create(createSampleDto);
+  async createSample(@Req() req: Request, @Body(new ValidationPipe({ transform: true })) createSampleDto: CreateSampleDto) {
+    const user: UserPayload = (req as any).user as UserPayload; 
+    const sample = await this.sampleService.create(createSampleDto);
+    await this.auditLogService.createAuditLog({
+      userId: user.id!,
+      action: 'CREATE SAMPLE',
+      entity: Entity.Reagent,
+      newData: sample
+    });
+    return sample
   }
 
   @ApiBearerAuth()
@@ -149,10 +187,18 @@ export class ReagentController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin, Role.ProcurementOfficer)
   @Delete(':id')
-  async deleteReagentById(@Param('id', ParseIdPipe) id: number) {
+  async deleteReagentById(@Req() req: Request, @Param('id', ParseIdPipe) id: number) {
+    const user: UserPayload = (req as any).user as UserPayload; 
     const reagent: IReagent | null = await this.reagentService.getReagentById(id);
     if (!reagent) throw new NotFoundException('Reagent Not Found!');
-    return await this.reagentService.deleteReagentById(id);
+    const deletedReagent =  await this.reagentService.deleteReagentById(id);
+    await this.auditLogService.createAuditLog({
+      userId: user.id!,
+      action: 'DELETE REAGENT',
+      entity: Entity.Reagent,
+      oldData: reagent
+    })
+    return deletedReagent;
   }
 
   @ApiBearerAuth()
@@ -170,10 +216,18 @@ export class ReagentController {
     }),
   )
   @Post('/upload')
-  async uploadCsv(@UploadedFile() file: Express.Multer.File) {
+  async uploadCsv(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new Error('No file uploaded');
     }
-    return await this.reagentService.uploadCsvFile(file.path);
+    const user: UserPayload = (req as any).user as UserPayload;
+    const uploadedReagents = await this.reagentService.uploadCsvFile(file.path);
+    await this.auditLogService.createAuditLog({
+      userId: user.id!,
+      action: 'UPLOAD REAGENTS FROM CSV',
+      entity: Entity.Reagent,
+      newData: uploadedReagents
+    })
+    return uploadedReagents;
   }
 }

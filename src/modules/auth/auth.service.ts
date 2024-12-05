@@ -8,6 +8,7 @@ import { ISecurityService } from '../security/interfaces/securityService.interfa
 import { IAuthRepository } from './interfaces/authRepository.interface';
 import { AUTH_REPOSITORY_TOKEN } from './auth.repository';
 import { AuditLogService } from 'src/common/services/auditLog.service';
+import { Entity } from '@prisma/client';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -34,6 +35,7 @@ export class AuthService implements IAuthService {
     await this.auditLogService.createAuditLog({
       userId: session.userId,
       action: 'Login',
+      entity: Entity.User
     })
     return tokens;
   }
@@ -54,6 +56,7 @@ export class AuthService implements IAuthService {
       await this.auditLogService.createAuditLog({
         userId: user?.id,
         action: 'Log out',
+        entity: Entity.User
       }) 
       this.logger.log(`[${this.logout.name}] - Method finished`);
     } catch (error) {
