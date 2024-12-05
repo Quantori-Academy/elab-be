@@ -41,6 +41,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { AuditLogService } from 'src/common/services/auditLog.service';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
+import { GetReagentHistorySuccessDto } from './dto/getReagentHistory.dto';
 
 const ROUTE = 'reagents';
 
@@ -229,5 +230,20 @@ export class ReagentController {
       newData: uploadedReagents
     })
     return uploadedReagents;
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetReagentHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getReagentHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.Reagent);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getReagentHistory.name}] - Exception thrown: ` + error);
+      throw error; 
+    }
   }
 }
