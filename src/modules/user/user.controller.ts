@@ -266,7 +266,7 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, type: GetUserHistorySuccessDto })
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('/history')
+  @Get('/history/log')
   async getUserHistory() {
     try {
       const history = await this.auditLogService.getHistory(Entity.User);

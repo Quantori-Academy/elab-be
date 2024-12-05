@@ -233,7 +233,7 @@ export class StorageController {
   @ApiResponse({ status: HttpStatus.OK, type: GetStorageHistorySuccessDto })
   @Roles(Role.ProcurementOfficer, Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('/history')
+  @Get('/history/log')
   async getStorageHistory() {
     try {
       const history = await this.auditLogService.getHistory(Entity.Storage);
