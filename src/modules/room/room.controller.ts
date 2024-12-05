@@ -41,6 +41,7 @@ import {
 import { GetRoomSuccessDto } from './dto/getRooms.dto';
 import { AuditLogService } from 'src/common/services/auditLog.service';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
+import { GetRoomHistorySuccessDto } from './dto/getRoomHistory.dto';
 
 const ROUTE = 'rooms';
 
@@ -157,6 +158,21 @@ export class RoomController {
     } catch (error) {
       this.logger.error(`[${this.getRooms.name}] - Exception thrown` + error);
       throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetRoomHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getRoomHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.Room);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomHistory.name}] - Exception thrown: ` + error);
+      throw error; 
     }
   }
 }
