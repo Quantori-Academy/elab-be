@@ -19,7 +19,7 @@ import {
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { USER_SERVICE_TOKEN } from './user.service';
-import { Role } from '@prisma/client';
+import { Entity, Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ForbiddenErrorDto } from 'src/common/dtos/forbidden.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -34,6 +34,7 @@ import { CreateUserDto, CreateUserErrorDto, CreateUserSuccessDto, CreateUserVali
 import { IUserService } from './interfaces/userService.interface';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
+import { AuditLogService } from 'src/common/services/auditLog.service';
 
 const ROUTE = 'users';
 
@@ -42,7 +43,7 @@ const ROUTE = 'users';
 export class UserController {
   private readonly logger: Logger = new Logger(UserController.name);
 
-  constructor(@Inject(USER_SERVICE_TOKEN) private userService: IUserService) {}
+  constructor(@Inject(USER_SERVICE_TOKEN) private userService: IUserService, private auditLogService: AuditLogService) {}
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: EditUserRoleSuccessResponseDto })
@@ -53,9 +54,24 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id/role')
-  async editRole(@Param('id', ParseIdPipe) userId: number, @Body(ValidationPipe) body: EditUserRoleDto): Promise<UserPayload> {
-    const role: Role = body.role;
-    return await this.userService.editUserRole(userId, role);
+  async editRole(@Param('id', ParseIdPipe) userId: number, @Body(ValidationPipe) body: EditUserRoleDto, @Req() req: any): Promise<UserPayload> {
+    try {
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const role: Role = body.role;
+      const oldRole = await this.userService.getUser(userId);
+      const newRole =  await this.userService.editUserRole(userId, role);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `UPDATE ROLE OF USER (id:${userId})`,
+        entity: Entity.User,
+        oldData: oldRole,
+        newData: newRole
+      });
+      return newRole;
+    } catch (error) {
+      this.logger.error(`[${this.editRole.name}] - Exception thrown` + error);
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -67,8 +83,21 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
-  async createUser(@Body(ValidationPipe) user: CreateUserDto): Promise<UserPayload> {
-    return this.userService.createUser(user);
+  async createUser(@Body(ValidationPipe) user: CreateUserDto, @Req() req: any): Promise<UserPayload> {
+    try {
+      const user: UserPayload = (req as any).user as UserPayload;
+      const newUser = this.userService.createUser(user);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `CREATE USER`,
+        entity: Entity.User,
+        newData: newUser
+      });
+      return newUser;
+    } catch (error) {
+      this.logger.error(`[${this.createUser.name}] - Exception thrown` + error);
+      throw error; 
+    }
   }
 
   @ApiBearerAuth()
@@ -80,17 +109,21 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('/:id/reset-password')
-  async adminResetPassword(@Param('id', ParseIdPipe) id: number) {
+  async adminResetPassword(@Param('id', ParseIdPipe) id: number, @Req() req: any) {
     try {
+      const user: UserPayload = (req as any).user as UserPayload;
       await this.userService.adminResetPassword(id);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `RESET USER PASSWORD INITIATED BY ADMIN`,
+        entity: Entity.User,
+      });
       return {
         message: 'The temporary password is sent to email of the user',
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
+      this.logger.error(`[${this.adminResetPassword.name}] - Exception thrown` + error);
+      throw error; 
     }
   }
 
@@ -99,17 +132,22 @@ export class UserController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Delete('/:id')
-  async deleteUser(@Param('id', ParseIdPipe) id: number) {
+  async deleteUser(@Param('id', ParseIdPipe) id: number, @Req() req: any) {
     try {
-      await this.userService.deleteUser(id);
+      const user: UserPayload = (req as any).user as UserPayload;
+      const deletedUser = await this.userService.deleteUser(id);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `DELETE USER`,
+        entity: Entity.User,
+        oldData: deletedUser
+      });
       return {
         message: 'User is deleted!',
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
-      }
-      throw new InternalServerErrorException(error.message);
+      this.logger.error(`[${this.deleteUser.name}] - Exception thrown` + error);
+      throw error; 
     }
   }
 
@@ -120,32 +158,64 @@ export class UserController {
   @Post('change-password')
   @UseGuards(AuthGuard)
   async changePassword(@Req() req: Request, @Body() changePasswordDto: ChangePasswordDto) {
-    const user: UserPayload = (req as any).user as UserPayload;
-    await this.userService.changePassword(user.id as number, changePasswordDto.oldPassword, changePasswordDto.newPassword);
-    return {
-      message: 'The password is changed successfully',
-    };
+    try {
+      const user: UserPayload = (req as any).user as UserPayload;
+      await this.userService.changePassword(user.id as number, changePasswordDto.oldPassword, changePasswordDto.newPassword);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `CHANGE PASSWORD BY USER`,
+        entity: Entity.User,
+      });
+      return {
+        message: 'The password is changed successfully',
+      };
+    } catch (error) {
+      this.logger.error(`[${this.changePassword.name}] - Exception thrown` + error);
+      throw error; 
+    }
   }
 
   @ApiResponse({ status: HttpStatus.CREATED, description: 'The link to reset password is sent to email' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User with this email not found' })
   @Post('forgot-password')
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    await this.userService.forgotPassword(forgotPasswordDto.email);
-    return {
-      message: 'The link is sent to your email. Please check it',
-    };
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto, @Req() req:any) {
+    try {
+      const user: UserPayload = (req as any).user as UserPayload;
+      await this.userService.forgotPassword(forgotPasswordDto.email);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `USER FORGOT PASSWORD, REQUESTED TO RESET`,
+        entity: Entity.User,
+      });
+      return {
+        message: 'The link is sent to your email. Please check it',
+      };
+    } catch (error) {
+      this.logger.error(`[${this.forgotPassword.name}] - Exception thrown` + error);
+      throw error; 
+    }
   }
 
   @ApiResponse({ status: HttpStatus.CREATED, description: 'The password is reset successfully' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Passwords do not match' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'The User is not found' })
   @Post('reset-password')
-  async resetPassword(@Query('reset_token') reset_token: string, @Body() resetPasswordDto: ResetPasswordDto) {
-    await this.userService.resetPassword(reset_token, resetPasswordDto.newPassword, resetPasswordDto.confirmPassword);
-    return {
-      message: 'The password reset successfully',
-    };
+  async resetPassword(@Query('reset_token') reset_token: string, @Body() resetPasswordDto: ResetPasswordDto, @Req() req:any) {
+    try {
+      const user: UserPayload = (req as any).user as UserPayload;
+      await this.userService.resetPassword(reset_token, resetPasswordDto.newPassword, resetPasswordDto.confirmPassword);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: `USER RESETTED PASSWORD`,
+        entity: Entity.User,
+      });
+      return {
+        message: 'The password reset successfully',
+      };
+    } catch (error) {
+      this.logger.error(`[${this.resetPassword.name}] - Exception thrown` + error);
+      throw error; 
+    }
   }
 
   @ApiBearerAuth()

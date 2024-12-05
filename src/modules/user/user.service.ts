@@ -163,12 +163,12 @@ class UserService implements IUserService {
     await this.userRepository.setPasswordResetFlag(user, true);
   }
 
-  async deleteUser(userId: number): Promise<void> {
+  async deleteUser(userId: number): Promise<IUser> {
     const user = await this.getUserById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.userRepository.delete(userId);
+    return await this.userRepository.delete(userId);
   }
 
   async getUser(userId: number): Promise<UserPayload> {
