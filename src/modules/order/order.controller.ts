@@ -50,6 +50,7 @@ import {
 } from './dto/updateOrder.dto';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
 import { AuditLogService } from 'src/common/services/auditLog.service';
+import { GetOrderHistorySuccessDto } from './dto/getOrderHistory.dto';
 
 const ROUTE = 'orders';
 
@@ -170,6 +171,21 @@ export class OrderController {
     } catch (error) {
       this.logger.error(`[${this.updateOrder.name}] - Exception thrown: ` + error);
       throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetOrderHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getOrderHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.Order);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getOrderHistory.name}] - Exception thrown: ` + error);
+      throw error; 
     }
   }
 }
