@@ -30,6 +30,7 @@ import { ParseIdPipe } from 'src/common/pipes/parseId.pipe';
 import { UpdateReagentRequestDto, UpdateReagentRequestSuccessDto } from './dto/updateReagentRequest.dto';
 import { AuditLogService } from 'src/common/services/auditLog.service';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
+import { GetReagentRequestHistorySuccessDto } from './dto/getReagentRequestHistory.dto';
 
 const ROUTE = 'reagent_requests';
 
@@ -119,5 +120,20 @@ export class ReagentRequestController {
       return request;
     }
     throw new ForbiddenException('Access to this Reagent Request is denied');
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetReagentRequestHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getReagentRequestHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.ReagentRequest);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getReagentRequestHistory.name}] - Exception thrown: ` + error);
+      throw error; 
+    }
   }
 }
