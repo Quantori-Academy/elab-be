@@ -285,6 +285,17 @@ export class OrderRepository implements IOrderRepository {
         throw new NotFoundException(`The following reagent IDs not found: ${missingIds} for including`);
       }
 
+      await this.prisma.reagentRequest.updateMany({
+        where: {
+          id: {
+            in: existingReagentIdsForInclude,
+          },
+        },
+        data: {
+          inOrder: true,
+        },
+      });
+
       await this.prisma.order.update({
         where: {
           id: order.id,
