@@ -165,7 +165,7 @@ export class RoomController {
   @ApiResponse({ status: HttpStatus.OK, type: GetRoomHistorySuccessDto })
   @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('')
+  @Get('/history')
   async getRoomHistory() {
     try {
       const history = await this.auditLogService.getHistory(Entity.Room);

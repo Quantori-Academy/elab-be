@@ -58,6 +58,7 @@ import {
 } from './dto/moveItems.dto';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { AuditLogService } from 'src/common/services/auditLog.service';
+import { GetStorageHistorySuccessDto } from './dto/getStorageHistory.dto';
 
 const ROUTE = 'storages';
 
@@ -225,6 +226,21 @@ export class StorageController {
     } catch (error) {
       this.logger.error(`[${this.updateStorage.name}] - Exception thrown: ` + error);
       throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetStorageHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('/history')
+  async getStorageHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.Reagent);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getStorageHistory.name}] - Exception thrown: ` + error);
+      throw error; 
     }
   }
 }

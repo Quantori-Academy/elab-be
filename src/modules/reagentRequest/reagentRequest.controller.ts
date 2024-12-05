@@ -126,7 +126,7 @@ export class ReagentRequestController {
   @ApiResponse({ status: HttpStatus.OK, type: GetReagentRequestHistorySuccessDto })
   @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('')
+  @Get('/history')
   async getReagentRequestHistory() {
     try {
       const history = await this.auditLogService.getHistory(Entity.ReagentRequest);

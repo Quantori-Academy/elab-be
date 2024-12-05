@@ -178,7 +178,7 @@ export class OrderController {
   @ApiResponse({ status: HttpStatus.OK, type: GetOrderHistorySuccessDto })
   @Roles(Role.ProcurementOfficer, Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('')
+  @Get('/history')
   async getOrderHistory() {
     try {
       const history = await this.auditLogService.getHistory(Entity.Order);
