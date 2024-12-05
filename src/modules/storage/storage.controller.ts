@@ -1,7 +1,7 @@
 import { STORAGE_SERVICE_TOKEN } from './storage.service';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IStorageService } from './interfaces/storageService.interface';
-import { Role, Storage } from '@prisma/client';
+import { Entity, Role, Storage } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -39,6 +39,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -55,6 +56,8 @@ import {
   MoveItemsSuccessDto,
   MoveItemsValidationErrorsDto,
 } from './dto/moveItems.dto';
+import { UserPayload } from '../user/interfaces/userEntity.interface';
+import { AuditLogService } from 'src/common/services/auditLog.service';
 
 const ROUTE = 'storages';
 
@@ -63,7 +66,7 @@ const ROUTE = 'storages';
 export class StorageController {
   private readonly logger: Logger = new Logger(StorageController.name);
 
-  constructor(@Inject(STORAGE_SERVICE_TOKEN) private storageService: IStorageService) {}
+  constructor(@Inject(STORAGE_SERVICE_TOKEN) private storageService: IStorageService, private auditLogService: AuditLogService) {}
 
   @ApiBearerAuth()
   @ApiQuery({ type: GetStoragesQueryDto })
@@ -116,11 +119,18 @@ export class StorageController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
-  async createStorageLocation(@Body(new ValidationPipe({ transform: true })) storageDto: CreateStorageLocationsDto) {
+  async createStorageLocation(@Body(new ValidationPipe({ transform: true })) storageDto: CreateStorageLocationsDto, @Req() req: any) {
     this.logger.log(`[${this.createStorageLocation.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload; 
       const storage: Storage = await this.storageService.createStorageLocation(storageDto);
       this.logger.log(`[${this.createStorageLocation.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'CREATE STORAGE',
+        entity: Entity.Storage,
+        newData: storage
+      });
       return storage;
     } catch (error) {
       this.logger.error(`[${this.createStorageLocation.name}] - Exception thrown: ` + error);
@@ -138,11 +148,18 @@ export class StorageController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Delete(':id')
-  async deleteStorage(@Param('id', ParseIdPipe) id: number) {
+  async deleteStorage(@Param('id', ParseIdPipe) id: number, @Req() req: any) {
     this.logger.log(`[${this.deleteStorage.name}] - Method start`);
     try {
-      await this.storageService.delete(id);
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const deletedStorage = await this.storageService.delete(id);
       this.logger.log(`[${this.deleteStorage.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'DELETE STORAGE',
+        entity: Entity.Storage,
+        oldData: deletedStorage
+      }); 
       return {
         message: 'Storage Successfully deleted',
         code: HttpStatus.OK,
@@ -161,11 +178,18 @@ export class StorageController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, type: MoveItemsNotFoundErrorDto })
   @ApiResponse({ status: HttpStatus.CONFLICT, type: MoveItemsConflictErrorDto })
   @Patch('move-items')
-  async moveItems(@Body(ValidationPipe) moveItemsDto: MoveItemsDto) {
+  async moveItems(@Body(ValidationPipe) moveItemsDto: MoveItemsDto, @Req() req: any) {
     this.logger.log(`[${this.moveItems.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload;
       const updatedStorages: UpdatedStorages = await this.storageService.moveItems(moveItemsDto);
       this.logger.log(`[${this.moveItems.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'UPDATE STORAGE BY MOVING ITEMS',
+        entity: Entity.Storage,
+        newData: updatedStorages
+      });
       return updatedStorages;
     } catch (error) {
       this.logger.error(`[${this.moveItems.name}] - Exception thrown: ` + error);
@@ -183,11 +207,20 @@ export class StorageController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id')
-  async updateStorage(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) storageDto: UpdateStroageDto) {
+  async updateStorage(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) storageDto: UpdateStroageDto, @Req() req: any) {
     this.logger.log(`[${this.updateStorage.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const oldStorage = await this.storageService.getStorage(id);
       const storage: Storage = await this.storageService.update(id, storageDto);
       this.logger.log(`[${this.updateStorage.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'UPDATE STORAGE',
+        entity: Entity.Storage,
+        oldData: oldStorage,
+        newData: storage
+      }); 
       return storage;
     } catch (error) {
       this.logger.error(`[${this.updateStorage.name}] - Exception thrown: ` + error);
