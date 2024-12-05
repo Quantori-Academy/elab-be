@@ -231,12 +231,12 @@ export class StorageController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetStorageHistorySuccessDto })
-  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @Roles(Role.ProcurementOfficer, Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('/history')
   async getStorageHistory() {
     try {
-      const history = await this.auditLogService.getHistory(Entity.Reagent);
+      const history = await this.auditLogService.getHistory(Entity.Storage);
       return history;
     } catch (error) {
       this.logger.error(`[${this.getStorageHistory.name}] - Exception thrown: ` + error);

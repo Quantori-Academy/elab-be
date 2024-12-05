@@ -35,6 +35,7 @@ import { IUserService } from './interfaces/userService.interface';
 import { GetUserErrorDto, GetUserSuccessDto } from './dto/getUser.dto';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
 import { AuditLogService } from 'src/common/services/auditLog.service';
+import { GetUserHistorySuccessDto } from './dto/getUserHistory.dto';
 
 const ROUTE = 'users';
 
@@ -259,5 +260,20 @@ export class UserController {
   @Get(':id')
   async getUser(@Param('id', ParseIdPipe) userId: number) {
     return await this.userService.getUser(userId);
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetUserHistorySuccessDto })
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('/history')
+  async getUserHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.User);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getUserHistory.name}] - Exception thrown: ` + error);
+      throw error; 
+    }
   }
 }

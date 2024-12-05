@@ -163,7 +163,7 @@ export class RoomController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetRoomHistorySuccessDto })
-  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @Roles(Role.ProcurementOfficer, Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('/history')
   async getRoomHistory() {

@@ -124,7 +124,7 @@ export class ReagentRequestController {
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.OK, type: GetReagentRequestHistorySuccessDto })
-  @Roles(Role.ProcurementOfficer, Role.Admin, Role.Researcher)
+  @Roles(Role.ProcurementOfficer, Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('/history')
   async getReagentRequestHistory() {

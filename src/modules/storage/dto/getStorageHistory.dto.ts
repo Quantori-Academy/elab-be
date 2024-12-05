@@ -7,7 +7,7 @@ export class GetStorageHistorySuccessDto {
             id: 100,
             userId: 23,
             action: 'DELETE STORAGE',
-            entity: Entity.Reagent,
+            entity: Entity.Storage,
             oldData: {
                 id: 24,
                 name: 'Storage 24',
