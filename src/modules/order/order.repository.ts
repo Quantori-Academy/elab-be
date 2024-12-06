@@ -239,6 +239,8 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Pending,
+            orderId: null,
+            inOrder: false
           },
         }),
       ]);
