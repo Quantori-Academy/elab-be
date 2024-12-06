@@ -4,8 +4,6 @@ import {
   Get,
   Delete,
   Inject,
-  InternalServerErrorException,
-  NotFoundException,
   Param,
   Patch,
   Post,
