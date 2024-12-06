@@ -107,6 +107,18 @@ export class RoomService implements IRoomService {
       throw error;
     }
   }
+
+  async getRoomById(id:number): Promise<Room | null> {
+    this.logger.log(`[${this.getRoomById.name}] - Method start`);
+    try {
+      const room: Room | null = await this.roomRepository.findById(id);
+      this.logger.log(`[${this.getRoomById.name}] - Method finished`);
+      return room;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomById.name}] - Exception thrown: ${error}`);
+      throw error;
+    }
+  }
 }
 
 const ROOM_SERVICE_TOKEN = Symbol('ROOM_SERVICE_TOKEN');

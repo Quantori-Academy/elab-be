@@ -28,7 +28,7 @@ import {
 import { Request } from 'express';
 import { UserPayload } from '../user/interfaces/userEntity.interface';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Entity, Role } from '@prisma/client';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { TokenErrorResponseDto } from '../security/dto/token.dto';
@@ -49,6 +49,8 @@ import {
   UpdateOrderValidationErrorDto,
 } from './dto/updateOrder.dto';
 import { ParseIdPipeErrorDto } from 'src/common/dtos/parseId.dto';
+import { AuditLogService } from 'src/common/services/auditLog.service';
+import { GetOrderHistorySuccessDto } from './dto/getOrderHistory.dto';
 
 const ROUTE = 'orders';
 
@@ -57,7 +59,7 @@ const ROUTE = 'orders';
 export class OrderController {
   private readonly logger: Logger = new Logger(OrderController.name);
 
-  constructor(@Inject(ORDER_SERVICE_TOKEN) private orderService: IOrderService) {}
+  constructor(@Inject(ORDER_SERVICE_TOKEN) private orderService: IOrderService, private auditLogService: AuditLogService) {}
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateOrderSuccessDto })
@@ -81,6 +83,12 @@ export class OrderController {
         ...orderDto,
       };
       const order: OrderWithReagents = await this.orderService.createOrder(complteOrderData);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'CREATE ORDER',
+        entity: Entity.Order,
+        newData: order,
+      })
       this.logger.log(`[${this.createOrder.name}] - Method finished`);
       return order;
     } catch (error) {
@@ -143,16 +151,41 @@ export class OrderController {
   @Patch(':id')
   async updateOrder(
     @Param('id', ParseIdPipe) id: number,
+    @Req() req: Request,
     @Body(new ValidationPipe({ transform: true, whitelist: true })) updateOrderDto: UpdateOrderDto,
   ): Promise<OrderWithReagents> {
     this.logger.log(`[${this.updateOrder.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const oldOrder = await this.orderService.getOrderById(id);
       const updatedOrder: OrderWithReagents = await this.orderService.updateOrder(id, updateOrderDto);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'UPDATE ORDER',
+        entity: Entity.Order,
+        oldData: oldOrder || null,
+        newData: updatedOrder 
+      })
       this.logger.log(`[${this.updateOrder.name}] - Method finished`);
       return updatedOrder;
     } catch (error) {
       this.logger.error(`[${this.updateOrder.name}] - Exception thrown: ` + error);
       throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetOrderHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('/history/log')
+  async getOrderHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.Order);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getOrderHistory.name}] - Exception thrown: ` + error);
+      throw error; 
     }
   }
 }

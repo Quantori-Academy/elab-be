@@ -239,6 +239,8 @@ export class OrderRepository implements IOrderRepository {
           },
           data: {
             status: Status.Pending,
+            orderId: null,
+            inOrder: false
           },
         }),
       ]);
@@ -284,6 +286,17 @@ export class OrderRepository implements IOrderRepository {
         this.logger.error(`[${this.create.name}] - Exception thrown: invalid reagent ids`);
         throw new NotFoundException(`The following reagent IDs not found: ${missingIds} for including`);
       }
+
+      await this.prisma.reagentRequest.updateMany({
+        where: {
+          id: {
+            in: existingReagentIdsForInclude,
+          },
+        },
+        data: {
+          inOrder: true,
+        },
+      });
 
       await this.prisma.order.update({
         where: {

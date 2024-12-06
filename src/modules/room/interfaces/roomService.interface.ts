@@ -11,4 +11,5 @@ export interface IRoomService {
   delete(id: number): Promise<void>;
   update(id: number, roomDto: UpdateRoomDto): Promise<Room>;
   getRooms(): Promise<RoomWithStorageCount[]>;
+  getRoomById(id:number): Promise<Room | null>;
 }

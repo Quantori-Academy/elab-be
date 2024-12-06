@@ -9,13 +9,14 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { ROOM_SERVICE_TOKEN } from './room.service';
 import { IRoomService } from './interfaces/roomService.interface';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Role, Room } from '@prisma/client';
+import { Entity, Role, Room } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -38,6 +39,9 @@ import {
   UpdateRoomValidationErrorDto,
 } from './dto/updateRoom.dto';
 import { GetRoomSuccessDto } from './dto/getRooms.dto';
+import { AuditLogService } from 'src/common/services/auditLog.service';
+import { UserPayload } from '../user/interfaces/userEntity.interface';
+import { GetRoomHistorySuccessDto } from './dto/getRoomHistory.dto';
 
 const ROUTE = 'rooms';
 
@@ -46,7 +50,7 @@ const ROUTE = 'rooms';
 export class RoomController {
   private readonly logger: Logger = new Logger(RoomController.name);
 
-  constructor(@Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService) {}
+  constructor(@Inject(ROOM_SERVICE_TOKEN) private roomService: IRoomService,  private auditLogService: AuditLogService) {}
 
   @ApiBearerAuth()
   @ApiResponse({ status: HttpStatus.CREATED, type: CreateRoomSuccessDto })
@@ -57,11 +61,18 @@ export class RoomController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('')
-  async createRoom(@Body(ValidationPipe) roomDto: CreateRoomDto) {
+  async createRoom(@Body(ValidationPipe) roomDto: CreateRoomDto, @Req() req: any) {
     this.logger.log(`[${this.createRoom.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload; 
       const room: Room = await this.roomService.createRoom(roomDto);
       this.logger.log(`[${this.createRoom.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'CREATE ROOM',
+        entity: Entity.Room,
+        newData: room
+      });
       return room;
     } catch (error) {
       this.logger.error(`[${this.createRoom.name}] - Exception thrown: ` + error);
@@ -79,11 +90,18 @@ export class RoomController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Delete(':id')
-  async deleteRoom(@Param('id', ParseIdPipe) id: number) {
+  async deleteRoom(@Param('id', ParseIdPipe) id: number, @Req() req: any) {
     this.logger.log(`[${this.deleteRoom.name}] - Method start`);
     try {
-      await this.roomService.delete(id);
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const deletedRoom = await this.roomService.delete(id);
       this.logger.log(`[${this.deleteRoom.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'DELETE ROOM',
+        entity: Entity.Room,
+        oldData: deletedRoom
+      });
       return {
         message: 'Room Successfully deleted',
         code: HttpStatus.OK,
@@ -104,11 +122,20 @@ export class RoomController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch(':id')
-  async updateRoom(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) roomDto: UpdateRoomDto) {
+  async updateRoom(@Param('id', ParseIdPipe) id: number, @Body(ValidationPipe) roomDto: UpdateRoomDto, @Req() req: any) {
     this.logger.log(`[${this.updateRoom.name}] - Method start`);
     try {
+      const user: UserPayload = (req as any).user as UserPayload; 
+      const oldRoom = await this.roomService.getRoomById(id);
       const room: Room = await this.roomService.update(id, roomDto);
       this.logger.log(`[${this.updateRoom.name}] - Method finished`);
+      await this.auditLogService.createAuditLog({
+        userId: user.id!,
+        action: 'UPDATE ROOM',
+        entity: Entity.Room,
+        oldData: oldRoom,
+        newData: room
+      });
       return room;
     } catch (error) {
       this.logger.error(`[${this.updateRoom.name}] - Exception thrown: ` + error);
@@ -131,6 +158,21 @@ export class RoomController {
     } catch (error) {
       this.logger.error(`[${this.getRooms.name}] - Exception thrown` + error);
       throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiResponse({ status: HttpStatus.OK, type: GetRoomHistorySuccessDto })
+  @Roles(Role.ProcurementOfficer, Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('/history/log')
+  async getRoomHistory() {
+    try {
+      const history = await this.auditLogService.getHistory(Entity.Room);
+      return history;
+    } catch (error) {
+      this.logger.error(`[${this.getRoomHistory.name}] - Exception thrown: ` + error);
+      throw error; 
     }
   }
 }

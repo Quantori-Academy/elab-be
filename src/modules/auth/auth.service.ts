@@ -7,6 +7,8 @@ import { ISession } from './interfaces/session.interface';
 import { ISecurityService } from '../security/interfaces/securityService.interface';
 import { IAuthRepository } from './interfaces/authRepository.interface';
 import { AUTH_REPOSITORY_TOKEN } from './auth.repository';
+import { AuditLogService } from 'src/common/services/auditLog.service';
+import { Entity } from '@prisma/client';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -15,6 +17,7 @@ export class AuthService implements IAuthService {
   constructor(
     @Inject(SECURITY_SERVICE_TOKEN) private securityService: ISecurityService,
     @Inject(AUTH_REPOSITORY_TOKEN) private authRepository: IAuthRepository,
+    private auditLogService: AuditLogService
   ) {}
 
   async login(payload: UserPayload): Promise<Tokens> {
@@ -29,6 +32,11 @@ export class AuthService implements IAuthService {
       userId: payload.id!,
     };
     await this.authRepository.upsert(session);
+    await this.auditLogService.createAuditLog({
+      userId: session.userId,
+      action: 'Login',
+      entity: Entity.User
+    })
     return tokens;
   }
 
@@ -45,7 +53,11 @@ export class AuthService implements IAuthService {
       if (!session) throw new NotFoundException('Session not found');
       session.isLoggedIn = false;
       await this.authRepository.update(session);
-
+      await this.auditLogService.createAuditLog({
+        userId: user?.id,
+        action: 'Log out',
+        entity: Entity.User
+      }) 
       this.logger.log(`[${this.logout.name}] - Method finished`);
     } catch (error) {
       this.logger.error(`[${this.logout.name}] - Exception thrown` + error);
