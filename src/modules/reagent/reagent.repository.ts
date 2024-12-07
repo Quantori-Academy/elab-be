@@ -87,6 +87,16 @@ export class ReagentRepository implements IReagentRepository {
       where: { id },
       include: {
         usedReagentSample: true,
+        storage: {
+          select: {
+            name: true,
+            room: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
       },
     });
   }
