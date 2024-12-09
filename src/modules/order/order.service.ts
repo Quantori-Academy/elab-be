@@ -67,13 +67,15 @@ export class OrderService implements IOrderService {
       if (currentStatus === Status.Declined || currentStatus === Status.Fulfilled) {
         throw new BadRequestException(`${currentStatus} orders can't be edited`);
       }
+      
       /*
       if (currentStatus === Status.Pending && status && status !== Status.Submitted) {
         throw new BadRequestException(`${currentStatus} orders can be changed only to ${Status.Submitted} status`);
       }
       */
+      
 
-      if (currentStatus === Status.Submitted || currentStatus === Status.Pending) {
+      if (currentStatus === Status.Submitted) {
         const isStatusAllowedToChange = status === Status.Fulfilled || status === Status.Declined;
         if (paramCount > 1 || !status || !isStatusAllowedToChange) {
           throw new BadRequestException(
