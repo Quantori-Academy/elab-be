@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { IUser, UserPayload } from './interfaces/userEntity.interface';
 import { IUserService } from './interfaces/userService.interface';
 import { Role } from '@prisma/client';
