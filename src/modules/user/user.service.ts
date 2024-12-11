@@ -91,10 +91,6 @@ class UserService implements IUserService {
       const userPayload: UserPayload = this.omitPassword(user);
       return userPayload;
     } catch (error) {
-      const toDelete: IUser | null = await this.userRepository.findByEmail(userInfo.email);
-      if (toDelete) {
-        await this.deleteUser(toDelete.id as number);
-      }
       throw error;
     }
   }
