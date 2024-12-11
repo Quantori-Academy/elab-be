@@ -76,8 +76,9 @@ class UserService implements IUserService {
   }
 
   async createUser(userInfo: CreateUserDto): Promise<UserPayload> {
+    try {
     const existingUser = await this.userRepository.findByEmail(userInfo.email);
-    if (existingUser) throw new ConflictException('User with this email already exists');
+    if (existingUser) throw new BadRequestException('User with this email already exists');
     const tempPassword = this.generatePassword();
 
     let user: IUser = {
@@ -85,9 +86,10 @@ class UserService implements IUserService {
       isPasswordResetRequired: true,
       password: await this.securityService.hash(tempPassword),
     };
-    try {
       user = await this.userRepository.create(user);
       await this.emailService.sendTempPasswordEmail(userInfo.email, tempPassword);
+      const userPayload: UserPayload = this.omitPassword(user);
+      return userPayload;
     } catch (error) {
       const toDelete: IUser | null = await this.userRepository.findByEmail(userInfo.email);
       if (toDelete) {
@@ -95,9 +97,6 @@ class UserService implements IUserService {
       }
       throw error;
     }
-
-    const userPayload: UserPayload = this.omitPassword(user);
-    return userPayload;
   }
 
   async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {

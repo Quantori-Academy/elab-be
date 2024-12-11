@@ -84,10 +84,10 @@ export class UserController {
   @Post('')
   async createUser(@Body(ValidationPipe) user: CreateUserDto, @Req() req: any): Promise<UserPayload> {
     try {
-      const user: UserPayload = (req as any).user as UserPayload;
-      const newUser = this.userService.createUser(user);
+      const userPayload: UserPayload = (req as any).user as UserPayload;
+      const newUser = await this.userService.createUser(user);
       await this.auditLogService.createAuditLog({
-        userId: user.id!,
+        userId: userPayload.id!,
         action: `CREATE USER`,
         entity: Entity.User,
         newData: newUser
